@@ -20,7 +20,8 @@
     nixpkgs-unstable,
     home-manager,
     ...
-  } @ inputs: let
+  } @ inputs: 
+  let
     inherit (self) outputs;
   in {
     # NixOS configuration entrypoint
@@ -38,14 +39,14 @@
           {
             nix.settings = {
               trusted-users = ["djoolz"];
-              # This seems to be the always active default.
               substituters = [
-                "https://cache.nixos.org/"
+                "https://cache.nixos.org/" # This seems to be the always active default.
                 "https://nix-community.cachix.org" 
               ];
               trusted-public-keys = [
                 "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
               ];
+              ## When would I need an extra-substituter?
               # extra-substituters = [
               #   "https://nix-community.cachix.org" 
               # ];
@@ -60,11 +61,9 @@
           {
             # home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            # Optionally, use home-manager.extraSpecialArgs to pass arguments to home.nix
             home-manager.extraSpecialArgs = {inherit inputs outputs;};
             home-manager.users.djoolz = import ./home-manager/home.nix;
-
-            # Optionally, use home-manager.extraSpecialArgs to pass
-            # arguments to home.nix
           }
         ];
       };
