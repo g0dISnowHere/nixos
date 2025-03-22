@@ -10,8 +10,12 @@
     # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
     # Enable networking
-    networkmanager.enable = true;
-    };
+    networkmanager = {
+      enable = true;
+      wifi.powersave = true;
+      };
+
+  };
 
   # Fix for networkmanager-wait-online
   systemd.services.NetworkManager-wait-online = {
@@ -29,6 +33,4 @@
   # };
 
   # List services that you want to enable:
-
-
 }
