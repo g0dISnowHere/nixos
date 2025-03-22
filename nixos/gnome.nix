@@ -17,7 +17,7 @@
     };
     desktopManager.gnome = {
       enable = true;
-    }
+    };
 	};
 
   # Enable plasma 6 Desktop Environment.
