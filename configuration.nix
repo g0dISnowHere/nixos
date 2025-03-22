@@ -14,10 +14,11 @@
   imports = [
     # TODO: Modify other-hardware.nix
     ./nixos/autoupgrade.nix
-    ./nixos/docker.nix
+    # ./nixos/docker.nix
     ./nixos/bootloader.nix
     # TODO: Open the appropriate ports in the firewall. A few are necessary.
     ./nixos/firewall.nix
+    ./nixos/flatpak.nix
     ./nixos/locale.nix
     ./nixos/networking.nix
     ./nixos/hardware-configuration.nix
@@ -26,12 +27,14 @@
     # ./nixos/plasma.nix
     ./nixos/gnome.nix
     # ./nixos/podman.nix
+    # ./nixos/homeassistant.nix
     ./nixos/scanner.nix
-    ./nixos/services.nix
     # TODO: Modify ssh.nix
-    # ./nixos/ssh.nix
+    ./nixos/ssh.nix
     # TODO: Modify users.nix
+    ./nixos/tailscale.nix
     ./nixos/users.nix
+    ./virt-manager/virtualisation.nix
   ];
 
   nix = let
