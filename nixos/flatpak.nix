@@ -4,23 +4,17 @@
 
 {config, pkgs, ...}:
 {
-  flatpak = {
+  services.flatpak = {
     enable = true;
-    extraRemotes = [
-      {
-        name = "flathub";
-        url = "https://flathub.org/repo/flathub.flatpakrepo";
-      }
-    ];
-    apps = [
-      {
-        name = "com.vivaldi.Vivaldi";
-        extraArgs = [ "--user" ];
-      }
-      {
-        name = "md.obsidian.Obsidian";
-        extraArgs = [ "--user" ];
-      }
-    ];
+    # apps = [
+    #   {
+    #     name = "com.vivaldi.Vivaldi";
+    #     extraArgs = [ "--user" ];
+    #   }
+    #   {
+    #     name = "md.obsidian.Obsidian";
+    #     extraArgs = [ "--user" ];
+    #   }
+    # ];
   };
 }
