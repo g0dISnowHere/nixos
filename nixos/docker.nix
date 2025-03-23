@@ -15,5 +15,8 @@
     # };
   };
   ## Make sure this works with home-manager!
-  users.users.djoolz.extraGroups = [ "docker" ]; # doesn't yet work, set in config or users.nix
+  # users.users.djoolz.extraGroups = [ "docker" ]; # doesn't yet work, set in config or users.nix
+  users.groups.docker = {
+    members = [ "djoolz" ];
+  };
 }
