@@ -1,7 +1,6 @@
 { pkgs, ... }:
 {
   # https://nixos.wiki/wiki/Scanners
-  # also added user to groupps "scanners" and "lp"
   hardware.sane = {
     enable = true;
 
@@ -30,6 +29,9 @@
       #NIX_CFLAGS_COMPILE = "-DPATH_SANE_LOCK_DIR=/var/lock/sane";
       });
   };
+
+  ## also added user to groupps "scanners" and "lp"
+  users.users.djoolz.extraGroups = [ "scanner" "lp" ]; # make sure this works with home-manager!
 
   # ## This part doesn't work... It should enable the scanner in GIMP: File->Create->XSane
   # nixpkgs.config.packageOverrides = pkgs: {
