@@ -11,4 +11,8 @@
   networking.firewall = {
     allowedTCPPorts = [ 24800 22000 ];
     };
+
+  ## Make sure this works with home-manager!
+  users.users.djoolz.extraGroups = [ "tailscale" ]; # doesn't yet work, set in config or users.nix
+
   }
