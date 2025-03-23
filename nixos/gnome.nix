@@ -19,15 +19,4 @@
       enable = true;
     };
 	};
-
-  # Enable plasma 6 Desktop Environment.
-  # services.desktopManager.plasma6.enable = true;
-
-  # # Enable a displaymanager.
-  # services.displayManager = {
-  #   sddm = {
-  #     enable = true;
-  #     wayland.enable = true; ## TODO find a better way to enable wayland.
-  #   };
-  # };
 }
