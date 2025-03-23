@@ -42,7 +42,6 @@
   home = {
     username = "djoolz";
     homeDirectory = "/home/djoolz";
-
     # language = {
     #   base = "en_US.UTF-8";
     #   address = "de_DE.UTF-8";
@@ -56,11 +55,8 @@
     #   paper = "de_DE.UTF-8";
     #   time = "de_DE.UTF-8";
     # };
-  };
 
-  # Add stuff for your user as you see fit:
-  # programs.neovim.enable = true;
-  home.packages = with pkgs; [ 
+  packages = with pkgs; [ 
     curl
     htop
     btop
@@ -81,7 +77,6 @@
     gimp-with-plugins
     git
     glxinfo
-    # gnome-software
     gparted
     inkscape
     # kicad
@@ -98,10 +93,7 @@
     synology-drive-client    
     syncthing # needs an open firewall port
     syncthingtray
-    # tailscale # needs an open firewall port. FIXME duplicate?
     traceroute
-    # usbutils
-    # virt-manager
     vlc
     # vscode
     vulkan-tools
@@ -109,7 +101,8 @@
     wireshark
     webcamoid
     xsane
-  ];
+    ];
+  };
   
   programs = {
     home-manager.enable = true;
@@ -128,7 +121,7 @@
     ## Works, but I want the latest version and not a beta.
     ## https://github.com/cideM/visual-studio-code-insiders-nix
     # vscode = {
-    #   enable = true;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    #   enable = true;
     #   package = (pkgs.vscode.override{ isInsiders = true; }).overrideAttrs (oldAttrs: rec {
     #     src = (builtins.fetchTarball {
     #       url = "https://update.code.visualstudio.com/latest/linux-x64/insiders";
