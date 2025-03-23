@@ -9,7 +9,7 @@
     };
 
   networking.firewall = {
-    allowedTCPPorts = [ 24800 22000 ];
+    allowedTCPPorts = [ 24800 22000 ]; # One of these ports is for barrier.
     };
 
   ## Make sure this works with home-manager!
