@@ -81,6 +81,7 @@
     gimp-with-plugins
     git
     glxinfo
+    # gnome-software
     gparted
     inkscape
     # kicad
@@ -99,6 +100,8 @@
     syncthingtray
     # tailscale # needs an open firewall port. FIXME duplicate?
     traceroute
+    # usbutils
+    # virt-manager
     vlc
     # vscode
     vulkan-tools
@@ -107,10 +110,15 @@
     webcamoid
     xsane
   ];
+  
   programs = {
     home-manager.enable = true;
     git.enable = true;
     firefox.enable = true;
+
+    direnv = {
+      enable = true;
+    }; 
 
     vscode = {
       enable = true;
