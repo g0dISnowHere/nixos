@@ -59,9 +59,6 @@
 
       ## Other Packages ############################################################
       vlc
-      wireshark
-      webcamoid
-      ansible
       # barrier # needs an open firewall port
       # input-leap # barrier, but currently maintained
       deskflow
@@ -69,11 +66,7 @@
       # blender
       moonlight-qt
       nextcloud-client
-      gimp-with-plugins
       gparted
-      inkscape
-      # kicad
-      obs-studio
       orca-slicer
       # prusa-slicer
       # super-slicer-latest
@@ -83,7 +76,7 @@
       # cacert # for eduroam
       obsidian
       rpi-imager
-      whatsie # WhatsApp desktop client
+      zigbee2mqtt_2
     ] ++ [
       pkgs-unstable.devenv # This might go back to stable in the future.
       pkgs-unstable.vscode # Lol, dev is too fast and plugins depend on the latest version.
