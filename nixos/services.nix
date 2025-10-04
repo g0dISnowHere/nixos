@@ -22,4 +22,30 @@
 
   };
 
+  systemd.services.zigbee2mqtt = {
+    description = "Zigbee2MQTT Service";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.zigbee2mqtt_2}/bin/zigbee2mqtt --data /home/%u/.z2m";
+      User = "djoolz";
+      Restart = "on-failure";
+    };
+    preStart = ''
+      mkdir -p /home/djoolz/.z2m
+      chown djoolz /home/djoolz/.z2m
+    '';
+  };
+
+
+    # # Ensure the user exists (if not already defined elsewhere)
+    # users.users.djoolz = {
+    #   isNormalUser = true;
+    #   home = "/home/djoolz";
+    # };
+
+  # services.octoprint = {
+  #   enable = true;
+  # };
+
 }
