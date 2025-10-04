@@ -44,6 +44,7 @@
   environment.systemPackages = with pkgs; [
     virt-manager
     virt-viewer
+    OVMF
     # spice
     # spice-gtk
     # spice-protocol
@@ -108,7 +109,7 @@
   };
 
   # Prevent host from using ConBee II ZigBee gateway (for VM passthrough)
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1cf1", ATTR{idProduct}=="0030", ATTR{authorized}="0"
-  '';
+  # services.udev.extraRules = ''
+  #   SUBSYSTEM=="usb", ATTR{idVendor}=="1cf1", ATTR{idProduct}=="0030", ATTR{authorized}="0"
+  # '';
 }
