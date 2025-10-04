@@ -6,6 +6,7 @@
 
 {
   imports = [ # Include the results of the hardware scan.
+    ../autoupgrade.nix
     ../../gnome.nix
     # ./homeassistant.nix
     ../../services.nix
