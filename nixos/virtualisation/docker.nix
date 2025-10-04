@@ -5,17 +5,17 @@
   virtualisation.docker = {
     enable = true;
     # https://search.nixos.org/options?from=0&size=50&sort=alpha_asc&query=virtualisation.docker
-    rootless = {
-      enable = true;
-      setSocketVariable = true;
+    # rootless = {
+    #   enable = true;
+    #   setSocketVariable = true;
 
-      # https://nixos.wiki/wiki/Docker#Changing_Docker_Daemon.27s_Data_Root
-      daemon.settings = {
-        userland-proxy = true;
-        experimental = true;
-        registry-mirrors = [ "https://mirror.gcr.io" ];
-      };
-    };
+    #   # https://nixos.wiki/wiki/Docker#Changing_Docker_Daemon.27s_Data_Root
+    #   daemon.settings = {
+    #     userland-proxy = true;
+    #     experimental = true;
+    #     registry-mirrors = [ "https://mirror.gcr.io" ];
+    #   };
+    # };
 
     autoPrune = {
       enable = true;
