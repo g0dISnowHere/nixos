@@ -37,6 +37,10 @@
     '';
   };
 
+  # Make zigbee2mqtt accessible through firewall
+  networking.firewall.allowedTCPPorts = [
+    8080
+  ];
 
     # # Ensure the user exists (if not already defined elsewhere)
     # users.users.djoolz = {

@@ -75,7 +75,7 @@
       # syncthingtray
       # cacert # for eduroam
       obsidian
-      rpi-imager
+      # rpi-imager
       zigbee2mqtt_2
     ] ++ [
       pkgs-unstable.devenv # This might go back to stable in the future.
