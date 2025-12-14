@@ -13,11 +13,13 @@
   # };
 
   ## This setups a SSH client.
-  programs.openssh = {
+  services.openssh = {
     enable = true;
     settings = {
       # Opinionated: use keys only. Remove if you want to SSH using passwords.
-      PasswordAuthentication = false;
+      PasswordAuthentication = true;
     };
   };
+  networking.firewall.allowedTCPPorts = [ 22 ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
 }

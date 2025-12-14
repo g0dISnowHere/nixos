@@ -10,7 +10,7 @@
     ../../gnome.nix
     # ./homeassistant.nix
     ../../services.nix
-    # ./ssh.nix
+    ../../ssh.nix
     ../../shell.nix
     ../../tailscale.nix
     ../../virtualisation/docker.nix
