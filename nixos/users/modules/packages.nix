@@ -62,7 +62,7 @@
       # barrier # needs an open firewall port
       # input-leap # barrier, but currently maintained
       deskflow
-      bitwarden
+      bitwarden-desktop
       # blender
       moonlight-qt
       nextcloud-client
