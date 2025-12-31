@@ -1,4 +1,4 @@
-{ self, nixpkgs, home-manager, nix-flatpak, nixpkgs-unstable, ... }@inputs:
+{ self, nixpkgs, home-manager, nix-flatpak, nixpkgs-unstable, vscode-server, ... }@inputs:
 
 let
   # Helper function to create a NixOS system configuration
@@ -63,7 +63,10 @@ in {
   mirach = mkNixosSystem {
     system = "x86_64-linux";
     hostname = "mirach";
-    modules = [ ];
+    modules = [
+      vscode-server.nixosModules.default
+      ({ config, pkgs, ... }: { services.vscode-server.enable = true; })
+    ];
   };
 
   # Add more machines as needed

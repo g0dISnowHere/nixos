@@ -7,6 +7,8 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     # nixpkgs-legacy.url = "github:nixos/nixpkgs/nixos-24.11";
 
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";

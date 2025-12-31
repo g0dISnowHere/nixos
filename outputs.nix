@@ -1,5 +1,5 @@
 { self, home-manager, nixpkgs, nixpkgs-unstable, flake-parts, nix-flatpak
-, treefmt-nix, systems,
+, vscode-server, treefmt-nix, systems,
 # nixpkgs-legacy,
 # nixos-conf-editor,
 # nix-software-center,
