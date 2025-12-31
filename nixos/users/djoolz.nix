@@ -6,6 +6,7 @@
   home.username = "djoolz";
   home.homeDirectory = "/home/djoolz";
 
+  services.syncthing.enable = true;
   dconf = { enable = true; };
   # Import modular home configuration
   imports = [
