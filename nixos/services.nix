@@ -1,6 +1,6 @@
 { config, pkgs, ... }: {
   services = {
-    syncthing.enable = true;
+    # syncthing.enable = true;
     # https://github.com/gmodena/nix-flatpak
     flatpak = {
       enable = true;
@@ -38,15 +38,13 @@
   };
 
   # Make zigbee2mqtt accessible through firewall
-  networking.firewall.allowedTCPPorts = [
-    8080
-  ];
+  networking.firewall.allowedTCPPorts = [ 8080 ];
 
-    # # Ensure the user exists (if not already defined elsewhere)
-    # users.users.djoolz = {
-    #   isNormalUser = true;
-    #   home = "/home/djoolz";
-    # };
+  # # Ensure the user exists (if not already defined elsewhere)
+  # users.users.djoolz = {
+  #   isNormalUser = true;
+  #   home = "/home/djoolz";
+  # };
 
   # services.octoprint = {
   #   enable = true;
