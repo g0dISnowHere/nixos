@@ -23,6 +23,14 @@
     };
   };
 
+  networking.firewall.allowedTCPPorts = [
+    80 # traefik
+    443 # traefik
+    8083 # octoprint-mingda
+    5050 # mjpg-streamer mingda
+    8085 # octoprint-ender3
+    5051 # mjpg-streamer ender3
+  ];
   # # Fix for TLS certificate verification issues with rootless Docker
   # systemd.user.services.docker.environment = {
   #   SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
