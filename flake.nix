@@ -33,6 +33,11 @@
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
+    ragenix = {
+      url = "github:yaxitech/ragenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     systems.url = "github:nix-systems/default";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
