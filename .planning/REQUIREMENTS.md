@@ -75,12 +75,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Pending |
+| INFRA-03 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Pending |
+| ENCRYPT-01 | Phase 2 | Pending |
+| ENCRYPT-02 | Phase 2 | Pending |
+| ENCRYPT-03 | Phase 2 | Pending |
+| ENCRYPT-04 | Phase 2 | Pending |
+| ENCRYPT-05 | Phase 2 | Pending |
+| ENCRYPT-06 | Phase 2 | Pending |
+| ENCRYPT-07 | Phase 2 | Pending |
+| DEPLOY-01 | Phase 3 | Pending |
+| DEPLOY-02 | Phase 3 | Pending |
+| DEPLOY-03 | Phase 3 | Pending |
+| DEPLOY-04 | Phase 3 | Pending |
+| DEPLOY-05 | Phase 3 | Pending |
+| DEPLOY-06 | Phase 3 | Pending |
+| INTEGRATE-01 | Phase 4 | Pending |
+| INTEGRATE-02 | Phase 4 | Pending |
+| INTEGRATE-03 | Phase 4 | Pending |
+| INTEGRATE-04 | Phase 4 | Pending |
+| INTEGRATE-05 | Phase 4 | Pending |
+| REMOTE-01 | Phase 4 | Pending |
+| REMOTE-02 | Phase 4 | Pending |
+| REMOTE-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 24 total
-- Mapped to phases: 0
-- Unmapped: 24 ⚠️
+- Mapped to phases: 24
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-06*
-*Last updated: 2026-02-06 after initial definition*
+*Last updated: 2026-02-06 after roadmap creation*
