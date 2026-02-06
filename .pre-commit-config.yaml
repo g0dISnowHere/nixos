@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: treefmt
+        name: treefmt
+        entry: treefmt --flake .
+        language: system
+        files: \.(nix)$
+        pass_filenames: false
