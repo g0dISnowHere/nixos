@@ -2,31 +2,19 @@
 
 {
   # User-specific home-manager configuration
-  # TODO: Make username configurable through specialArgs
+  # This imports the desktop profile which includes all GUI apps and settings
+  # For machine-integrated home-manager (used by NixOS configurations)
+
+  imports = [
+    ../../flake/homes/profiles/desktop.nix
+    # QuickEMU for easy VM management
+    ../../modules/nixos/virtualisation/quickemu.nix
+  ];
+
+  # User identity
   home.username = "djoolz";
   home.homeDirectory = "/home/djoolz";
 
-  fonts.fontconfig.enable = true;
-  # home.packages = with pkgs; 
-  # [
-  #   cantarell-fonts
-  # ];
-
-  # Import modular home configuration
-  imports = [
-    # ./modules/flatpak.nix # doesn't work here for some reason
-    ./modules/packages.nix
-    ./modules/programs.nix
-    # ./modules/shell.nix
-    ../../modules/nixos/virtualisation/quickemu.nix
-  ];
-  services.syncthing.enable = true;
-  # This value determines the home Manager release that your
-  # configuration is compatible with. This helps avoid breakage
-  # when a new home Manager release introduces backwards
-  # incompatible changes.
+  # Keep state version aligned with system
   home.stateVersion = "24.11";
-
-  # Let home Manager install and manage itself.
-  programs.home-manager.enable = true;
 }

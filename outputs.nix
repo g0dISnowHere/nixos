@@ -16,6 +16,9 @@
     inputs.home-manager.flakeModules.home-manager
     inputs.treefmt-nix.flakeModule
     ./parts/formatter.nix
+
+    # Standalone home-manager configurations
+    ./flake/homes/djoolz.nix
   ];
 
   systems = [
