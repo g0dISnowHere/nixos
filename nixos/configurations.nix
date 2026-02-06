@@ -39,9 +39,6 @@ let
             extraOptions = "experimental-features = nix-command flakes";
             settings = {
               trusted-users = [ "djoolz" ];
-              access-tokens = [
-                "github.com=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"
-              ];
 
               keep-outputs = false; # remove old derivations
               keep-derivations = false; # remove old derivations
