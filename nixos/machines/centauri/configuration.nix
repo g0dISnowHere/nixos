@@ -7,20 +7,20 @@
 {
   imports = [
     # Include the results of the hardware scan.
-    ../common/autoupgrade.nix
-    ../common/gnome.nix
+    ../../../modules/nixos/system/autoupgrade.nix
+    ../../../modules/nixos/desktop/gnome.nix
     # ./homeassistant.nix
-    ../common/locale.nix
+    ../../../modules/nixos/system/locale.nix
     ./other-hardware.nix
-    ../common/services.nix
+    ../../../modules/nixos/system/services.nix
     # ./ssh.nix
-    ../common/shell.nix
-    ../common/tailscale.nix
-    # ../common/virtualisation/docker.nix
-    ../common/virtualisation/docker_rootless.nix
-    # ../common/virtualisation/quickemu.nix
-    # ../common/virtualisation/libvirtd.nix
-    # ../common/virtualisation/podman.nix    
+    ../../../modules/nixos/system/shell.nix
+    ../../../modules/nixos/services/tailscale.nix
+    # ../../../modules/nixos/virtualisation/docker.nix
+    ../../../modules/nixos/virtualisation/docker_rootless.nix
+    # ../../../modules/nixos/virtualisation/quickemu.nix
+    # ../../../modules/nixos/virtualisation/libvirtd.nix
+    # ../../../modules/nixos/virtualisation/podman.nix
   ];
 
   programs.dconf = {

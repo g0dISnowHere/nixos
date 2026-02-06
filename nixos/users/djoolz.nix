@@ -18,7 +18,7 @@
     ./modules/packages.nix
     ./modules/programs.nix
     # ./modules/shell.nix
-    ../machines/common/virtualisation/quickemu.nix
+    ../../modules/nixos/virtualisation/quickemu.nix
   ];
   services.syncthing.enable = true;
   # This value determines the home Manager release that your
