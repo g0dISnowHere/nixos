@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   perSystem = { pkgs, system, ... }: {
     # Development environment for this flake
     # Available via: nix develop

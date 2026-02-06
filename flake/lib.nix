@@ -1,12 +1,13 @@
 { inputs, ... }:
 let
-  inherit (inputs) nixpkgs home-manager nix-flatpak nixpkgs-unstable nixpkgs-tailscale;
-in
-{
+  inherit (inputs)
+    nixpkgs home-manager nix-flatpak nixpkgs-unstable nixpkgs-tailscale;
+in {
   flake.lib = {
     # Helper function to create a NixOS system configuration
     # Provides consistent setup for all machines with role-based defaults
-    mkNixosSystem = { system, hostname, role, modules ? [ ], extraSpecialArgs ? { } }:
+    mkNixosSystem =
+      { system, hostname, role, modules ? [ ], extraSpecialArgs ? { } }:
       nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [

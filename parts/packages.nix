@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   # Custom packages
   # Currently empty - will be populated as needed
   perSystem = { pkgs, ... }: {
