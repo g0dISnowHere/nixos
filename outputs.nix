@@ -15,7 +15,7 @@
     # Import home-manager's flake module
     inputs.home-manager.flakeModules.home-manager
     inputs.treefmt-nix.flakeModule
-    ./treefmt.nix
+    ./parts/formatter.nix
   ];
 
   systems = [
