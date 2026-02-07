@@ -12,12 +12,12 @@
   #   };
   # };
 
-  ## This setups a SSH client.
-  programs.openssh = {
-    enable = true;
-    settings = {
-      # Opinionated: use keys only. Remove if you want to SSH using passwords.
-      PasswordAuthentication = false;
-    };
-  };
+  ## SSH client configuration should be set up in home-manager, not here
+  # programs.openssh = {
+  #   enable = true;
+  #   settings = {
+  #     # Opinionated: use keys only. Remove if you want to SSH using passwords.
+  #     PasswordAuthentication = false;
+  #   };
+  # };
 }
