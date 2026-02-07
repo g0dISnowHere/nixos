@@ -12,15 +12,7 @@
           [ pkgs.virtiofsd ]; # virtiofsd is needed for vhost-user-fs
         runAsRoot = true;
         swtpm.enable = true;
-        ovmf = {
-          enable = true;
-          packages = [
-            (pkgs.OVMF.override {
-              secureBoot = true;
-              tpmSupport = true;
-            }).fd
-          ];
-        };
+        # Note: OVMF is now available by default, no need to configure packages
       };
     };
   };
