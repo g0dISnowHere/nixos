@@ -12,6 +12,18 @@ This is a modular NixOS flake configuration managing multiple machines using fla
 
 **Current Status:** Undergoing refactoring to modular structure. See `plan.md` for migration details.
 
+## Getting Started
+
+### Initial Setup (After Cloning)
+
+When you first clone this repository, configure git to use the included pre-commit hooks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This ensures that formatting and validation runs before every commit automatically.
+
 ## Essential Commands
 
 ### Fast Validation (Preferred During Development)
@@ -66,13 +78,33 @@ home-manager switch --flake .#djoolz@server  # CLI-only profile
 
 ### Code Quality
 
+The repository uses automated pre-commit hooks to ensure code quality. These run automatically before every commit.
+
+**Pre-commit checks:**
+1. `nix fmt` - Format all Nix code with treefmt
+2. `validate.sh` - Run comprehensive validation tests
+3. Commits are blocked if validation fails
+
+**Manual code quality commands:**
+
 ```bash
-# Format all code (runs automatically on commit via treefmt hook)
+# Format all code (also runs automatically on commit)
 nix fmt
 
 # Enter development shell with linting tools
 nix develop
 # Available tools: nixpkgs-fmt, statix (linter), deadnix (dead code detection)
+
+# Run validation tests anytime
+sh validate.sh
+```
+
+**Bypassing pre-commit hooks (if necessary):**
+
+```bash
+# Use --no-verify flag to skip pre-commit checks
+# ⚠️  Only use if you know what you're doing!
+git commit --no-verify -m "your message"
 ```
 
 ### Flake Management
