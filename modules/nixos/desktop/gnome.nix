@@ -1,4 +1,1 @@
-{ config, lib, pkgs, ... }:
-{
-  services.desktopManager.gnome.enable = true;
-}
+{ config, lib, pkgs, ... }: { services.desktopManager.gnome.enable = true; }

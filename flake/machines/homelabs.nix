@@ -1,5 +1,4 @@
-{ self, inputs, ... }:
-{
+{ self, inputs, ... }: {
   flake.nixosConfigurations = {
     # Mirach - Homelab server with optional GUI
     # Runs Home Assistant VM, Docker services, media server

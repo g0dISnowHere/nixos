@@ -1,5 +1,4 @@
-{ self, inputs, ... }:
-{
+{ self, inputs, ... }: {
   flake.nixosConfigurations = {
     # Centauri - Primary laptop/workstation
     # Lenovo ThinkPad laptop used for development

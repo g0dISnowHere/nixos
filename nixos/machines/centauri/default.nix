@@ -1,5 +1,4 @@
-{ config, pkgs, hostname, ... }:
-{
+{ config, pkgs, hostname, ... }: {
   # Centauri - Primary laptop/workstation
   # Hardware: [describe hardware]
   # Role: Workstation (development, daily use)
@@ -48,9 +47,10 @@
   };
 
   # Machine-specific packages
-  environment.systemPackages = with pkgs; [
-    # Add machine-specific tools here
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      # Add machine-specific tools here
+    ];
 
   system.stateVersion = "25.11";
 }

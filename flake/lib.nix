@@ -40,9 +40,7 @@ in {
 
           # Global Nix daemon settings
           ../modules/nixos/system/nix-settings.nix
-          {
-            nixpkgs.config.allowUnfree = true;
-          }
+          { nixpkgs.config.allowUnfree = true; }
         ] ++ modules;
 
         specialArgs = {

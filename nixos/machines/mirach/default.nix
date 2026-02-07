@@ -1,5 +1,4 @@
-{ config, pkgs, hostname, ... }:
-{
+{ config, pkgs, hostname, ... }: {
   # Mirach - Homelab server
   # Hardware: [describe hardware]
   # Role: Homelab (VMs, Docker services, Home Assistant)
@@ -33,9 +32,10 @@
   home-manager.users.djoolz = import ../../../flake/homes/profiles/desktop.nix;
 
   # Machine-specific packages
-  environment.systemPackages = with pkgs; [
-    # Add homelab-specific tools here
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      # Add homelab-specific tools here
+    ];
 
   system.stateVersion = "23.11";
 }
