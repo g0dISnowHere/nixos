@@ -12,7 +12,7 @@ in {
         inherit system;
         modules = [
           # Machine-specific hardware and config
-          ../machines/${hostname}
+          ../machines/${hostname} # This is where the default.nix for centauri is imported
 
           # Role-based defaults (workstation, homelab, etc.)
           ../modules/nixos/roles/${role}.nix
@@ -40,6 +40,9 @@ in {
 
           # Global Nix daemon settings
           ../modules/nixos/system/nix-settings.nix
+          {
+            nixpkgs.config.allowUnfree = true;
+          }
         ] ++ modules;
 
         specialArgs = {

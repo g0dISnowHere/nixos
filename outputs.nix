@@ -17,6 +17,11 @@
     inputs.treefmt-nix.flakeModule
     ./parts/formatter.nix
 
+    # Library functions and machine definitions
+    ./flake/lib.nix
+    ./flake/machines/workstations.nix
+    ./flake/machines/homelabs.nix
+
     # Standalone home-manager configurations
     ./flake/homes/djoolz.nix
   ];
@@ -46,19 +51,18 @@
   };
 
   flake = {
-    # Define `nixosConfigurations` using our modular approach
-    nixosConfigurations = import ./nixos/configurations.nix inputs;
+    # `nixosConfigurations` are defined by importing flake/machines/*.nix
+    # which use self.lib.mkNixosSystem with role-based defaults
 
     # System-agnostic flake attributes
     nixosModules = {
-      # Export reusable modules for other flakes 
+      # Export reusable modules for other flakes
       # TODO How to use this?
-      # powermanagement = import ./nixos/machines/common/powermanagement.nix;
-      # autoupgrade = import ./nixos/machines/common/autoupgrade.nix;
+      # powermanagement = import ./modules/nixos/system/powermanagement.nix;
+      # autoupgrade = import ./modules/nixos/system/autoupgrade.nix;
     };
 
-    # Optional: define homeConfigurations separately if needed
-    # homeConfigurations = import ./home/configurations.nix inputs;
+    # Home-manager configurations are defined in flake/homes/*.nix
   };
 
   # See flake.parts for more features, such as `perSystem`
