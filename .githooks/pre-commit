@@ -4,6 +4,13 @@
 
 set -e
 
+# Prevent running as root (would create root-owned git files)
+if [ "$(id -u)" = "0" ]; then
+    echo "❌ Pre-commit hook must run as regular user, not root"
+    echo "   Do not use 'sudo git commit' or run nix commands with sudo"
+    exit 1
+fi
+
 echo "🔍 Running pre-commit checks..."
 echo ""
 
@@ -14,7 +21,8 @@ if git diff-index --quiet HEAD --; then
     echo "   ✓ No formatting changes"
 else
     echo "   ℹ️  Code was reformatted, staging changes..."
-    git add $(git diff-index --name-only HEAD --)
+    # Stage all changes (including deleted files), but exclude untracked files
+    git add -u
 fi
 echo ""
 
