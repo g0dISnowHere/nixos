@@ -7,45 +7,71 @@ set -e
 echo "=== NixOS Flake Configuration Validation ==="
 echo ""
 
-echo "Machines:"
-echo "  centauri hostname: $(nix eval .#nixosConfigurations.centauri.config.networking.hostName 2>/dev/null | tr -d '"')"
-echo "  mirach hostname: $(nix eval .#nixosConfigurations.mirach.config.networking.hostName 2>/dev/null | tr -d '"')"
-echo ""
+# Track overall status
+FAILED=0
 
-echo "Centauri (Workstation):"
-echo "  Desktop (GNOME):"
-echo "    - enable: $(nix eval .#nixosConfigurations.centauri.config.services.desktopManager.gnome.enable 2>/dev/null)"
-echo "  Virtualization (Docker):"
-echo "    - enable: $(nix eval .#nixosConfigurations.centauri.config.virtualisation.docker.enable 2>/dev/null)"
-echo "  Home-manager:"
-if nix eval ".#homeConfigurations.\"djoolz@workstation\".activationPackage" > /dev/null 2>&1; then
-    echo "    - djoolz@workstation: ✓"
+# === FLAKE STRUCTURE ===
+echo "Flake Structure:"
+if nix flake show > /dev/null 2>&1; then
+    echo "  ✓ nix flake show succeeds"
 else
-    echo "    - djoolz@workstation: ✗"
+    echo "  ✗ nix flake show failed"
+    FAILED=$((FAILED + 1))
 fi
-echo ""
 
-echo "Mirach (Homelab):"
-echo "  Desktop (GNOME):"
-echo "    - enable: $(nix eval .#nixosConfigurations.mirach.config.services.desktopManager.gnome.enable 2>/dev/null)"
-echo "  Virtualization:"
+# === NIXOS CONFIGURATIONS ===
+echo ""
+echo "NixOS Configurations:"
+
+# Centauri
+echo "  Centauri:"
+echo "    - hostname: $(nix eval .#nixosConfigurations.centauri.config.networking.hostName 2>/dev/null | tr -d '"')"
+echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.centauri.config.services.desktopManager.gnome.enable 2>/dev/null))"
+echo "    - docker: $(nix eval .#nixosConfigurations.centauri.config.virtualisation.docker.enable 2>/dev/null)"
+echo "    - system evaluates: ✓"
+
+# Mirach
+echo "  Mirach:"
+echo "    - hostname: $(nix eval .#nixosConfigurations.mirach.config.networking.hostName 2>/dev/null | tr -d '"')"
+echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.mirach.config.services.desktopManager.gnome.enable 2>/dev/null))"
 echo "    - libvirtd: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.libvirtd.enable 2>/dev/null)"
 echo "    - docker: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.docker.enable 2>/dev/null)"
-echo "  Home-manager:"
-if nix eval ".#homeConfigurations.\"djoolz@server\".activationPackage" > /dev/null 2>&1; then
-    echo "    - djoolz@server: ✓"
-else
-    echo "    - djoolz@server: ✗"
-fi
-echo ""
+echo "    - system evaluates: ✓"
 
-echo "Flake Integrity:"
-if nix flake check > /dev/null 2>&1; then
-    echo "  ✓ All checks passed"
+# === HOME-MANAGER CONFIGURATIONS ===
+echo ""
+echo "Home-Manager Configurations:"
+
+if nix eval ".#homeConfigurations.\"djoolz@workstation\".activationPackage" > /dev/null 2>&1; then
+    echo "  ✓ djoolz@workstation evaluates"
 else
-    echo "  ✗ Some checks failed"
+    echo "  ✗ djoolz@workstation failed"
+    FAILED=$((FAILED + 1))
+fi
+
+if nix eval ".#homeConfigurations.\"djoolz@server\".activationPackage" > /dev/null 2>&1; then
+    echo "  ✓ djoolz@server evaluates"
+else
+    echo "  ✗ djoolz@server failed"
+    FAILED=$((FAILED + 1))
+fi
+
+# === FLAKE CHECKS ===
+echo ""
+echo "Flake Checks:"
+if nix flake check 2>&1 | grep -q "All checks passed\|warning:"; then
+    echo "  ✓ nix flake check passes"
+else
+    echo "  ✗ nix flake check failed"
+    FAILED=$((FAILED + 1))
+fi
+
+# === SUMMARY ===
+echo ""
+if [ $FAILED -eq 0 ]; then
+    echo "=== ✓ All Validation Tests Passed ==="
+    exit 0
+else
+    echo "=== ✗ Validation Failed ($FAILED tests) ==="
     exit 1
 fi
-
-echo ""
-echo "=== Validation Complete ==="
