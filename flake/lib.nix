@@ -6,9 +6,14 @@ in {
   flake.lib = {
     # Helper function to create a NixOS system configuration
     # Provides consistent setup for all machines with role-based defaults
-    mkNixosSystem =
-      { system, hostname, role, modules ? [ ], extraSpecialArgs ? { } }:
-      nixpkgs.lib.nixosSystem {
+    mkNixosSystem = { system, hostname, role, desktop ? null, modules ? [ ]
+      , extraSpecialArgs ? { } }:
+      let
+        desktopModule = if desktop != null then
+          ../modules/nixos/desktop/${desktop}.nix
+        else
+          { };
+      in nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           # Machine-specific hardware and config
@@ -16,6 +21,9 @@ in {
 
           # Role-based defaults (workstation, homelab, etc.)
           ../modules/nixos/roles/${role}.nix
+
+          # Desktop environment (if specified)
+          desktopModule
 
           # Home-manager integration
           home-manager.nixosModules.home-manager

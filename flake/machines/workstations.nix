@@ -6,10 +6,8 @@
       system = "x86_64-linux";
       hostname = "centauri";
       role = "workstation";
+      desktop = "gnome";
       modules = [
-        # Desktop environment
-        ../../modules/nixos/desktop/gnome.nix
-
         # Virtualization for development
         ../../modules/nixos/virtualisation/docker_rootless.nix
       ];

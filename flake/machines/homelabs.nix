@@ -6,10 +6,8 @@
       system = "x86_64-linux";
       hostname = "mirach";
       role = "homelab";
+      desktop = "gnome";
       modules = [
-        # GUI for management interface
-        ../../modules/nixos/desktop/gnome.nix
-
         # Virtualization for Home Assistant VM
         ../../modules/nixos/virtualisation/libvirtd.nix
 
