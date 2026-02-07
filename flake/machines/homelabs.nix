@@ -9,13 +9,13 @@
       role = "homelab";
       modules = [
         # GUI for management interface
-        ../modules/nixos/desktop/gnome.nix
+        ../../modules/nixos/desktop/gnome.nix
 
         # Virtualization for Home Assistant VM
-        ../modules/nixos/virtualisation/libvirtd.nix
+        ../../modules/nixos/virtualisation/libvirtd.nix
 
         # Docker for services
-        ../modules/nixos/virtualisation/docker.nix
+        ../../modules/nixos/virtualisation/docker.nix
 
         # Machine-specific services in machines/mirach/
       ];

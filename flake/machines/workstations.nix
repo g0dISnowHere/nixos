@@ -9,10 +9,10 @@
       role = "workstation";
       modules = [
         # Desktop environment
-        ../modules/nixos/desktop/gnome.nix
+        ../../modules/nixos/desktop/gnome.nix
 
         # Virtualization for development
-        ../modules/nixos/virtualisation/docker-rootless.nix
+        ../../modules/nixos/virtualisation/docker-rootless.nix
       ];
     };
 
