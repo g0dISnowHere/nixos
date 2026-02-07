@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Pre-commit hook for NixOS flake configuration
+# Runs validation before allowing commits
+
+set -e
+
+echo "🔍 Running pre-commit checks..."
+echo ""
+
+# === Format Code ===
+echo "1️⃣  Formatting code with nix fmt..."
+nix fmt
+if git diff-index --quiet HEAD --; then
+    echo "   ✓ No formatting changes"
+else
+    echo "   ℹ️  Code was reformatted, staging changes..."
+    git add $(git diff-index --name-only HEAD --)
+fi
+echo ""
+
+# === Validate Configuration ===
+echo "2️⃣  Running validation script..."
+if sh validate.sh > /tmp/validate-output.txt 2>&1; then
+    cat /tmp/validate-output.txt | grep "^  ✓\|^  ✗\|^==="
+    echo ""
+else
+    echo ""
+    cat /tmp/validate-output.txt
+    echo ""
+    echo "❌ Validation failed! Commit aborted."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
+echo ""

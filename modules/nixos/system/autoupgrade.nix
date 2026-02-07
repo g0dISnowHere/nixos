@@ -9,19 +9,19 @@ let
 in {
   # https://nixos.wiki/wiki/Automatic_system_upgrades
   # Automatic upgrades, pointing at the locally maintained flake.
-  # system.autoUpgrade = {
-  #   enable = true;
-  #   allowReboot = true;
-  #   flake = "${flakePath}#${config.networking.hostName}";
-  #   flags = [
-  #     "flake update"
-  #     "nixpkgs"
-  #     # "--commit-lock-file"
-  #     "-L" # print build logs
-  #   ];
-  #   dates = "9:05";
-  #   randomizedDelaySec = "45min";
-  # };
+  system.autoUpgrade = {
+    enable = true;
+    allowReboot = true;
+    flake = "${flakePath}#${config.networking.hostName}";
+    flags = [
+      "flake update"
+      "nixpkgs"
+      # "--commit-lock-file"
+      "-L" # print build logs
+    ];
+    dates = "9:05";
+    randomizedDelaySec = "45min";
+  };
 
   # Also enable garbage collection of old generations.
   nix.gc = {
