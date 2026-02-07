@@ -5,7 +5,8 @@
 
   imports = [
     ./hardware-configuration.nix
-    # Add other machine-specific service configs
+    # Home Assistant service for homelab automation
+    # ../../../modules/nixos/services/homeassistant.nix
   ];
 
   # Hostname
