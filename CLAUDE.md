@@ -239,14 +239,11 @@ Machines are organized by role with machine-specific overrides:
      system = "x86_64-linux";
      hostname = "NEW_MACHINE";
      role = "workstation";  # or "homelab"
+     desktop = "gnome";     # or "plasma", "niri", etc. (optional)
      modules = [
-       # Desktop environment (choose one)
-       ../modules/nixos/desktop/gnome.nix
-       # ../modules/nixos/desktop/plasma.nix
-
        # Virtualization (choose as needed)
-       # ../modules/nixos/virtualisation/docker-rootless.nix
-       # ../modules/nixos/virtualisation/libvirtd.nix
+       # ../../modules/nixos/virtualisation/docker-rootless.nix
+       # ../../modules/nixos/virtualisation/libvirtd.nix
      ];
    };
    ```
@@ -261,6 +258,57 @@ Machines are organized by role with machine-specific overrides:
    ```bash
    sudo nixos-rebuild test --flake .#NEW_MACHINE
    ```
+
+### Switching Desktop Environments
+
+Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`. This makes it easy to switch between different DE's without code duplication.
+
+**Available desktop environments:**
+- `gnome` - GNOME desktop with GDM display manager
+- `plasma` - KDE Plasma 6 with SDDM display manager
+- Others can be added as modules in `modules/nixos/desktop/`
+
+**To switch desktop on an existing machine:**
+
+1. Edit `flake/machines/workstations.nix` or `flake/machines/homelabs.nix`
+2. Change the `desktop` parameter:
+   ```nix
+   centauri = self.lib.mkNixosSystem {
+     system = "x86_64-linux";
+     hostname = "centauri";
+     role = "workstation";
+     desktop = "plasma";  # Changed from "gnome"
+     modules = [ ... ];
+   };
+   ```
+
+3. Validate the change:
+   ```bash
+   nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
+   ```
+
+4. If validation passes, test and switch:
+   ```bash
+   sudo nixos-rebuild test --flake .#centauri
+   sudo nixos-rebuild switch --flake .#centauri  # When confident
+   ```
+
+**To create a new desktop environment module:**
+
+1. Create `modules/nixos/desktop/my-de.nix`:
+   ```nix
+   { config, lib, pkgs, ... }: {
+     services.desktopManager.myDE.enable = true;
+     # Add other DE-specific configuration
+   }
+   ```
+
+2. Then use it in any machine definition:
+   ```nix
+   desktop = "my-de";
+   ```
+
+**Note:** The `desktop` parameter is optional. Machines without a desktop environment can omit it for headless/server configurations.
 
 ### Adding a New Module
 
