@@ -5,7 +5,10 @@
     # Standalone home-manager config for djoolz@workstation
     # Usage: home-manager switch --flake .#djoolz@workstation
     "djoolz@workstation" = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+      pkgs = import inputs.nixpkgs {
+        system = "x86_64-linux";
+        config.allowUnfree = true;
+      };
 
       extraSpecialArgs = {
         pkgs-unstable = import inputs.nixpkgs-unstable {
@@ -26,7 +29,10 @@
     # CLI-only profile for servers
     # Usage: home-manager switch --flake .#djoolz@server
     "djoolz@server" = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+      pkgs = import inputs.nixpkgs {
+        system = "x86_64-linux";
+        config.allowUnfree = true;
+      };
 
       extraSpecialArgs = {
         pkgs-unstable = import inputs.nixpkgs-unstable {

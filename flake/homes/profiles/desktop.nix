@@ -6,7 +6,7 @@
   imports = [
     ./common.nix
     # Import dconf settings (GNOME configuration)
-    ../../../modules/home/dconf/dconf.nix
+    # ../../../modules/home/dconf/dconf.nix
   ];
 
   # Enable font configuration for GUI apps

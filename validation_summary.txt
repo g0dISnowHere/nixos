@@ -1,0 +1,7 @@
+Phase 1: Create Infrastructure - Accomplished. All directories and files were created with the correct content.
+Phase 2: Extract and Organize NixOS Modules - Accomplished. Directory structure is correct, and the checked files have the correct content.
+Phase 3: Create Role Profiles - Accomplished. Files exist with the correct content.
+Phase 4: Separate Home-Manager from Machines - Accomplished. Files exist with the correct content.
+Phase 5: Refactor Machine Definitions - Accomplished.
+    flake/machines/workstations.nix and flake/machines/homelabs.nix were created.
+    nixos/machines/centauri/default.nix and nixos/machines/mirach/default.nix were updated as per the plan.

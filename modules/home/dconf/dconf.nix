@@ -51,18 +51,6 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/Weather" = {
-      locations = [
-        (mkVariant [
-          (mkUint32 2)
-          (mkVariant [
-            "Dresden"
-            "EDDC"
-            true
-            [ (mkTuple [ 0.8924450183686697 0.2399827721492203 ]) ]
-            [ (mkTuple [ 0.8909905831431052 0.2399827721492203 ]) ]
-          ])
-        ])
-      ];
       window-height = 1048;
       window-maximized = false;
       window-width = 1920;
