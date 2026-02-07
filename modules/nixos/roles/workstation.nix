@@ -1,5 +1,4 @@
-{ config, lib, pkgs, ... }:
-{
+{ config, lib, pkgs, ... }: {
   # Workstation Role Profile
   # Interactive desktop machine for development and daily use
   #

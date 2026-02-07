@@ -1,5 +1,4 @@
-{ config, lib, pkgs, ... }:
-{
+{ config, lib, pkgs, ... }: {
   # Homelab Role Profile
   # Server/homelab machine with optional GUI for management
   #

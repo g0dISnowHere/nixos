@@ -1,5 +1,4 @@
-{ config, pkgs, pkgs-unstable, ... }:
-{
+{ config, pkgs, pkgs-unstable, ... }: {
   # Desktop profile
   # Extends common profile with GUI applications and GNOME settings
   # Use this profile for workstations and GUI-enabled machines

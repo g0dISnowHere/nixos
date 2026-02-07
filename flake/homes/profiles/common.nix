@@ -1,5 +1,4 @@
-{ config, lib, pkgs, pkgs-unstable, ... }:
-{
+{ config, lib, pkgs, pkgs-unstable, ... }: {
   # Common home-manager configuration
   # Shared across all profiles - provides CLI essentials
   # Use this profile for headless servers
@@ -18,9 +17,5 @@
   programs.home-manager.enable = true;
 
   # Basic CLI packages (minimal set - more in packages.nix)
-  home.packages = with pkgs; [
-    vim
-    git
-    htop
-  ];
+  home.packages = with pkgs; [ vim git htop ];
 }
