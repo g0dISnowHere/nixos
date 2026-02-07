@@ -12,7 +12,7 @@
         ../../modules/nixos/desktop/gnome.nix
 
         # Virtualization for development
-        ../../modules/nixos/virtualisation/docker-rootless.nix
+        ../../modules/nixos/virtualisation/docker_rootless.nix
       ];
     };
 
