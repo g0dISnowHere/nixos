@@ -1,24 +1,41 @@
-{ config, pkgs, lib, hostname, ... }:
-
+{ config, pkgs, hostname, ... }:
 {
+  # Mirach - Homelab server
+  # Hardware: [describe hardware]
+  # Role: Homelab (VMs, Docker services, Home Assistant)
+
   imports = [
-    # ./bootloader.nix
-    ./configuration.nix
     ./hardware-configuration.nix
-    # ./other-hardware.nix
-    ../common/powermanagement.nix
-    ../common/autoupgrade.nix
-    # ./networking.nix
-    # ./firewall.nix
+    # Add other machine-specific service configs
   ];
 
-  # Set the hostname
+  # Hostname
   networking.hostName = hostname;
 
-  # Machine-specific configuration can go here
-  # For example, if this machine has specific hardware requirements,
-  # performance tuning, or other machine-specific settings
+  # Boot configuration
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.useOSProber = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # Example: Enable specific services only on this machine
-  # services.some-service.enable = true;
+  # Networking
+  networking.networkmanager.enable = true;
+
+  # User configuration
+  users.users.djoolz = {
+    isNormalUser = true;
+    description = "djoolz";
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
+  };
+
+  # Home-manager configuration for this machine
+  # Uses desktop profile since we need GUI for management
+  home-manager.users.djoolz = import ../../../flake/homes/profiles/desktop.nix;
+
+  # Machine-specific packages
+  environment.systemPackages = with pkgs; [
+    # Add homelab-specific tools here
+  ];
+
+  system.stateVersion = "23.11";
 }

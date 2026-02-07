@@ -1,29 +1,56 @@
-{ config, pkgs, lib, hostname, ... }:
-
+{ config, pkgs, hostname, ... }:
 {
+  # Centauri - Primary laptop/workstation
+  # Hardware: [describe hardware]
+  # Role: Workstation (development, daily use)
+
   imports = [
-    ./bootloader.nix
-    ./configuration.nix
     ./hardware-configuration.nix
+    ./bootloader.nix
     ./other-hardware.nix
-    ## The next two are also declare in output.nix as nixosModules.
-    # ../powermanagement.nix
-    # ../autoupgrade.nix
-    ./networking.nix
-    ./firewall.nix
+    ../../../modules/nixos/system/nix-settings.nix # Explicitly import nix-settings
   ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Set the hostname
+  # Hostname
   networking.hostName = hostname;
 
-  # Machine-specific configuration can go here
-  # For example, if this machine has specific hardware requirements,
-  # performance tuning, or other machine-specific settings
+  # User configuration
+  users.users.djoolz = {
+    isNormalUser = true;
+    description = "djoolz";
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+  };
 
-  # Example: Enable specific services only on this machine
-  # services.some-service.enable = true;
+  # Home-manager configuration for this machine
+  # References the desktop profile (GUI + dev tools)
+  home-manager.users.djoolz = import ../../../flake/homes/profiles/desktop.nix;
+
+  # AppImage support
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
+  # dconf settings (machine-specific overrides)
+  programs.dconf = {
+    enable = true;
+    profiles.user.databases = [{
+      settings = {
+        "org/gnome/desktop/interface" = {
+          # clock-show-weekday = true;
+        };
+      };
+    }];
+  };
+
+  # Machine-specific packages
+  environment.systemPackages = with pkgs; [
+    # Add machine-specific tools here
+  ];
+
+  system.stateVersion = "25.11";
 }
