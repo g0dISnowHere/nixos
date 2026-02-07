@@ -132,6 +132,14 @@ sudo nixos-generate-config --show-hardware-config > machines/NEW_MACHINE/hardwar
 
 ## Architecture
 
+### Core Principles
+
+**Modularity:** Each module is independent and self-contained, focusing on a single feature or concern.
+
+**Self-containment:** A module includes everything needed for its feature - configuration, related packages, user groups, firewall rules, etc. - in one file. This ensures modules can be imported anywhere without hidden dependencies.
+
+**Explicit imports:** No recursive discovery. All imports are explicit and visible, making dependencies clear.
+
 ### Configuration Flow
 
 The configuration uses flake-parts with a clear separation of concerns:
@@ -356,35 +364,75 @@ Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`.
    ```
 
 2. **Make it self-contained:**
+
+   A self-contained module includes **everything** needed for that feature to work:
+   - Service/application configuration
+   - Related packages needed for the service
+   - User groups and permissions
+   - Firewall rules (if networking)
+   - Environment variables
+   - File permissions
+   - Kernel parameters (if needed)
+
    ```nix
    { config, lib, pkgs, ... }:
    {
      # My Service
      # Description of what this module provides
-     # Dependencies: [list any dependencies]
+     # Related configuration: firewall rules, user groups, environment setup
+     # Dependencies: [list any external dependencies]
 
      services.my-service = {
        enable = true;
        # ... configuration ...
      };
 
+     # Include ALL related config here - firewall, users, packages, etc.
+     networking.firewall.allowedTCPPorts = [ 1234 ];
+     users.users.djoolz.extraGroups = [ "my-service-group" ];
+
      # Related packages
      environment.systemPackages = with pkgs; [
-       # ...
+       my-service-cli-tool
+       # ... other related tools ...
      ];
    }
    ```
 
-3. **Import in machine or role:**
-   - In `flake/machines/*.nix` for specific machines
-   - In `modules/nixos/roles/*.nix` for all machines with that role
+3. **Module isolation - what NOT to do:**
+   ```nix
+   # ❌ WRONG: Service config here
+   services.my-service.enable = true;
 
-4. **Export if reusable (optional):**
+   # ❌ WRONG: User group config in another file
+   # In some other file: users.users.djoolz.extraGroups = [ "my-service" ];
+
+   # ✅ RIGHT: Everything together in one module
+   { config, lib, pkgs, ... }:
+   {
+     services.my-service.enable = true;
+     users.users.djoolz.extraGroups = [ "my-service" ];
+     # ... all related config ...
+   }
+   ```
+
+4. **Import in machine or role:**
+   - In `flake/machines/*.nix` for machine-specific modules
+   - In `modules/nixos/roles/*.nix` for all machines with that role
+   - In `flake/homes/profiles/*.nix` for home-manager modules
+
+5. **Export if reusable (optional):**
    Add to `flake/modules.nix`:
    ```nix
    flake.nixosModules = {
      my-service = ./modules/nixos/services/my-service.nix;
    };
+   ```
+
+6. **Test module independence:**
+   ```bash
+   # Verify module can be imported standalone
+   nix eval .#nixosConfigurations.centauri.config.services.my-service.enable
    ```
 
 #### Home-Manager Module
@@ -397,6 +445,36 @@ Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`.
 2. **Import in home profile:**
    - `flake/homes/profiles/common.nix` for all profiles
    - `flake/homes/profiles/desktop.nix` for GUI-only
+
+### Module Boundaries & When to Split/Combine
+
+**Single concern principle:**
+- Each module should do one thing well
+- A module file should be focused and understandable at a glance
+- If a module becomes too large (>100 lines), consider splitting by concern
+
+**When to keep together (single module):**
+- A service + its firewall rules
+- A service + required user groups
+- Related configuration for one feature
+
+**When to split (separate modules):**
+- Different services that don't depend on each other (e.g., `docker.nix`, `tailscale.nix`)
+- Different desktop environments (e.g., `gnome.nix`, `plasma.nix`)
+- System-level config categories (e.g., `locale.nix`, `shell.nix`)
+
+**Example: Good module boundaries**
+```
+modules/nixos/services/
+├── tailscale.nix         # Single concern: VPN service + firewall
+├── firewall.nix          # Single concern: General firewall rules
+└── flatpak.nix           # Single concern: Flatpak runtime
+
+modules/nixos/system/
+├── locale.nix            # Single concern: Timezone, locale
+├── shell.nix             # Single concern: Shell configuration
+└── nix-settings.nix      # Single concern: Nix daemon settings
+```
 
 ### Modifying an Existing Module
 
@@ -467,6 +545,9 @@ Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`.
 - ❌ **DON'T** put machine-specific config in shared modules
 - ❌ **DON'T** create "god modules" that do everything (keep focused)
 - ❌ **DON'T** mix concerns (e.g., networking + virtualization in one module)
+- ❌ **DON'T** split related config across multiple files (keep service + dependencies together)
+- ❌ **DON'T** assume hidden dependencies (always include everything a module needs in that file)
+- ❌ **DON'T** require users to import multiple files for one feature (module should be standalone)
 
 ### Security
 
