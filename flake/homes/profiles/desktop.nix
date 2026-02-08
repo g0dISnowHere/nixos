@@ -6,11 +6,15 @@
 
   imports = [
     ./common.nix
-    # GNOME: dconf settings
-    # Uncomment below to enable GNOME home-manager config when desktop = "gnome"
-    # ../../../modules/home/dconf/dconf.nix
   ]
-  # Plasma: plasma-manager settings
+  # GNOME: dconf settings
+    ++ (if desktop == "gnome" then
+      [
+        # ../../../modules/home/dconf/dconf.nix 
+      ]
+    else
+      [ ])
+    # Plasma: plasma-manager settings
     ++ (if desktop == "plasma" then
       [ ../../../modules/home/plasma/plasma.nix ]
     else

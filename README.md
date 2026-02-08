@@ -1,33 +1,33 @@
 # NixOS Configuration
 
-A system-agnostic, modular NixOS configuration using flake-parts for managing multiple machines.
+A modular NixOS flake using flake-parts, role modules, and optional desktop selection per machine.
 
 ## Structure
 
 ```
-├── flake.nix                     # Main flake definition with inputs
-├── outputs.nix                   # Flake-parts configuration with system outputs
-├── treefmt.nix                   # Code formatting configuration
+├── flake.nix
+├── outputs.nix
+├── flake/
+│   ├── lib.nix                    # mkNixosSystem + helpers
+│   ├── machines/
+│   │   ├── workstations.nix       # Workstation definitions
+│   │   └── homelabs.nix           # Homelab definitions
+│   └── homes/
+│       ├── djoolz.nix             # Standalone home-manager configs
+│       └── profiles/
+│           ├── common.nix
+│           └── desktop.nix
+├── modules/
+│   ├── nixos/
+│   │   ├── desktop/               # common + DE modules
+│   │   ├── roles/                 # workstation, homelab
+│   │   ├── services/              # system services
+│   │   ├── system/                # base system modules
+│   │   └── virtualisation/        # VM/container modules
+│   └── home/                      # home-manager modules
 ├── nixos/
-│   ├── configuration.nix         # Base NixOS configuration (shared across all machines)
-│   ├── configurations.nix        # Machine configuration builder
-│   ├── *.nix                     # Modular NixOS configurations (services, networking, etc.)
-│   └── users/
-│       ├── djoolz.nix            # User-specific home-manager configuration
-│       └── modules/               # Modular home-manager configurations
-│           ├── packages.nix       # User packages
-│           ├── programs.nix       # Program configurations
-│           └── shell.nix          # Shell configuration
-├── machines/
-│   ├── template/                  # Template for new machines
-│   │   └── default.nix
-│   ├── centauri/                  # Example machine configuration
-│   │   ├── default.nix            # Machine-specific configuration
-│   │   ├── hardware-configuration.nix
-│   │   ├── bootloader.nix
-│   │   └── other-hardware.nix
-│   ├── powermanagement.nix        # Shared power management module
-│   └── autoupgrade.nix            # Shared auto-upgrade module
+│   └── machines/                  # per-host configs + hardware
+└── parts/                         # flake-parts modules
 ```
 
 ## Features
@@ -42,67 +42,42 @@ A system-agnostic, modular NixOS configuration using flake-parts for managing mu
 
 ## Adding a New Machine
 
-1. **Copy the template**:
+1. **Create host directory** under [nixos/machines](nixos/machines):
+   - Add [nixos/machines/your-host/default.nix](nixos/machines/your-host/default.nix)
+   - Add [nixos/machines/your-host/hardware-configuration.nix](nixos/machines/your-host/hardware-configuration.nix)
+
+2. **Define the machine** in [flake/machines/workstations.nix](flake/machines/workstations.nix) or [flake/machines/homelabs.nix](flake/machines/homelabs.nix):
+   - Set `system`, `hostname`, `role`, and optional `desktop`
+   - Add any extra modules in the `modules` list
+
+3. **Build and deploy**:
+
    ```bash
-   cp -r machines/template machines/your-machine-name
-   ```
-
-2. **Generate hardware configuration**:
-   ```bash
-   sudo nixos-generate-config --show-hardware-config > machines/your-machine-name/hardware-configuration.nix
-   ```
-
-3. **Edit machine configuration**:
-   Edit `machines/your-machine-name/default.nix` to customize for your machine.
-
-4. **Add to configurations**:
-   Edit `nixos/configurations.nix` and add your machine:
-   ```nix
-   your-machine-name = mkNixosSystem {
-     system = "x86_64-linux";  # or "aarch64-linux"
-     hostname = "your-machine-name";
-     modules = [
-       # Add any machine-specific modules here
-     ];
-   };
-   ```
-
-5. **Build and deploy**:
-   ```bash
-   sudo nixos-rebuild switch --flake .#your-machine-name
+   sudo nixos-rebuild switch --flake .#your-host
    ```
 
 ## Adding a New User
 
-1. **Create user configuration**:
-   ```bash
-   cp nixos/users/djoolz.nix nixos/users/new-user.nix
-   ```
-
-2. **Edit user configuration**:
-   Update the username and home directory in the new file.
-
-3. **Add to machine configuration**:
-   Edit `nixos/configurations.nix` and add the user to home-manager:
-   ```nix
-   users.new-user = import ./users/new-user.nix;
-   ```
+1. Add a home-manager profile under [modules/home](modules/home) or [flake/homes/profiles](flake/homes/profiles).
+2. Reference it from the machine’s [nixos/machines/your-host/default.nix](nixos/machines/your-host/default.nix) under `home-manager.users`.
 
 ## Supported Systems
 
 - `x86_64-linux` - 64-bit Intel/AMD Linux
 - `aarch64-linux` - 64-bit ARM Linux (e.g., Raspberry Pi 4)
 
-Additional systems can be added by updating the `systems` list in `outputs.nix`.
+Additional systems can be added by updating the systems list in [outputs.nix](outputs.nix).
 
 ## Development
 
 Enter the development environment:
+
 ```bash
 nix develop
 ```
 
 This provides tools for:
+
 - `nixpkgs-fmt` - Nix code formatting
 - `statix` - Nix static analysis
 - `deadnix` - Dead code detection
@@ -125,23 +100,24 @@ make update
 make rebuild
 ```
 
-**Git Integration**: 
+**Git Integration**:
+
 - Code is automatically formatted on every commit
 - flake.lock files are automatically staged
 - Pre-push hooks prevent unformatted code from being pushed
 
 **VS Code Integration**: Use Ctrl+Shift+P → "Tasks: Run Task" for GUI access to common operations.
 
-See `../docs/auto-commit-flake-lock.md` for complete automation documentation.
-
 ## Building
 
 Build a specific machine configuration:
+
 ```bash
 nix build .#nixosConfigurations.centauri.config.system.build.toplevel
 ```
 
 Build for all systems:
+
 ```bash
 nix flake check
 ```
@@ -149,67 +125,53 @@ nix flake check
 ## Deployment
 
 Local deployment:
+
 ```bash
 sudo nixos-rebuild switch --flake .#centauri
 ```
 
 Remote deployment (if using deployment tools):
+
 ```bash
 # Example with deploy-rs or similar tools
 deploy .#centauri
 ```
 
-## Customization
+## Adding Services
 
-### Machine-Specific Configuration
+1. Add a module under [modules/nixos/services](modules/nixos/services) (system services) or [modules/home](modules/home) (user services).
+2. Import it in the relevant role module or host file:
+   - Roles: [modules/nixos/roles](modules/nixos/roles)
+   - Hosts: [nixos/machines/your-host/default.nix](nixos/machines/your-host/default.nix)
 
-Each machine can have its own:
-- Hardware configuration
-- Bootloader settings  
-- Network configuration
-- Services and programs
-- Users and permissions
+## Adding Modules
 
-### Shared Modules
-
-Common functionality is shared through:
-- `nixos/configuration.nix` - Base system configuration
-- `machines/*.nix` - Reusable machine modules
-- `nixos/users/modules/*.nix` - Reusable user modules
-
-### Adding New Modules
-
-1. Create the module file in the appropriate directory
-2. Import it in the relevant configuration file
-3. Document any new options or dependencies
+1. Create the module in the appropriate folder under [modules](modules).
+2. Import it explicitly from the role, host, or desktop module.
+3. Keep desktop-specific logic inside [modules/nixos/desktop](modules/nixos/desktop).
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Import errors**: Check that all file paths in imports are correct
-2. **System mismatch**: Ensure the system in configurations.nix matches your hardware
-3. **Missing dependencies**: Make sure all required inputs are in flake.nix
+1. **Import errors**: Check that all file paths in imports are correct.
+2. **System mismatch**: Ensure the `system` value matches your hardware.
+3. **Missing modules**: Confirm imports are explicit (no recursive discovery).
 
 ### Debugging
 
 View flake structure:
+
 ```bash
 nix flake show
 ```
 
 Check configuration:
+
 ```bash
 nixos-rebuild dry-build --flake .#machine-name
 ```
 
-## Migration from Old Configuration
+## Migration Notes
 
-This configuration replaces the previous monolithic setup. The key changes:
-
-1. **Modular structure**: Configuration is split into logical modules
-2. **Multi-system support**: Can build for different architectures
-3. **Machine abstraction**: Easy to add new machines
-4. **Flake-parts integration**: Proper use of modern Nix flake patterns
-
-To migrate from the old configuration, machines should be gradually moved to the new structure by creating machine-specific directories and updating the configurations.nix file.
+This repository uses flake-parts with explicit imports and role modules. Hosts live under [nixos/machines](nixos/machines), while system modules are under [modules/nixos](modules/nixos) and home-manager modules under [modules/home](modules/home).

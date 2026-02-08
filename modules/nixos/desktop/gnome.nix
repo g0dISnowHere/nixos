@@ -3,7 +3,10 @@
   # Imports shared desktop infrastructure from common.nix
   # Provides: GNOME DE + GDM, plus all dependencies from common.nix
 
-  imports = [ ./common.nix ];
+  imports = [
+    ./common.nix
+    ./gsconnect.nix # Import self-contained GSConnect configuration with firewall rules
+  ];
 
   # Enable GNOME Desktop Environment
   services.desktopManager.gnome.enable = true;
