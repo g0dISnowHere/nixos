@@ -10,7 +10,7 @@ This is a modular NixOS flake configuration managing multiple machines using fla
 - **Standalone home-manager** configurations decoupled from machines
 - **Explicit imports** with no recursive discovery (clear dependencies)
 
-**Current Status:** Undergoing refactoring to modular structure. See `plan.md` for migration details.
+**Current Status:** Refactor to modular structure in progress. See `plan.md` for migration details.
 
 ## Getting Started
 
@@ -181,6 +181,7 @@ mine/
 ├── modules/                           # Reusable NixOS & Home modules
 │   ├── nixos/
 │   │   ├── desktop/                   # Desktop environments (GNOME, Plasma)
+│   │   │   ├── common.nix             # Shared desktop infrastructure (audio/printing/bluetooth/etc.)
 │   │   ├── virtualisation/            # Docker, Podman, libvirtd, QuickEMU
 │   │   ├── services/                  # Tailscale, SSH, Android, etc.
 │   │   ├── system/                    # Locale, shell, power, nix-settings
@@ -188,7 +189,8 @@ mine/
 │   └── home/                          # Home-manager modules
 │       ├── programs/                  # Program configurations
 │       ├── packages/                  # Package lists
-│       └── dconf/                     # GNOME/dconf settings
+│       ├── dconf/                     # GNOME/dconf settings
+│       └── plasma/                    # KDE Plasma home-manager settings (plasma-manager)
 │
 └── machines/                          # Machine-specific configurations
     ├── centauri/                      # Primary laptop/workstation
@@ -219,8 +221,8 @@ Access in any config: `pkgs-unstable.package-name` or `pkgs-tailscale.package-na
 Machines are organized by role with machine-specific overrides:
 
 - **Workstation**: Interactive desktop for development (Centauri)
-  - Includes: Desktop environment, audio, printing, Bluetooth, power management
-  - Virtualization: Docker rootless for development containers
+   - Includes: Desktop environment (via desktop module), power management, networking
+   - Virtualization: Docker rootless for development containers
 
 - **Homelab**: Server with optional GUI for management (Mirach)
   - Includes: SSH server, Tailscale, firewall
@@ -301,7 +303,7 @@ Machines are organized by role with machine-specific overrides:
 
 ### Switching Desktop Environments
 
-Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`. This makes it easy to switch between different DE's without code duplication.
+Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`. Desktop modules are self-contained and import `modules/nixos/desktop/common.nix` for shared infrastructure.
 
 **Available desktop environments:**
 - `gnome` - GNOME desktop with GDM display manager
@@ -338,6 +340,7 @@ Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`.
 1. Create `modules/nixos/desktop/my-de.nix`:
    ```nix
    { config, lib, pkgs, ... }: {
+       imports = [ ./common.nix ];
      services.desktopManager.myDE.enable = true;
      # Add other DE-specific configuration
    }

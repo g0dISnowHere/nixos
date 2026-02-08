@@ -62,7 +62,6 @@
       ##############################################################################
 
       ## Nix Tools #################################################################
-      dconf2nix
       nix-output-monitor # https://github.com/maralorn/nix-output-monitor
 
       nix-tree

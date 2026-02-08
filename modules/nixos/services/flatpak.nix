@@ -2,6 +2,7 @@
   # Flatpak Support with Application List
   # Provides sandboxed application distribution via Flatpak
   # Reference: https://github.com/gmodena/nix-flatpak
+  # Note: Desktop environment specific Flatpak apps are in their respective desktop modules
 
   services.flatpak = {
     enable = true;
@@ -35,7 +36,6 @@
       # Utilities
       "io.github.flattool.Warehouse" # Flatpak package manager
       "io.github.giantpinkrobots.flatsweep" # Unused dependency cleaner
-      "com.github.tchx84.Flatseal" # Permissions manager
       "page.tesk.Refine" # OpenRefine (data tool)
 
       # Design and 3D Printing
@@ -48,8 +48,6 @@
       # Internet and Media
       "org.mozilla.firefox" # Firefox browser
       "com.vivaldi.Vivaldi" # Vivaldi browser
-      "org.gnome.Extensions" # GNOME extensions browser
-      "org.gnome.PowerStats" # Power consumption monitor
 
       # Network Tools
       "org.nmap.Zenmap" # Network security scanner
@@ -67,11 +65,4 @@
       };
     };
   };
-
-  # Additional fonts for Flatpak applications
-  environment.systemPackages = with pkgs; [
-    cantarell-fonts
-    fira-code
-    nerd-fonts.open-dyslexic
-  ];
 }

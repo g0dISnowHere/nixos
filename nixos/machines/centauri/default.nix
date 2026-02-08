@@ -37,18 +37,6 @@
     binfmt = true;
   };
 
-  # dconf settings (machine-specific overrides)
-  programs.dconf = {
-    enable = true;
-    profiles.user.databases = [{
-      settings = {
-        "org/gnome/desktop/interface" = {
-          # clock-show-weekday = true;
-        };
-      };
-    }];
-  };
-
   # Machine-specific packages
   environment.systemPackages = with pkgs;
     [

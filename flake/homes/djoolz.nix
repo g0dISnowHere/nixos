@@ -11,6 +11,8 @@
       };
 
       extraSpecialArgs = {
+        desktop = "gnome";
+        inherit inputs;
         pkgs-unstable = import inputs.nixpkgs-unstable {
           system = "x86_64-linux";
           config.allowUnfree = true;
@@ -35,6 +37,8 @@
       };
 
       extraSpecialArgs = {
+        desktop = null;
+        inherit inputs;
         pkgs-unstable = import inputs.nixpkgs-unstable {
           system = "x86_64-linux";
           config.allowUnfree = true;

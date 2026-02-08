@@ -1,7 +1,8 @@
 { inputs, ... }:
 let
   inherit (inputs)
-    nixpkgs home-manager nix-flatpak nixpkgs-unstable nixpkgs-tailscale;
+    nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable
+    nixpkgs-tailscale;
 in {
   flake.lib = {
     # Helper function to create a NixOS system configuration
@@ -35,6 +36,7 @@ in {
               # Note: Individual machines set home-manager.users.*
               # in their default.nix to reference profile modules
               extraSpecialArgs = {
+                inherit desktop inputs;
                 pkgs-unstable = import nixpkgs-unstable {
                   inherit system;
                   config.allowUnfree = true;
@@ -52,7 +54,7 @@ in {
         ] ++ modules;
 
         specialArgs = {
-          inherit inputs hostname;
+          inherit inputs hostname desktop;
           pkgs-unstable = import nixpkgs-unstable {
             inherit system;
             config.allowUnfree = true;

@@ -14,6 +14,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
 
     # nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";

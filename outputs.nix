@@ -1,5 +1,5 @@
 { self, home-manager, nixpkgs, nixpkgs-unstable, nixpkgs-tailscale, flake-parts
-, nix-flatpak, treefmt-nix, systems,
+, nix-flatpak, plasma-manager, treefmt-nix, systems,
 # nixos-conf-editor,
 # nix-software-center,
 ... }@inputs:

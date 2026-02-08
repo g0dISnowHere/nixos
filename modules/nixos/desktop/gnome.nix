@@ -1,15 +1,9 @@
 { config, pkgs, ... }: {
-  # GNOME Desktop Environment
-  # Provides GNOME desktop with Wayland support and GDM login manager
-  # Reference: https://wiki.nixos.org/wiki/GNOME
+  # GNOME Desktop Environment — Self-Contained
+  # Imports shared desktop infrastructure from common.nix
+  # Provides: GNOME DE + GDM, plus all dependencies from common.nix
 
-  # Enable the X11 windowing system
-  services.xserver = {
-    enable = true;
-    videoDrivers = [ "modesetting" ];
-    # Configure keymap in X11
-    xkb = { layout = "de"; };
-  };
+  imports = [ ./common.nix ];
 
   # Enable GNOME Desktop Environment
   services.desktopManager.gnome.enable = true;
@@ -19,4 +13,10 @@
     enable = true;
     wayland = true;
   };
+
+  # Enable dconf (GNOME settings backend)
+  programs.dconf.enable = true;
+
+  # GNOME-specific system packages
+  environment.systemPackages = with pkgs; [ dconf2nix ];
 }

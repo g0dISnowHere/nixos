@@ -8,6 +8,8 @@
   # - Networking with NetworkManager
   # - Firewall enabled by default
   # - Optional desktop environment (imported by machine)
+  #
+  # Audio support (if needed) is provided by the desktop environment module when present
 
   imports = [
     # System essentials
@@ -34,14 +36,5 @@
       PasswordAuthentication = false;
       PermitRootLogin = "no";
     };
-  };
-
-  # Optional: Audio for machines with GUI
-  # Enabled by default, can be disabled in machine config
-  security.rtkit.enable = lib.mkDefault true;
-  services.pipewire = {
-    enable = lib.mkDefault true;
-    alsa.enable = lib.mkDefault true;
-    pulse.enable = lib.mkDefault true;
   };
 }
