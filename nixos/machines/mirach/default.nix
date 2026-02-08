@@ -5,6 +5,7 @@
 
   imports = [
     ./hardware-configuration.nix
+    ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
     # Home Assistant service for homelab automation
     # ../../../modules/nixos/services/homeassistant.nix
   ];

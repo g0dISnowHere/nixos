@@ -5,7 +5,6 @@
   # enable the tailscale service using the tailscale-specific nixpkgs version
   services.tailscale = {
     enable = true;
-    # package = pkgs-tailscale.tailscale;
     package = pkgs.tailscale;
   };
 

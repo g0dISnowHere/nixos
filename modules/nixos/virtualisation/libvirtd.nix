@@ -98,4 +98,28 @@
     '';
     path = with pkgs; [ libvirt ];
   };
+
+  # Firewall rules for libvirt bridge networking
+  networking.firewall = {
+    trustedInterfaces = [ "br0" ];
+
+    extraCommands = ''
+      # Allow traffic through bridge
+      iptables -I FORWARD -i br0 -j ACCEPT
+      iptables -I FORWARD -o br0 -j ACCEPT
+
+      # Allow bridge to communicate with physical interface
+      # CUSTOMIZE: Replace enp0s31f6 with your actual interface name
+      iptables -I FORWARD -i br0 -o enp0s31f6 -j ACCEPT
+      iptables -I FORWARD -i enp0s31f6 -o br0 -j ACCEPT
+    '';
+
+    extraStopCommands = ''
+      # Clean up bridge rules on firewall stop
+      iptables -D FORWARD -i br0 -j ACCEPT 2>/dev/null || true
+      iptables -D FORWARD -o br0 -j ACCEPT 2>/dev/null || true
+      iptables -D FORWARD -i br0 -o enp0s31f6 -j ACCEPT 2>/dev/null || true
+      iptables -D FORWARD -i enp0s31f6 -o br0 -j ACCEPT 2>/dev/null || true
+    '';
+  };
 }
