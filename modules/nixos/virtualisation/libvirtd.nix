@@ -1,6 +1,18 @@
 { config, lib, pkgs, ... }:
 let cfg = config.my.libvirt;
 in {
+  # Libvirtd/KVM Virtualization with Bridge Networking
+  #
+  # IMPORTANT: To enable bridge networking, update these interface names
+  # in your machine configuration (nixos/machines/your-machine/default.nix):
+  #
+  #   my.libvirt = {
+  #     bridgeInterface = "br0";              # Bridge interface name
+  #     physicalInterface = "enp0s31f6";      # Your physical ethernet interface
+  #   };
+  #
+  # Find your interface name with: ip link show
+
   config = {
     # Assertion: both interfaces must be set together
     assertions = [{
