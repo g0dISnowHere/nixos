@@ -16,13 +16,22 @@ echo ""
 
 # === Format Code ===
 echo "1️⃣  Formatting code with nix fmt..."
+# Capture the currently staged files so we can re-stage only those.
+staged_files_file="/tmp/pre-commit-staged-files.txt"
+git diff --name-only --cached > "$staged_files_file"
+cleanup_staged_file() {
+    rm -f "$staged_files_file"
+}
+trap cleanup_staged_file EXIT
 nix fmt
 if git diff-index --quiet HEAD --; then
     echo "   ✓ No formatting changes"
 else
     echo "   ℹ️  Code was reformatted, staging changes..."
-    # Stage all changes (including deleted files), but exclude untracked files
-    git add -u
+    # Re-stage only the files that were staged before formatting.
+    if [ -s "$staged_files_file" ]; then
+        xargs -d '\n' git add -- < "$staged_files_file"
+    fi
 fi
 echo ""
 

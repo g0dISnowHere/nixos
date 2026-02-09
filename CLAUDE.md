@@ -127,7 +127,7 @@ nix flake metadata
 
 ```bash
 # Generate hardware configuration for a new machine
-sudo nixos-generate-config --show-hardware-config > machines/NEW_MACHINE/hardware-configuration.nix
+sudo nixos-generate-config --show-hardware-config > nixos/machines/NEW_MACHINE/hardware-configuration.nix
 ```
 
 ## Architecture
@@ -192,18 +192,22 @@ mine/
 │       ├── dconf/                     # GNOME/dconf settings
 │       └── plasma/                    # KDE Plasma home-manager settings (plasma-manager)
 │
-└── machines/                          # Machine-specific configurations
-    ├── centauri/                      # Primary laptop/workstation
-    │   ├── default.nix                # Machine config + role imports
-    │   ├── hardware-configuration.nix # Hardware scan output
-    │   ├── bootloader.nix             # Boot configuration
-    │   └── other-hardware.nix         # Additional hardware settings
-    ├── mirach/                        # Homelab server
-    │   ├── default.nix
-    │   ├── hardware-configuration.nix
-    │   └── services/                  # Machine-specific services
-    │       └── homeassistant.nix
-    └── template/                      # Template for new machines
+└── nixos/                             # Contains legacy machine configurations
+    └── machines/
+        ├── centauri/                      # Primary laptop/workstation
+        │   ├── default.nix                # Machine config + role imports
+        │   ├── hardware-configuration.nix # Hardware scan output
+        │   ├── bootloader.nix             # Boot configuration
+        │   └── other-hardware.nix         # Additional hardware settings
+        ├── karakan/
+        │   └── ...
+        ├── mirach/                    # Homelab server
+        │   ├── default.nix
+        │   ├── hardware-configuration.nix
+        │   └── services/                  # Machine-specific services
+        │       └── homeassistant.nix
+        └── template/                      # Template for new machines
+
 ```
 
 ### Multiple nixpkgs Versions
@@ -240,7 +244,7 @@ Machines are organized by role with machine-specific overrides:
 
 2. **Generate hardware config:**
    ```bash
-   sudo nixos-generate-config --show-hardware-config > machines/NEW_MACHINE/hardware-configuration.nix
+   sudo nixos-generate-config --show-hardware-config > nixos/machines/NEW_MACHINE/hardware-configuration.nix
    ```
 
 3. **Create `machines/NEW_MACHINE/default.nix`:**

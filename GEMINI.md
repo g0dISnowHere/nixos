@@ -192,18 +192,22 @@ mine/
 │       ├── dconf/                     # GNOME/dconf settings
 │       └── plasma/                    # KDE Plasma home-manager settings (plasma-manager)
 │
-└── machines/                          # Machine-specific configurations
-    ├── centauri/                      # Primary laptop/workstation
-    │   ├── default.nix                # Machine config + role imports
-    │   ├── hardware-configuration.nix # Hardware scan output
-    │   ├── bootloader.nix             # Boot configuration
-    │   └── other-hardware.nix         # Additional hardware settings
-    ├── mirach/                        # Homelab server
-    │   ├── default.nix
-    │   ├── hardware-configuration.nix
-    │   └── services/                  # Machine-specific services
-    │       └── homeassistant.nix
-    └── template/                      # Template for new machines
+└── nixos/                             # Contains legacy machine configurations (to be migrated to flake/machines)
+    └── machines/
+        ├── centauri/                      # Primary laptop/workstation
+        │   ├── default.nix                # Machine config + role imports
+        │   ├── hardware-configuration.nix # Hardware scan output
+        │   ├── bootloader.nix             # Boot configuration
+        │   └── other-hardware.nix         # Additional hardware settings
+        ├── karakan/
+        │   └── ...
+        ├── mirach/                        # Homelab server
+        │   ├── default.nix
+        │   ├── hardware-configuration.nix
+        │   └── services/                  # Machine-specific services
+        │       └── homeassistant.nix
+        └── template/                      # Template for new machines
+
 ```
 
 ### Multiple nixpkgs Versions

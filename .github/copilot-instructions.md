@@ -17,7 +17,7 @@ You are working in a modular NixOS flake repository.
 - Flake outputs: flake/
 - Reusable NixOS modules: modules/nixos/
 - Home-Manager modules: modules/home/
-- Machine configs: machines/
+- Machine configs: nixos/machines/
 
 ## Desktop Interchangeability
 - Desktop selection is via `desktop` in mkNixosSystem.

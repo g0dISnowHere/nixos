@@ -17,6 +17,7 @@
       };
 
       settings.global.excludes = [
+        "modules/home/dconf/dconf.nix"
         "machines/*/facts/*"
         "old-machines/*/facts/*"
         "vars/*"
