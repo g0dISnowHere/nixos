@@ -19,6 +19,10 @@ echo "1️⃣  Formatting code with nix fmt..."
 # Capture the currently staged files so we can re-stage only those.
 staged_files_file="/tmp/pre-commit-staged-files.txt"
 git diff --name-only --cached > "$staged_files_file"
+if ! grep -E '\.nix$' "$staged_files_file" | grep -vq -x "dconf.nix"; then
+    echo "   ℹ️  No staged .nix files (excluding dconf.nix); skipping checks."
+    exit 0
+fi
 cleanup_staged_file() {
     rm -f "$staged_files_file"
 }
