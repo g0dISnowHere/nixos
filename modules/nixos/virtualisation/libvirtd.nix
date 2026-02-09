@@ -1,125 +1,145 @@
-{ config, pkgs, ... }: {
-  # Libvirtd/KVM Virtualization
-  # Provides KVM/QEMU virtualization with virt-manager, SPICE USB redirection, and OVMF UEFI support
-  # Reference: https://nixos.wiki/wiki/Libvirt
-  virtualisation = {
-    spiceUSBRedirection.enable = true;
-    libvirtd = {
-      enable = true;
-      qemu = {
-        package = pkgs.qemu_kvm;
-        vhostUserPackages =
-          [ pkgs.virtiofsd ]; # virtiofsd is needed for vhost-user-fs
-        runAsRoot = true;
-        swtpm.enable = true;
-        # Note: OVMF is now available by default, no need to configure packages
+{ config, lib, pkgs, ... }:
+let cfg = config.my.libvirt;
+in {
+  config = {
+    # Assertion: both interfaces must be set together
+    assertions = [{
+      assertion = (cfg.bridgeInterface == null && cfg.physicalInterface == null)
+        || (cfg.bridgeInterface != null && cfg.physicalInterface != null);
+      message = ''
+        my.libvirt: Both bridgeInterface and physicalInterface must be set together, or both null.
+        Example configuration in nixos/machines/your-machine/default.nix:
+          my.libvirt = {
+            bridgeInterface = "br0";
+            physicalInterface = "enp0s31f6";
+          };
+      '';
+    }];
+
+    # Libvirtd/KVM Virtualization
+    # Provides KVM/QEMU virtualization with virt-manager, SPICE USB redirection, and OVMF UEFI support
+    # Reference: https://nixos.wiki/wiki/Libvirt
+    virtualisation = {
+      spiceUSBRedirection.enable = true;
+      libvirtd = {
+        enable = true;
+        qemu = {
+          package = pkgs.qemu_kvm;
+          vhostUserPackages =
+            [ pkgs.virtiofsd ]; # virtiofsd is needed for vhost-user-fs
+          runAsRoot = true;
+          swtpm.enable = true;
+          # Note: OVMF is now available by default, no need to configure packages
+        };
       };
     };
-  };
 
-  users.users.djoolz = { extraGroups = [ "libvirtd" ]; };
+    users.users.djoolz = { extraGroups = [ "libvirtd" ]; };
 
-  # nested virtualization
-  boot.extraModprobeConfig = "options kvm_intel nested=1";
+    # nested virtualization
+    boot.extraModprobeConfig = "options kvm_intel nested=1";
 
-  # Enable bridge kernel modules and IP forwarding
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-    "net.bridge.bridge-nf-call-iptables" = 0;
-    "net.bridge.bridge-nf-call-ip6tables" = 0;
-    "net.bridge.bridge-nf-call-arptables" = 0;
-  };
-
-  # Load bridge kernel modules
-  boot.kernelModules = [ "bridge" "br_netfilter" ];
-
-  environment.systemPackages = with pkgs; [
-    virt-manager
-    virt-viewer
-    # spice
-    # spice-gtk
-    # spice-protocol
-    # win-virtio
-    # win-spice
-  ];
-
-  services.spice-vdagentd.enable = true;
-
-  # Network bridge configuration for Home Assistant VM
-  networking = {
-    # Make the fucking unmanaged.
-    networkmanager.unmanaged = [ "enp0s31f6" "br0" ];
-
-    # Create bridge for VM networking
-    bridges.br0.interfaces = [ "enp0s31f6" ];
-
-    # Configure bridge to get IP via DHCP
-    interfaces.br0.useDHCP = true;
-
-    # Ensure the physical interface has no IP (bridge takes over)
-    interfaces.enp0s31f6.useDHCP = false;
-  };
-
-  # Define the bridge network for libvirt/virt-manager
-  systemd.services.libvirt-bridge-network = {
-    description = "Create libvirt bridge network";
-    after = [ "libvirtd.service" "network.target" ];
-    wants = [ "libvirtd.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
+    # Enable bridge kernel modules and IP forwarding
+    # For nftables to filter bridged traffic, enable bridge netfilter hooks
+    boot.kernel.sysctl = {
+      "net.ipv4.ip_forward" = 1;
+      # Enable bridge netfilter so nftables can inspect bridged packets
+      "net.bridge.bridge-nf-call-iptables" = 1;
+      "net.bridge.bridge-nf-call-ip6tables" = 1;
+      "net.bridge.bridge-nf-call-arptables" = 1;
     };
-    script = ''
-      # Check if bridge network already exists
-      if ${pkgs.libvirt}/bin/virsh net-list --all | grep -q "br0"; then
-        echo "Bridge network already exists"
-        exit 0
-      fi
 
-      # Create network definition
-      cat > /tmp/br0-network.xml << EOF
-      <network>
-        <name>br0</name>
-        <forward mode='bridge'/>
-        <bridge name='br0'/>
-      </network>
-      EOF
+    # Load bridge kernel modules
+    boot.kernelModules = [ "bridge" "br_netfilter" ];
 
-      # Define and start the network
-      ${pkgs.libvirt}/bin/virsh net-define /tmp/br0-network.xml
-      ${pkgs.libvirt}/bin/virsh net-start br0
-      ${pkgs.libvirt}/bin/virsh net-autostart br0
+    environment.systemPackages = with pkgs; [
+      virt-manager
+      virt-viewer
+      # spice
+      # spice-gtk
+      # spice-protocol
+      # win-virtio
+      # win-spice
+    ];
 
-      # Clean up
-      rm /tmp/br0-network.xml
+    services.spice-vdagentd.enable = true;
 
-      echo "Bridge network br0 created and configured for libvirt"
-    '';
-    path = with pkgs; [ libvirt ];
-  };
+    # Network configuration for bridge (when interfaces are configured)
+    networking.networkmanager.unmanaged =
+      lib.mkIf (cfg.bridgeInterface != null) [
+        cfg.physicalInterface
+        cfg.bridgeInterface
+      ];
 
-  # Firewall rules for libvirt bridge networking
-  networking.firewall = {
-    trustedInterfaces = [ "br0" ];
+    networking.bridges = lib.mkIf (cfg.bridgeInterface != null) {
+      "${cfg.bridgeInterface}".interfaces = [ cfg.physicalInterface ];
+    };
 
-    extraCommands = ''
-      # Allow traffic through bridge
-      iptables -I FORWARD -i br0 -j ACCEPT
-      iptables -I FORWARD -o br0 -j ACCEPT
+    networking.interfaces = lib.mkIf (cfg.bridgeInterface != null) {
+      "${cfg.bridgeInterface}".useDHCP = true;
+      "${cfg.physicalInterface}".useDHCP = false;
+    };
 
-      # Allow bridge to communicate with physical interface
-      # CUSTOMIZE: Replace enp0s31f6 with your actual interface name
-      iptables -I FORWARD -i br0 -o enp0s31f6 -j ACCEPT
-      iptables -I FORWARD -i enp0s31f6 -o br0 -j ACCEPT
-    '';
+    # Firewall rules for libvirt bridge networking
+    networking.firewall.trustedInterfaces =
+      lib.mkIf (cfg.bridgeInterface != null) [ cfg.bridgeInterface ];
 
-    extraStopCommands = ''
-      # Clean up bridge rules on firewall stop
-      iptables -D FORWARD -i br0 -j ACCEPT 2>/dev/null || true
-      iptables -D FORWARD -o br0 -j ACCEPT 2>/dev/null || true
-      iptables -D FORWARD -i br0 -o enp0s31f6 -j ACCEPT 2>/dev/null || true
-      iptables -D FORWARD -i enp0s31f6 -o br0 -j ACCEPT 2>/dev/null || true
-    '';
+    # Define the bridge network for libvirt/virt-manager (when interfaces are configured)
+    systemd.services = lib.mkIf (cfg.bridgeInterface != null) {
+      libvirt-bridge-network = {
+        description = "Create libvirt bridge network";
+        after = [ "libvirtd.service" "network.target" ];
+        wants = [ "libvirtd.service" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          # Check if bridge network already exists
+          if ${pkgs.libvirt}/bin/virsh net-list --all | grep -q "${cfg.bridgeInterface}"; then
+            echo "Bridge network already exists"
+            exit 0
+          fi
+
+          # Create network definition
+          cat > /tmp/${cfg.bridgeInterface}-network.xml << EOF
+          <network>
+            <name>${cfg.bridgeInterface}</name>
+            <forward mode='bridge'/>
+            <bridge name='${cfg.bridgeInterface}'/>
+          </network>
+          EOF
+
+          # Define and start the network
+          ${pkgs.libvirt}/bin/virsh net-define /tmp/${cfg.bridgeInterface}-network.xml
+          ${pkgs.libvirt}/bin/virsh net-start ${cfg.bridgeInterface}
+          ${pkgs.libvirt}/bin/virsh net-autostart ${cfg.bridgeInterface}
+
+          # Clean up
+          rm /tmp/${cfg.bridgeInterface}-network.xml
+
+          echo "Bridge network ${cfg.bridgeInterface} created and configured for libvirt"
+        '';
+        path = with pkgs; [ libvirt ];
+      };
+    };
+
+    # nftables rules for libvirt bridge forwarding (when interfaces are configured)
+    networking.nftables.tables."libvirt-bridge" =
+      lib.mkIf (cfg.bridgeInterface != null) {
+        family = "inet";
+        content = ''
+          chain bridge-forward {
+            type filter hook forward priority filter; policy drop;
+            # Allow all traffic through bridge
+            iifname "${cfg.bridgeInterface}" accept
+            oifname "${cfg.bridgeInterface}" accept
+            # Allow bridge to communicate with physical interface
+            iifname "${cfg.bridgeInterface}" oifname "${cfg.physicalInterface}" accept
+            iifname "${cfg.physicalInterface}" oifname "${cfg.bridgeInterface}" accept
+          }
+        '';
+      };
   };
 }

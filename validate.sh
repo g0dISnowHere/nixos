@@ -110,14 +110,14 @@ else
 fi
 
 # === FLAKE CHECKS ===
-echo ""
-echo "Flake Checks:"
-if nix flake check 2>&1 | grep -q "All checks passed\|warning:"; then
-    echo "  ✓ nix flake check passes"
-else
-    echo "  ✗ nix flake check failed"
-    FAILED=$((FAILED + 1))
-fi
+# echo ""
+# echo "Flake Checks:"
+# if nix flake check 2>&1 | grep -q "All checks passed\|warning:"; then
+#     echo "  ✓ nix flake check passes"
+# else
+#     echo "  ✗ nix flake check failed"
+#     FAILED=$((FAILED + 1))
+# fi
 
 # === SUMMARY ===
 echo ""

@@ -22,4 +22,10 @@
 
   # GNOME-specific system packages
   environment.systemPackages = with pkgs; [ dconf2nix ];
+
+  # GNOME-specific Flatpak applications
+  services.flatpak.packages = [
+    "org.gnome.Extensions" # GNOME Extensions Manager
+    "org.gnome.PowerStats" # Power consumption monitor
+  ];
 }

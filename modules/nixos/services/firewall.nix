@@ -1,8 +1,11 @@
 { config, ... }: {
   # Firewall Configuration with Port Rules
-  # Enables firewall with specific port allowlists for services
-  # Includes bridge networking rules for VM networking (libvirtd)
+  # Enables firewall with nftables backend and specific port allowlists for services
   # Reference: https://nixos.wiki/wiki/Firewall
+
+  # Enable nftables as the firewall backend
+  # This provides a modern, performant firewall implementation
+  networking.nftables.enable = true;
 
   networking.firewall = {
     enable = true;

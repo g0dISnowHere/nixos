@@ -10,3 +10,13 @@ sudo nixos-rebuild switch &>nixos-switch.log || (cat nixos-switch.log | grep --c
 sudo nixos-rebuild switch &>nixos-switch.log || (echo "NixOS rebuild failed with the following error:" && cat nixos-switch.log | grep --color error && exit 1)
 ````
 
+# rollback
+
+```bash
+sudo nixos-rebuild switch --flake .# --rollback  
+```
+# list generated system generations
+
+```bash
+sudo nixos-rebuild list-generations
+```

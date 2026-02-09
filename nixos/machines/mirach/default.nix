@@ -5,13 +5,22 @@
 
   imports = [
     ./hardware-configuration.nix
+    ../../../modules/nixos/system/my-options.nix # Custom 'my' namespace options
+    ../../../modules/nixos/services/firewall.nix # Firewall with port rules
     ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
+    # ../../../modules/nixos/virtualisation/libvirtd.nix # Libvirt/KVM virtualization
     # Home Assistant service for homelab automation
     # ../../../modules/nixos/services/homeassistant.nix
   ];
 
   # Hostname
   networking.hostName = hostname;
+
+  # Libvirt bridge interface configuration
+  my.libvirt = {
+    bridgeInterface = "br0";
+    physicalInterface = "enp0s31f6";
+  };
 
   # Boot configuration
   boot.loader.grub.enable = true;
