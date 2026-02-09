@@ -8,9 +8,7 @@
     ../../../modules/nixos/system/my-options.nix # Custom 'my' namespace options
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
     ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
-    # ../../../modules/nixos/virtualisation/libvirtd.nix # Libvirt/KVM virtualization
-    # Home Assistant service for homelab automation
-    # ../../../modules/nixos/services/homeassistant.nix
+
   ];
 
   # Hostname

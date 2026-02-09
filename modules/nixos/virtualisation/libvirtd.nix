@@ -138,20 +138,7 @@ in {
     };
 
     # nftables rules for libvirt bridge forwarding (when interfaces are configured)
-    networking.nftables.tables."libvirt-bridge" =
-      lib.mkIf (cfg.bridgeInterface != null) {
-        family = "inet";
-        content = ''
-          chain bridge-forward {
-            type filter hook forward priority filter; policy drop;
-            # Allow all traffic through bridge
-            iifname "${cfg.bridgeInterface}" accept
-            oifname "${cfg.bridgeInterface}" accept
-            # Allow bridge to communicate with physical interface
-            iifname "${cfg.bridgeInterface}" oifname "${cfg.physicalInterface}" accept
-            iifname "${cfg.physicalInterface}" oifname "${cfg.bridgeInterface}" accept
-          }
-        '';
-      };
+    # NOTE: NixOS's firewall.trustedInterfaces already handles this via nftables
+    # No additional rules needed - the bridge is marked as trusted above
   };
 }
