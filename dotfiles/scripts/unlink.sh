@@ -19,6 +19,8 @@ unlink_path() {
 }
 
 unlink_path "${ROOT_DIR}/modules/compositor/niri/config.kdl" "${TARGET_BASE}/niri/config.kdl"
+unlink_path "${ROOT_DIR}/modules/compositor/nirinit" "${TARGET_BASE}/nirinit"
 unlink_path "${ROOT_DIR}/modules/ui/waybar" "${TARGET_BASE}/waybar"
 unlink_path "${ROOT_DIR}/modules/ui/mako" "${TARGET_BASE}/mako"
 unlink_path "${ROOT_DIR}/modules/launcher/fuzzel" "${TARGET_BASE}/fuzzel"
+unlink_path "${ROOT_DIR}/modules/ui/noctalia" "${TARGET_BASE}/noctalia"

@@ -1,3 +1,7 @@
+## Overview
+
+This plan migrates an existing Niri-based desktop setup into a structured, versioned repo without changing behavior first, then progressively adds window rules, startup management, session restore, and health checks. It is organized into phases that keep changes incremental and reversible, with clear acceptance criteria to confirm a stable, predictable workflow.
+
 ## Detailed implementation plan with checkboxes
 
 ### Phase 0 — Foundations

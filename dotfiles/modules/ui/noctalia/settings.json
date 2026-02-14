@@ -24,7 +24,7 @@
         "sortByMostUsed": true,
         "terminalCommand": "alacritty -e",
         "useApp2Unit": false,
-        "viewMode": "list"
+        "viewMode": "grid"
     },
     "audio": {
         "cavaFrameRate": 30,
@@ -43,12 +43,12 @@
         "barType": "simple",
         "capsuleColorKey": "none",
         "capsuleOpacity": 1,
-        "density": "default",
+        "density": "compact",
         "displayMode": "always_visible",
         "floating": false,
         "frameRadius": 12,
         "frameThickness": 8,
-        "hideOnOverview": false,
+        "hideOnOverview": true,
         "marginHorizontal": 4,
         "marginVertical": 4,
         "monitors": [
@@ -81,13 +81,6 @@
                     "showBadge": true,
                     "showLabelsOnlyWhenOccupied": true,
                     "unfocusedIconsOpacity": 1
-                }
-            ],
-            "left": [
-                {
-                    "icon": "rocket",
-                    "iconColor": "none",
-                    "id": "Launcher"
                 },
                 {
                     "clockColor": "none",
@@ -97,6 +90,13 @@
                     "id": "Clock",
                     "tooltipFormat": "HH:mm ddd, MMM dd",
                     "useCustomFont": false
+                }
+            ],
+            "left": [
+                {
+                    "icon": "rocket",
+                    "iconColor": "none",
+                    "id": "Launcher"
                 },
                 {
                     "compactMode": true,
@@ -151,6 +151,20 @@
             ],
             "right": [
                 {
+                    "defaultSettings": {
+                        "arrowType": "caret",
+                        "byteThresholdActive": 1024,
+                        "fontSizeModifier": 1,
+                        "forceMegabytes": false,
+                        "iconSizeModifier": 1,
+                        "minWidth": 0,
+                        "showNumbers": true,
+                        "spacingInbetween": 0,
+                        "useCustomColors": false
+                    },
+                    "id": "plugin:network-indicator"
+                },
+                {
                     "blacklist": [
                     ],
                     "chevronColor": "none",
@@ -170,15 +184,6 @@
                     "unreadBadgeColor": "primary"
                 },
                 {
-                    "deviceNativePath": "__default__",
-                    "displayMode": "graphic-clean",
-                    "hideIfIdle": false,
-                    "hideIfNotDetected": true,
-                    "id": "Battery",
-                    "showNoctaliaPerformance": false,
-                    "showPowerProfiles": false
-                },
-                {
                     "displayMode": "onhover",
                     "iconColor": "none",
                     "id": "Volume",
@@ -192,6 +197,81 @@
                     "textColor": "none"
                 },
                 {
+                    "defaultSettings": {
+                        "compactMode": false,
+                        "defaultPeerAction": "copy-ip",
+                        "hideDisconnected": false,
+                        "pingCount": 5,
+                        "refreshInterval": 5000,
+                        "showIpAddress": true,
+                        "showPeerCount": true,
+                        "terminalCommand": ""
+                    },
+                    "id": "plugin:tailscale"
+                },
+                {
+                    "defaultSettings": {
+                        "customColor": "none",
+                        "showConditionIcon": true,
+                        "showTempUnit": true,
+                        "showTempValue": true,
+                        "tooltipOption": "everything"
+                    },
+                    "id": "plugin:weather-indicator"
+                },
+                {
+                    "defaultSettings": {
+                        "chargeThreshold": 80
+                    },
+                    "id": "plugin:battery-threshold"
+                },
+                {
+                    "defaultSettings": {
+                        "enableTodoIntegration": false,
+                        "notecardsEnabled": true,
+                        "pincardsEnabled": true,
+                        "position": "Bottom",
+                        "showCloseButton": false
+                    },
+                    "id": "plugin:clipper"
+                },
+                {
+                    "defaultSettings": {
+                        "refreshInterval": 5000
+                    },
+                    "id": "plugin:mini-docker"
+                },
+                {
+                    "defaultSettings": {
+                        "autoHeight": true,
+                        "cheatsheetData": [
+                        ],
+                        "columnCount": 3,
+                        "detectedCompositor": "",
+                        "hyprlandConfigPath": "~/.config/hypr/hyprland.conf",
+                        "modKeyVariable": "$mod",
+                        "niriConfigPath": "~/.config/niri/config.kdl",
+                        "windowHeight": 0,
+                        "windowWidth": 1400
+                    },
+                    "id": "plugin:keybind-cheatsheet"
+                },
+                {
+                    "defaultSettings": {
+                        "mode": "region"
+                    },
+                    "id": "plugin:screenshot"
+                },
+                {
+                    "deviceNativePath": "__default__",
+                    "displayMode": "graphic-clean",
+                    "hideIfIdle": false,
+                    "hideIfNotDetected": true,
+                    "id": "Battery",
+                    "showNoctaliaPerformance": false,
+                    "showPowerProfiles": false
+                },
+                {
                     "colorizeDistroLogo": false,
                     "colorizeSystemIcon": "none",
                     "customIconPath": "",
@@ -199,15 +279,6 @@
                     "icon": "noctalia",
                     "id": "ControlCenter",
                     "useDistroLogo": false
-                },
-                {
-                    "id": "plugin:tailscale"
-                },
-                {
-                    "id": "plugin:weather-indicator"
-                },
-                {
-                    "id": "plugin:battery-threshold"
                 }
             ]
         }
@@ -258,11 +329,11 @@
                 "id": "audio-card"
             },
             {
-                "enabled": false,
+                "enabled": true,
                 "id": "brightness-card"
             },
             {
-                "enabled": true,
+                "enabled": false,
                 "id": "weather-card"
             },
             {

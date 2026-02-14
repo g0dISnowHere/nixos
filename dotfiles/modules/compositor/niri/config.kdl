@@ -16,6 +16,13 @@ layout {
   gaps 12
 }
 
+// Tier 0: Overview (zoomed-out workspace grid)
+// Uses Mod+Tab for a visual overview across workspaces.
+overview {
+  // Dense overview: smaller workspaces for more windows on screen.
+  zoom 0.35
+}
+
 // Tier 0: Foundation (minimal keybinds)
 binds {
   Mod+Return { spawn "alacritty"; } // terminal
@@ -26,26 +33,18 @@ binds {
   Mod+Shift+R { spawn "niri" "msg" "action" "load-config-file"; } // reload config
   Mod+Shift+E { quit; }             // exit session
   Mod+F { maximize-window-to-edges; } // maximize current window, keep bar
+  Mod+Tab { toggle-overview; }      // overview (grid of workspaces/windows)
 }
 
 // Tier 0.5: Predictability layer
 // Route new windows to named workspaces
-window-rule {
-  match app-id="Vivaldi-flatpak" title=r#"WhatsApp"#
-  open-on-workspace "3:comms"
-}
-window-rule {
-  match app-id="Vivaldi-flatpak" title=r#"Telegram Web"#
-  open-on-workspace "3:comms"
-}
-window-rule {
-  match app-id="Vivaldi-flatpak" title=r#"Gmail"#
-  open-on-workspace "3:comms"
-}
-window-rule {
-  match app-id="Vivaldi-flatpak" title=r#"Proton Mail"#
-  open-on-workspace "3:comms"
-}
+// window-rule {
+  // match app-id="Vivaldi-flatpak" title=r#"WhatsApp"#
+
+  // match app-id="Vivaldi-flatpak" title=r#"Gmail"#
+  
+  // match app-id="Vivaldi-flatpak" title=r#"Proton Mail"#
+  // open-on-workspace "3:comms" }
 window-rule {
   match app-id="Vivaldi-flatpak"
   match app-id="com.google.Chrome"
@@ -107,12 +106,6 @@ window-rule {
   match app-id="page.tesk.Refine"
   open-on-workspace "5:scratch"
 }
-
-// Tier 1: Desktop shell (commented placeholder)
-// - Autostarts live here when enabled
-
-// Tier 2: Persistence (commented placeholder)
-// - nirinit config goes here
 
 // Tier 3: Extras (commented placeholder)
 // - Optional QoL features

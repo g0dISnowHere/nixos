@@ -18,6 +18,22 @@
 
   services.nirinit.enable = true;
 
+  systemd.user.services.nirinit = {
+    description = lib.mkForce "Nirinit";
+    partOf = lib.mkForce [ "niri.service" ];
+    after = lib.mkForce [ "niri.service" ];
+    wantedBy = lib.mkForce [ "niri.service" ];
+    serviceConfig = {
+      ExecStart = lib.mkForce [
+        ""
+        "${
+          inputs.nirinit.packages.${pkgs.system}.default
+        }/bin/nirinit --config %h/.config/nirinit/config.toml"
+      ];
+      Restart = "always";
+    };
+  };
+
   # Authentication / secrets
   security.polkit.enable = true;
   services.gnome.gnome-keyring.enable = true; # Secret Service
@@ -62,6 +78,18 @@
       Restart = "on-failure";
     };
   };
+
+  # Battery threshold control (Noctalia plugin)
+  users.groups.battery_ctl = { };
+  users.users.djoolz.extraGroups = [ "battery_ctl" ];
+  services.udev.extraRules = ''
+    # Battery Threshold Control - udev rule
+    # Grants write access to charge_control_end_threshold for users in the
+    # 'battery_ctl' group, only for BAT0
+    SUBSYSTEM=="power_supply", KERNEL=="BAT0", \
+        RUN+="${pkgs.coreutils}/bin/chgrp battery_ctl /sys$devpath/charge_control_end_threshold", \
+        RUN+="${pkgs.coreutils}/bin/chmod g+w /sys$devpath/charge_control_end_threshold"
+  '';
   environment.systemPackages = with pkgs; [
     alacritty
     fuzzel

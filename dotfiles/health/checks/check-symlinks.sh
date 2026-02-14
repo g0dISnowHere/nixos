@@ -4,8 +4,10 @@ set -u
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 expect_niri="${ROOT_DIR}/modules/compositor/niri/config.kdl"
+expect_nirinit="${ROOT_DIR}/modules/compositor/nirinit"
 expect_waybar="${ROOT_DIR}/modules/ui/waybar"
 expect_mako="${ROOT_DIR}/modules/ui/mako"
+expect_noctalia="${ROOT_DIR}/modules/ui/noctalia"
 
 status=0
 
@@ -28,7 +30,9 @@ check_link() {
 }
 
 check_link "$HOME/.config/niri/config.kdl" "$expect_niri"
+check_link "$HOME/.config/nirinit" "$expect_nirinit"
 check_link "$HOME/.config/waybar" "$expect_waybar"
 check_link "$HOME/.config/mako" "$expect_mako"
+check_link "$HOME/.config/noctalia" "$expect_noctalia"
 
 exit "$status"

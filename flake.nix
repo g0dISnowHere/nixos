@@ -22,6 +22,16 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
 
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
+    nirinit = {
+      url = "github:amaanq/nirinit";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     # nix-software-center.url = "github:snowfallorg/nix-software-center";
 
