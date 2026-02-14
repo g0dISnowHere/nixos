@@ -13,9 +13,6 @@
   # Note: Individual configs can override this
   home.stateVersion = lib.mkDefault "25.11";
 
-  # Enable home-manager
-  programs.home-manager.enable = true;
-
   # Basic CLI packages (minimal set - more in packages.nix)
   home.packages = with pkgs; [ vim git htop ];
 }

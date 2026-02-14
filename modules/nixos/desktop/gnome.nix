@@ -21,7 +21,7 @@
   programs.dconf.enable = true;
 
   # GNOME-specific system packages
-  environment.systemPackages = with pkgs; [ dconf2nix ];
+  environment.systemPackages = with pkgs; [ dconf2nix dconf-editor dconf ];
 
   # GNOME-specific Flatpak applications
   services.flatpak.packages = [

@@ -144,6 +144,7 @@
       ## AI
       #################################################################################
 
+      pkgs-unstable.codex
       # pkgs-unstable.aider-chat-full
       pkgs-unstable.opencode
       pkgs-unstable.gh # github cli
