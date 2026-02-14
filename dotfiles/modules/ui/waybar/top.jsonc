@@ -1,7 +1,6 @@
-// Waybar config (dotfiles/modules/ui/waybar/config.jsonc)
+// Waybar top bar (dotfiles/modules/ui/waybar/top.jsonc)
 // Tier 1: Desktop shell (minimal)
 // - Keep modules minimal and stable
-// - Avoid automation here
 {
   "layer": "top",
   "position": "top",

@@ -1,0 +1,12 @@
+// Waybar dock (dotfiles/modules/ui/waybar/dock.jsonc)
+// Tier 1: Desktop shell (minimal)
+// - Placeholder until dock is configured
+{
+  "layer": "bottom",
+  "position": "bottom",
+  "exclusive": true,
+  "height": 28,
+  "modules-center": ["wlr/taskbar"]
+}
+// Tier 2: Persistence (commented placeholder)
+// Tier 3: Extras (commented placeholder)

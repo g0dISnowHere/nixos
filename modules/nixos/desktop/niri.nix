@@ -11,6 +11,14 @@
   security.polkit.enable = true;
   services.gnome.gnome-keyring.enable = true; # Secret Service
   security.pam.services.swaylock = { };
+  security.pam.services.login.enableGnomeKeyring = true;
+  security.pam.services.gdm-password.enableGnomeKeyring = true;
+
+  # Greeter
+  services.displayManager.gdm = {
+    enable = true;
+    wayland = true;
+  };
 
   # Portals for file pickers/screen sharing on Wayland
   xdg.portal.enable = true;

@@ -1,3 +1,6 @@
+/* Waybar style (dotfiles/modules/ui/waybar/style.css) */
+/* Tier 1: Desktop shell (minimal) */
+/* - Keep visuals quiet and predictable */
 * {
   font-family: monospace;
   font-size: 12px;
@@ -7,3 +10,6 @@ window#waybar {
   background: rgba(20, 20, 20, 0.9);
   color: #e6e6e6;
 }
+
+/* Tier 2: Persistence (commented placeholder) */
+/* Tier 3: Extras (commented placeholder) */

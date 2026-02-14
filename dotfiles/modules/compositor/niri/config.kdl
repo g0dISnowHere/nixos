@@ -15,6 +15,7 @@ binds {
   Mod+Shift+7 { show-hotkey-overlay; } // shortcuts (German layout "/")
   Mod+Shift+R { spawn "niri" "msg" "action" "load-config-file"; } // reload config
   Mod+Shift+E { quit; }             // exit session
+  Mod+F { maximize-window-to-edges; } // maximize current window, keep bar
 }
 
 // Tier 0.5: Predictability layer
@@ -23,3 +24,18 @@ window-rule {
   match app-id="firefox"
   open-on-workspace "2:research"
 }
+
+// Tier 0.5 (commented examples)
+// window-rule {
+//   match app-id="code"
+//   open-on-workspace "1:dev"
+// }
+
+// Tier 1: Desktop shell (commented placeholder)
+// - Autostarts live here when enabled
+
+// Tier 2: Persistence (commented placeholder)
+// - nirinit config goes here
+
+// Tier 3: Extras (commented placeholder)
+// - Optional QoL features
