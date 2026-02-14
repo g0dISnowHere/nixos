@@ -3,6 +3,14 @@
 // - Keep layout predictable
 // - Avoid automation here
 
+// Named workspaces (Tier 0 foundation)
+workspace "1:dev"
+workspace "2:research"
+workspace "3:comms"
+workspace "4:media"
+workspace "5:scratch"
+workspace "6:engineering"
+
 // Example layout defaults (adjust as needed)
 layout {
   gaps 12
@@ -12,6 +20,8 @@ layout {
 binds {
   Mod+Return { spawn "alacritty"; } // terminal
   Mod+D { spawn "fuzzel"; }         // launcher
+  Mod+Space { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; } // Noctalia launcher
+  Alt+F4 { close-window; }          // close window
   Mod+Shift+7 { show-hotkey-overlay; } // shortcuts (German layout "/")
   Mod+Shift+R { spawn "niri" "msg" "action" "load-config-file"; } // reload config
   Mod+Shift+E { quit; }             // exit session
@@ -21,15 +31,82 @@ binds {
 // Tier 0.5: Predictability layer
 // Route new windows to named workspaces
 window-rule {
-  match app-id="firefox"
+  match app-id="Vivaldi-flatpak" title=r#"WhatsApp"#
+  open-on-workspace "3:comms"
+}
+window-rule {
+  match app-id="Vivaldi-flatpak" title=r#"Telegram Web"#
+  open-on-workspace "3:comms"
+}
+window-rule {
+  match app-id="Vivaldi-flatpak" title=r#"Gmail"#
+  open-on-workspace "3:comms"
+}
+window-rule {
+  match app-id="Vivaldi-flatpak" title=r#"Proton Mail"#
+  open-on-workspace "3:comms"
+}
+window-rule {
+  match app-id="Vivaldi-flatpak"
+  match app-id="com.google.Chrome"
   open-on-workspace "2:research"
 }
 
-// Tier 0.5 (commented examples)
-// window-rule {
-//   match app-id="code"
-//   open-on-workspace "1:dev"
-// }
+window-rule {
+  match app-id="io.dbeaver.DBeaverCommunity"
+  match app-id="io.github.Omniaevo.mqtt5-explorer"
+  match app-id="org.nmap.Zenmap"
+  match app-id="code"
+  match app-id="com.visualstudio.code"
+  match app-id="com.visualstudio.code-insiders"
+  match app-id="code-oss"
+  match app-id="codium"
+  match app-id="VSCodium"
+  match app-id="Kiro"
+  match app-id="kiro"
+  match app-id="Antigravity"
+  match app-id="antigravity"
+  open-on-workspace "1:dev"
+}
+
+window-rule {
+  match app-id="org.signal.Signal"
+  match app-id="org.mozilla.Thunderbird"
+  match app-id="com.rustdesk.RustDesk"
+  match app-id="com.freerdp.FreeRDP"
+  match app-id="Bitwarden"
+  open-on-workspace "3:comms"
+}
+
+window-rule {
+  match app-id="org.mozilla.firefox"
+  match app-id="com.spotify.Client"
+  match app-id="org.audacityteam.Audacity"
+  match app-id="org.blender.Blender"
+  match app-id="org.gimp.GIMP"
+  match app-id="org.inkscape.Inkscape"
+  open-on-workspace "4:media"
+}
+
+window-rule {
+  match app-id="org.freecad.FreeCAD"
+  match app-id="org.kicad.KiCad"
+  match app-id="org.librecad.librecad"
+  match app-id="org.openscad.OpenSCAD"
+  match app-id="com.prusa3d.PrusaSlicer"
+  match app-id="com.connorcode.mslicer"
+  open-on-workspace "6:engineering"
+}
+
+window-rule {
+  match app-id="org.libreoffice.LibreOffice"
+  match app-id="io.github.alainm23.planify"
+  match app-id="io.github.flattool.Warehouse"
+  match app-id="com.github.tchx84.Flatseal"
+  match app-id="io.github.giantpinkrobots.flatsweep"
+  match app-id="page.tesk.Refine"
+  open-on-workspace "5:scratch"
+}
 
 // Tier 1: Desktop shell (commented placeholder)
 // - Autostarts live here when enabled

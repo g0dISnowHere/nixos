@@ -7,3 +7,4 @@ These workspaces are semantic and should be named persistently.
 3:comms
 4:media
 5:scratch
+6:engineering

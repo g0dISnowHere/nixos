@@ -14,6 +14,7 @@
   * [x] `3:comms`
   * [x] `4:media`
   * [x] `5:scratch`
+  * [x] `6:engineering`
 
 ---
 
@@ -81,25 +82,26 @@
 * [x] Verify links:
 
   * [x] `readlink ~/.config/niri/config.kdl` points into repo
-  * [ ] `readlink ~/.config/waybar/top.jsonc` points into repo
+  * [x] `readlink ~/.config/waybar/top.jsonc` points into repo
   * [x] `readlink ~/.config/mako/config` points into repo
+  * [x] `readlink ~/.config/noctalia` points into repo
 * [ ] Confirm nothing changed behaviorally yet
 
 ---
 
 ### Phase 4 — Predictability layer (Tier 0.5 window rules)
 
-* [ ] Add ONE window rule (commented at first)
+* [x] Add ONE window rule (commented at first)
 
-  * [ ] Browser → `2:research`
-* [ ] Determine actual `app-id` for your browser
+  * [x] Browser → `2:research`
+* [x] Determine actual `app-id` for your browser
 
   * [ ] Native package?
   * [ ] Flatpak? (IDs often become `org.*`)
-* [ ] Enable only that one rule
+* [x] Enable only that one rule
 * [ ] Validate:
 
-  * [ ] Browser opens in `2:research` consistently
+  * [x] Browser opens in `2:research` consistently
 * [ ] Add rules gradually (1/day max):
 
   * [ ] IDE → `1:dev`
@@ -116,21 +118,21 @@
 
 ### Phase 5 — Desktop shell (Tier 1) without startup conflicts
 
-* [ ] Choose ONE startup method:
+* [x] Choose ONE startup method:
 
-  * [ ] Systemd user services (recommended)
+  * [x] Systemd user services (recommended)
   * [ ] `spawn-at-startup` in niri
-* [ ] Implement top bar:
+* [x] Implement top bar:
 
-  * [ ] Waybar top config with modules-left stats
-  * [ ] modules-center workspace indicator
-  * [ ] modules-right connectivity/system icons
-* [ ] Implement dock (simple first):
+  * [x] Waybar top config with modules-left stats
+  * [x] modules-center workspace indicator
+  * [x] modules-right connectivity/system icons
+* [x] Implement dock (simple first):
 
-  * [ ] Waybar `wlr/taskbar` dock bottom
-* [ ] Notifications:
+  * [x] Waybar `wlr/taskbar` dock bottom
+* [x] Notifications:
 
-  * [ ] Mako config + start method selected
+  * [x] Mako config + start method selected
 * [ ] Verify no duplicates:
 
   * [ ] Waybar started exactly once
@@ -140,11 +142,11 @@
 
 ### Phase 6 — Zero-friction restore (Tier 2 + 2.5)
 
-* [ ] Add session persistence tool (Tier 2)
+* [x] Add session persistence tool (Tier 2)
 
-  * [ ] Install `nirinit`
-  * [ ] Start via systemd user service OR niri spawn (not both)
-* [ ] Enable autosave/restore only
+  * [x] Install `nirinit`
+  * [x] Start via systemd user service OR niri spawn (not both)
+* [x] Enable autosave/restore only
 * [ ] Validate after relog/reboot:
 
   * [ ] Workspaces come back

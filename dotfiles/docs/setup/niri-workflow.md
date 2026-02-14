@@ -13,6 +13,7 @@ Named workspaces remain even when empty:
 3:comms
 4:media
 5:scratch
+6:engineering
 
 ## Column semantics
 - Left: reference
