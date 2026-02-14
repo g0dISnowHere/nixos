@@ -10,7 +10,7 @@ This is a modular NixOS flake configuration managing multiple machines using fla
 - **Standalone home-manager** configurations decoupled from machines
 - **Explicit imports** with no recursive discovery (clear dependencies)
 
-**Current Status:** Refactor to modular structure in progress. See `plan.md` for migration details.
+**Current Status:** Modular structure migration substantially complete (~90%). See `plan.md` for details.
 
 ## Getting Started
 
@@ -149,7 +149,7 @@ The configuration uses flake-parts with a clear separation of concerns:
 3. **perSystem modules**: `parts/` directory contains development tools, formatters, checks
 4. **Flake outputs**: `flake/` directory contains machines, homes, exported modules
 5. **Reusable modules**: `modules/nixos/` and `modules/home/` contain self-contained feature modules
-6. **Machine configs**: `machines/{hostname}/` contain hardware and machine-specific overrides
+6. **Machine configs**: `nixos/machines/{hostname}/` contain hardware and machine-specific overrides
 
 ### Directory Structure
 
@@ -170,18 +170,19 @@ mine/
 │   ├── machines/                      # Machine definitions by role
 │   │   ├── workstations.nix           # Laptop/desktop machines
 │   │   └── homelabs.nix               # Server/homelab machines
-│   ├── homes/                         # Standalone home-manager configs
-│   │   ├── djoolz.nix                 # User configurations
-│   │   └── profiles/                  # Reusable home profiles
-│   │       ├── common.nix             # CLI-only (for servers)
-│   │       ├── desktop.nix            # GUI + development tools
-│   │       └── development.nix        # Additional dev tools
-│   └── modules.nix                    # Exported nixosModules/homeModules
+│   └── homes/                         # Standalone home-manager configs
+│       ├── djoolz.nix                 # User configurations
+│       └── profiles/                  # Reusable home profiles
+│           ├── common.nix             # CLI-only (for servers)
+│           └── desktop.nix            # GUI + development tools
 │
 ├── modules/                           # Reusable NixOS & Home modules
 │   ├── nixos/
 │   │   ├── desktop/                   # Desktop environments (GNOME, Plasma)
 │   │   │   ├── common.nix             # Shared desktop infrastructure (audio/printing/bluetooth/etc.)
+│   │   │   ├── gnome.nix              # GNOME desktop with GDM
+│   │   │   ├── plasma.nix             # KDE Plasma 6 with SDDM
+│   │   │   └── gsconnect.nix          # GSConnect/KDE Connect integration
 │   │   ├── virtualisation/            # Docker, Podman, libvirtd, QuickEMU
 │   │   ├── services/                  # Tailscale, SSH, Android, etc.
 │   │   ├── system/                    # Locale, shell, power, nix-settings
@@ -192,21 +193,16 @@ mine/
 │       ├── dconf/                     # GNOME/dconf settings
 │       └── plasma/                    # KDE Plasma home-manager settings (plasma-manager)
 │
-└── nixos/                             # Contains legacy machine configurations
+└── nixos/                             # Machine-specific configurations
     └── machines/
-        ├── centauri/                      # Primary laptop/workstation
-        │   ├── default.nix                # Machine config + role imports
+        ├── centauri/                  # Primary laptop/workstation
+        │   ├── default.nix            # Machine config + role imports
         │   ├── hardware-configuration.nix # Hardware scan output
-        │   ├── bootloader.nix             # Boot configuration
-        │   └── other-hardware.nix         # Additional hardware settings
-        ├── karakan/
-        │   └── ...
-        ├── mirach/                    # Homelab server
-        │   ├── default.nix
-        │   ├── hardware-configuration.nix
-        │   └── services/                  # Machine-specific services
-        │       └── homeassistant.nix
-        └── template/                      # Template for new machines
+        │   ├── bootloader.nix         # Boot configuration
+        │   └── other-hardware.nix     # Additional hardware settings
+        └── mirach/                    # Homelab server
+            ├── default.nix
+            └── hardware-configuration.nix
 
 ```
 
@@ -239,7 +235,7 @@ Machines are organized by role with machine-specific overrides:
 
 1. **Create machine directory:**
    ```bash
-   mkdir -p machines/NEW_MACHINE
+   mkdir -p nixos/machines/NEW_MACHINE
    ```
 
 2. **Generate hardware config:**
@@ -247,7 +243,7 @@ Machines are organized by role with machine-specific overrides:
    sudo nixos-generate-config --show-hardware-config > nixos/machines/NEW_MACHINE/hardware-configuration.nix
    ```
 
-3. **Create `machines/NEW_MACHINE/default.nix`:**
+3. **Create `nixos/machines/NEW_MACHINE/default.nix`:**
    ```nix
    { config, pkgs, hostname, ... }:
    {
@@ -288,7 +284,7 @@ Machines are organized by role with machine-specific overrides:
      desktop = "gnome";     # or "plasma", "niri", etc. (optional)
      modules = [
        # Virtualization (choose as needed)
-       # ../../modules/nixos/virtualisation/docker-rootless.nix
+       # ../../modules/nixos/virtualisation/docker_rootless.nix
        # ../../modules/nixos/virtualisation/libvirtd.nix
      ];
    };
@@ -424,19 +420,12 @@ Desktop environments are managed via the `desktop` parameter in `mkNixosSystem`.
    ```
 
 4. **Import in machine or role:**
-   - In `flake/machines/*.nix` for machine-specific modules
+   - In `nixos/machines/{hostname}/default.nix` for machine-specific modules
+   - In `flake/machines/*.nix` for modules shared by role
    - In `modules/nixos/roles/*.nix` for all machines with that role
    - In `flake/homes/profiles/*.nix` for home-manager modules
 
-5. **Export if reusable (optional):**
-   Add to `flake/modules.nix`:
-   ```nix
-   flake.nixosModules = {
-     my-service = ./modules/nixos/services/my-service.nix;
-   };
-   ```
-
-6. **Test module independence:**
+5. **Test module independence:**
    ```bash
    # Verify module can be imported standalone
    nix eval .#nixosConfigurations.centauri.config.services.my-service.enable
@@ -505,9 +494,9 @@ modules/nixos/system/
 - ✅ **DO** make modules self-contained (all related config in one file)
 - ✅ **DO** add descriptive comments to each module explaining its purpose
 - ✅ **DO** use role profiles for shared configuration across machines
-- ✅ **DO** keep machine-specific config in `machines/{hostname}/`
+- ✅ **DO** keep machine-specific config in `nixos/machines/{hostname}/`
 - ✅ **DO** use `pkgs-unstable` for packages requiring newer versions
-- ✅ **DO** export reusable modules in `flake/modules.nix`
+- ✅ **DO** consider exporting reusable modules for other flakes
 - ✅ **DO** use standalone home-manager for user configurations
 - ✅ **DO** test changes with `nixos-rebuild test` before switching
 - ✅ **DO** commit after each successful validation
@@ -593,7 +582,7 @@ services.myservice.passwordFile = config.age.secrets.my-secret.path;
 
 ### CPU Mitigations
 
-`machines/centauri/bootloader.nix` may disable Spectre/Meltdown mitigations with `mitigations=off`.
+`nixos/machines/centauri/bootloader.nix` may disable Spectre/Meltdown mitigations with `mitigations=off`.
 
 - Only acceptable for air-gapped machines
 - For networked machines: Remove or use `mitigations=auto`
@@ -799,11 +788,10 @@ Automate validation in CI:
 
 ## Migration Notes
 
-**Current Status:** This repository is undergoing refactoring to the modular structure described above.
+**Current Status:** Migration to modular structure is substantially complete (~90%).
 
-- See `plan.md` for detailed migration plan and phases
-- Old structure: `nixos/machines/common/` → New: `modules/nixos/`
-- Old: Coupled home-manager → New: Standalone `homeConfigurations`
-- Old: Flat machine list → New: Role-based organization
+- See `plan.md` for detailed migration history
+- Completed: Role-based machine organization, standalone home-manager, modular services
+- Remaining: Minor cleanup and documentation updates
 
-During migration, both old and new structures may coexist. Always validate with `nix eval` after changes.
+Always validate with `nix eval` after changes.
