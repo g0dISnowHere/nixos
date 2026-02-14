@@ -11,7 +11,7 @@
       };
 
       extraSpecialArgs = {
-        desktop = "gnome";
+        desktop = "niri";
         inherit inputs;
         pkgs-unstable = import inputs.nixpkgs-unstable {
           system = "x86_64-linux";

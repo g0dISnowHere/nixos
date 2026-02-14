@@ -18,6 +18,11 @@
     ++ (if desktop == "plasma" then
       [ ../../../modules/home/plasma/plasma.nix ]
     else
+      [ ])
+    # Niri: dotfiles link script + compositor-specific home setup
+    ++ (if desktop == "niri" then
+      [ ../../../modules/home/desktop/niri.nix ]
+    else
       [ ]);
 
   # Enable font configuration for GUI apps

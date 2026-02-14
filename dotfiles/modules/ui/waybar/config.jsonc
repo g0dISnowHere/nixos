@@ -1,0 +1,10 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+  "modules-left": ["niri/workspaces"],
+  "modules-right": ["clock"],
+  "clock": {
+    "format": "{:%H:%M}"
+  }
+}

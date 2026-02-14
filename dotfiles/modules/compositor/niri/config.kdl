@@ -1,0 +1,25 @@
+// Niri config (dotfiles/modules/compositor/niri/config.kdl)
+// Tier 0: Foundation
+// - Keep layout predictable
+// - Avoid automation here
+
+// Example layout defaults (adjust as needed)
+layout {
+  gaps 12
+}
+
+// Tier 0: Foundation (minimal keybinds)
+binds {
+  Mod+Return { spawn "alacritty"; } // terminal
+  Mod+D { spawn "fuzzel"; }         // launcher
+  Mod+Shift+7 { show-hotkey-overlay; } // shortcuts (German layout "/")
+  Mod+Shift+R { spawn "niri" "msg" "action" "load-config-file"; } // reload config
+  Mod+Shift+E { quit; }             // exit session
+}
+
+// Tier 0.5: Predictability layer
+// Route new windows to named workspaces
+window-rule {
+  match app-id="firefox"
+  open-on-workspace "2:research"
+}
