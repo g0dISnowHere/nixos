@@ -49,9 +49,18 @@
         {
           "keys": "Super + F",
           "desc": "Maximize Window To Edges; } // Maximize Current Window, Keep Bar"
+        },
+        {
+          "keys": "Super + Tab",
+          "desc": "Toggle Overview; }      // Overview (Grid Of Workspaces/Windows)"
         }
       ]
     }
   ],
-  "detectedCompositor": "niri"
+  "detectedCompositor": "niri",
+  "niriConfigPath": "~/.config/niri/config.kdl",
+  "hyprlandConfigPath": "~/.config/hypr/hyprland.conf",
+  "modKeyVariable": "$mod",
+  "windowHeight": 850,
+  "windowWidth": 1400
 }

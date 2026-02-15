@@ -174,14 +174,14 @@ This plan migrates an existing Niri-based desktop setup into a structured, versi
 * [x] Create `health/doctor.sh`
 
   * [x] Runs every script in `health/checks/`
-  * [ ] Prints PASS/WARN output
-* [ ] Implement checks:
+  * [x] Prints PASS/WARN output
+* [x] Implement checks:
 
   * [x] `check-symlinks.sh` (broken symlinks under `~/.config`)
   * [x] `check-appids.sh` (expected app IDs vs current niri windows)
-  * [ ] `check-duplicate-startup.sh` (systemd vs niri spawn conflicts)
+  * [x] `check-duplicate-startup.sh` (systemd vs niri spawn conflicts)
   * [ ] `check-deprecated-options.sh` (optional, later)
-* [ ] Add `scripts/doctor.sh` wrapper
+* [x] Add `scripts/doctor.sh` wrapper
 * [ ] Add shell alias (optional):
 
   * [ ] `dotdoctor`
@@ -190,13 +190,13 @@ This plan migrates an existing Niri-based desktop setup into a structured, versi
 
 ### Phase 8 — Codex operationalization
 
-* [ ] Ensure `README_FOR_AI.md` includes:
+* [x] Ensure `README_FOR_AI.md` includes:
 
-  * [ ] preserve tier structure
-  * [ ] new features commented out
-  * [ ] minimal diffs
-  * [ ] run `scripts/doctor.sh` before edits
-* [ ] Add `docs/codex-bootstrap.md` with a copy/paste prompt
+  * [x] preserve tier structure
+  * [x] new features commented out
+  * [x] minimal diffs
+  * [x] run `scripts/doctor.sh` before edits
+* [x] Add `docs/codex-bootstrap.md` with a copy/paste prompt
 * [ ] Verify Codex behavior:
 
   * [ ] Codex reads docs first

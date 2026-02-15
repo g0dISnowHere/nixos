@@ -3,12 +3,11 @@
 # - Keep mappings empty until Tier 2.5
 
 # interval in seconds between autosaves (default is usually fine)
-# save_interval = 30
+save_interval = 30
 
 # Tier 2.5: Deterministic restore (commented placeholder)
 # [mappings]
 # "2:research" = ["Vivaldi-flatpak", "org.mozilla.firefox"]
-
 # Tier 2.5: Ignore transient windows (commented placeholder)
-# [ignore]
-# app_id = ["pavucontrol", "blueman-manager"]
+[ignore]
+app_id = ["pavucontrol", "blueman-manager"]

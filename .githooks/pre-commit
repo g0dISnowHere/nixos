@@ -34,7 +34,15 @@ else
     echo "   ℹ️  Code was reformatted, staging changes..."
     # Re-stage only the files that were staged before formatting.
     if [ -s "$staged_files_file" ]; then
-        xargs -d '\n' git add -- < "$staged_files_file"
+        while IFS= read -r path; do
+            if [ -e "$path" ] || [ -L "$path" ]; then
+                git add -- "$path"
+            else
+                if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+                    git add -u -- "$path"
+                fi
+            fi
+        done < "$staged_files_file"
     fi
 fi
 echo ""

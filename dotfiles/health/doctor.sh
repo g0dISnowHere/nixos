@@ -10,9 +10,9 @@ for check in "${CHECK_DIR}"/*.sh; do
   [ -e "$check" ] || continue
   printf '==> %s\n' "$(basename "$check")"
   if bash "$check"; then
-    printf 'ok\n\n'
+    printf 'PASS\n\n'
   else
-    printf 'FAIL\n\n'
+    printf 'WARN\n\n'
     status=1
   fi
 done

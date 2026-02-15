@@ -132,7 +132,16 @@
     # disabling mouse acceleration
     mouse = { accelProfile = "flat"; };
     # disabling touchpad acceleration
-    touchpad = { accelProfile = "flat"; };
+    touchpad = {
+      accelProfile = "flat";
+      tapping = true; # tap-to-click
+      tappingButtonMap = "lrm"; # 2-finger tap = right click
+      tappingDragLock = true; # double-tap + hold to drag
+      clickMethod = "clickfinger"; # 2-finger physical click = right click
+      scrollMethod = "twofinger"; # touch gestures for scrolling
+      horizontalScrolling = true;
+      disableWhileTyping = true;
+    };
   };
 
   # https://nixos.wiki/wiki/Logitech_Unifying_Receiver

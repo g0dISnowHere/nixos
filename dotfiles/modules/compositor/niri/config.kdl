@@ -11,6 +11,14 @@ workspace "4:media"
 workspace "5:scratch"
 workspace "6:engineering"
 
+// Input (explicit to avoid compositor overrides)
+input {
+  touchpad {
+    tap
+    dwt
+  }
+}
+
 // Example layout defaults (adjust as needed)
 layout {
   gaps 12
@@ -34,6 +42,18 @@ binds {
   Mod+Shift+E { quit; }             // exit session
   Mod+F { maximize-window-to-edges; } // maximize current window, keep bar
   Mod+Tab { toggle-overview; }      // overview (grid of workspaces/windows)
+
+  // Optional: window movement (commented by default)
+  Mod+Left { move-column-left; } // move window left (column)
+  Mod+Right { move-column-right; } // move window right (column)
+  Mod+Up { move-window-to-workspace-up; } // move window to workspace above
+  Mod+Down { move-window-to-workspace-down; } // move window to workspace below
+
+  // Optional: view movement (commented by default)
+  Ctrl+Mod+Left { focus-column-left; } // move view left (column)
+  Ctrl+Mod+Right { focus-column-right; } // move view right (column)
+  Ctrl+Mod+Up { focus-workspace-up; } // move view to workspace above
+  Ctrl+Mod+Down { focus-workspace-down; } // move view to workspace below
 }
 
 // Tier 0.5: Predictability layer

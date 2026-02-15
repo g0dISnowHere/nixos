@@ -27,7 +27,7 @@
       ExecStart = lib.mkForce [
         ""
         "${
-          inputs.nirinit.packages.${pkgs.system}.default
+          inputs.nirinit.packages.${pkgs.stdenv.hostPlatform.system}.default
         }/bin/nirinit --config %h/.config/nirinit/config.toml"
       ];
       Restart = "always";

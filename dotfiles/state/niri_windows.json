@@ -1,0 +1,60 @@
+Window ID 2: (focused)
+  Title: "basic niri.md - mine - Visual Studio Code"
+  App ID: "code"
+  Is floating: no
+  PID: 70315
+  Workspace ID: 3
+  Layout:
+    Tile size: 1536 x 840
+    Scrolling position: column 1, tile 1
+    Window size: 1536 x 840
+    Window offset in tile: 0 x 0
+
+Window ID 5:
+  Title: "Niri on Nix Configuration - Vivaldi"
+  App ID: "Vivaldi-flatpak"
+  Is floating: no
+  PID: 77548
+  Workspace ID: 2
+  Layout:
+    Tile size: 1536 x 840
+    Scrolling position: column 1, tile 1
+    Window size: 1536 x 840
+    Window offset in tile: 0 x 0
+
+Window ID 6:
+  Title: "gimp stitch together multiple pictures - Vivaldi"
+  App ID: "Vivaldi-flatpak"
+  Is floating: no
+  PID: 77548
+  Workspace ID: 2
+  Layout:
+    Tile size: 750.40 x 816
+    Scrolling position: column 2, tile 1
+    Window size: 750 x 816
+    Window offset in tile: 0 x 0
+
+Window ID 7:
+  Title: "NixOS Search - Packages - rtk- - Vivaldi"
+  App ID: "Vivaldi-flatpak"
+  Is floating: no
+  PID: 77548
+  Workspace ID: 2
+  Layout:
+    Tile size: 750.40 x 816
+    Scrolling position: column 3, tile 1
+    Window size: 750 x 816
+    Window offset in tile: 0 x 0
+
+Window ID 8:
+  Title: "(6) WhatsApp - Vivaldi"
+  App ID: "Vivaldi-flatpak"
+  Is floating: no
+  PID: 77548
+  Workspace ID: 2
+  Layout:
+    Tile size: 750.40 x 816
+    Scrolling position: column 4, tile 1
+    Window size: 750 x 816
+    Window offset in tile: 0 x 0
+
