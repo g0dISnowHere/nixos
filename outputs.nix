@@ -1,4 +1,4 @@
-{ self, home-manager, nixpkgs, nixpkgs-unstable, nixpkgs-tailscale, flake-parts
+{ self, home-manager, nixpkgs, nixpkgs-unstable, nixpkgs-broken, flake-parts
 , nix-flatpak, plasma-manager, treefmt-nix, systems,
 # nixos-conf-editor,
 # nix-software-center,

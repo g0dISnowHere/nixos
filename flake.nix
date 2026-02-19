@@ -6,7 +6,7 @@
     # Nixpkgs unstable for packages that need newer versions
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     # Use nixpkgs commit from previous working flake.lock
-    nixpkgs-tailscale.url =
+    nixpkgs-broken.url =
       "github:nixos/nixpkgs/ce01daebf8489ba97bd1609d185ea276efdeb121";
 
     home-manager = {

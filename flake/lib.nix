@@ -2,7 +2,7 @@
 let
   inherit (inputs)
     nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable
-    nixpkgs-tailscale;
+    nixpkgs-broken;
 in {
   flake.lib = {
     # Helper function to create a NixOS system configuration
@@ -59,7 +59,7 @@ in {
             inherit system;
             config.allowUnfree = true;
           };
-          pkgs-tailscale = import nixpkgs-tailscale {
+          pkgs-tailscale = import nixpkgs-broken {
             inherit system;
             config.allowUnfree = true;
           };

@@ -234,7 +234,7 @@ mkdir -p flake/machines flake/homes/profiles
 ```nix
 { inputs, ... }:
 let
-  inherit (inputs) nixpkgs home-manager nix-flatpak nixpkgs-unstable nixpkgs-tailscale;
+  inherit (inputs) nixpkgs home-manager nix-flatpak nixpkgs-unstable nixpkgs-broken;
 in
 {
   flake.lib = {
@@ -281,7 +281,7 @@ in
             inherit system;
             config.allowUnfree = true;
           };
-          pkgs-tailscale = import nixpkgs-tailscale {
+          pkgs-tailscale = import nixpkgs-broken {
             inherit system;
             config.allowUnfree = true;
           };
@@ -971,7 +971,7 @@ nix eval .#nixosConfigurations.mirach.config.virtualisation.libvirtd.enable
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # Pinned nixpkgs for Tailscale stability
-    nixpkgs-tailscale.url =
+    nixpkgs-broken.url =
       "github:nixos/nixpkgs/ce01daebf8489ba97bd1609d185ea276efdeb121";
 
     # Home-manager for user environment management

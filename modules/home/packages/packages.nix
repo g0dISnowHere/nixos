@@ -11,6 +11,7 @@
       # noto-fonts
       nerd-fonts.open-dyslexic
 
+      nautilus
       # libreoffice-qt
       hunspell
       hunspellDicts.de_DE
@@ -132,6 +133,7 @@
       crush
       claude-code
       claude-monitor
+      ripgrep
       # zed-editor
     ] ++ [
       #################################################################################
