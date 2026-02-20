@@ -4,12 +4,12 @@
 // - Avoid automation here
 
 // Named workspaces (Tier 0 foundation)
-workspace "1:dev"
-workspace "2:research"
-workspace "3:comms"
-workspace "4:media"
-workspace "5:scratch"
-workspace "6:engineering"
+workspace "1:comms"
+// workspace "2:research"
+// workspace "3:dev"
+// workspace "4:media"
+// workspace "5:scratch"
+// workspace "6:engineering"
 
 // Input (explicit to avoid compositor overrides)
 input {
@@ -36,12 +36,32 @@ binds {
   Mod+Return { spawn "alacritty"; } // terminal
   Mod+D { spawn "fuzzel"; }         // launcher
   Mod+Space { spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"; } // Noctalia launcher
+  Mod+X { spawn "noctalia-shell" "ipc" "call" "controlCenter" "toggle"; } // Noctalia control center
+  Mod+V { spawn "noctalia-shell" "ipc" "call" "plugin:clipper" "toggle"; } // clipboard history
   Alt+F4 { close-window; }          // close window
   Mod+Shift+7 { show-hotkey-overlay; } // shortcuts (German layout "/")
   Mod+Shift+R { spawn "niri" "msg" "action" "load-config-file"; } // reload config
   Mod+Shift+E { quit; }             // exit session
   Mod+F { maximize-window-to-edges; } // maximize current window, keep bar
   Mod+Tab { toggle-overview; }      // overview (grid of workspaces/windows)
+  Mod+L { spawn "~/.config/niri/swaylock-noctalia.sh"; } // lock screen (Noctalia wallpaper/colors)
+
+  // ThinkPad T480s Fn keys (enabled)
+  XF86MonBrightnessUp { spawn "brightnessctl" "set" "5%+"; }
+  XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+  XF86KbdBrightnessUp { spawn "brightnessctl" "-d" "tpacpi::kbd_backlight" "set" "+1"; }
+  XF86KbdBrightnessDown { spawn "brightnessctl" "-d" "tpacpi::kbd_backlight" "set" "-1"; }
+  XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+  XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+  XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+  XF86AudioMicMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+  XF86AudioPlay { spawn "playerctl" "play-pause"; }
+  XF86AudioNext { spawn "playerctl" "next"; }
+  XF86AudioPrev { spawn "playerctl" "previous"; }
+  XF86AudioStop { spawn "playerctl" "stop"; }
+  Print { spawn "niri" "msg" "action" "screenshot"; }
+  XF86WLAN repeat=false { spawn "noctalia-shell" "ipc" "call" "wifi" "toggle"; }
+  // XF86Bluetooth repeat=false { spawn "noctalia-shell" "ipc" "call" "bluetooth" "toggle"; }
 
   // Optional: window movement (commented by default)
   Mod+Left { move-column-left; } // move window left (column)
@@ -65,28 +85,28 @@ binds {
   
   // match app-id="Vivaldi-flatpak" title=r#"Proton Mail"#
   // open-on-workspace "3:comms" }
-window-rule {
-  match app-id="Vivaldi-flatpak"
-  match app-id="com.google.Chrome"
-  open-on-workspace "2:research"
-}
+// window-rule {
+//   match app-id="Vivaldi-flatpak"
+//   match app-id="com.google.Chrome"
+//   open-on-workspace "2"
+// }
 
-window-rule {
-  match app-id="io.dbeaver.DBeaverCommunity"
-  match app-id="io.github.Omniaevo.mqtt5-explorer"
-  match app-id="org.nmap.Zenmap"
-  match app-id="code"
-  match app-id="com.visualstudio.code"
-  match app-id="com.visualstudio.code-insiders"
-  match app-id="code-oss"
-  match app-id="codium"
-  match app-id="VSCodium"
-  match app-id="Kiro"
-  match app-id="kiro"
-  match app-id="Antigravity"
-  match app-id="antigravity"
-  open-on-workspace "1:dev"
-}
+// window-rule {
+//   match app-id="io.dbeaver.DBeaverCommunity"
+//   match app-id="io.github.Omniaevo.mqtt5-explorer"
+//   match app-id="org.nmap.Zenmap"
+//   match app-id="code"
+//   match app-id="com.visualstudio.code"
+//   match app-id="com.visualstudio.code-insiders"
+//   match app-id="code-oss"
+//   match app-id="codium"
+//   match app-id="VSCodium"
+//   match app-id="Kiro"
+//   match app-id="kiro"
+//   match app-id="Antigravity"
+//   match app-id="antigravity"
+//   open-on-workspace "1"
+// }
 
 window-rule {
   match app-id="org.signal.Signal"
@@ -94,38 +114,39 @@ window-rule {
   match app-id="com.rustdesk.RustDesk"
   match app-id="com.freerdp.FreeRDP"
   match app-id="Bitwarden"
-  open-on-workspace "3:comms"
+  match app-id="obsidian"
+  open-on-workspace "1"
 }
 
-window-rule {
-  match app-id="org.mozilla.firefox"
-  match app-id="com.spotify.Client"
-  match app-id="org.audacityteam.Audacity"
-  match app-id="org.blender.Blender"
-  match app-id="org.gimp.GIMP"
-  match app-id="org.inkscape.Inkscape"
-  open-on-workspace "4:media"
-}
+// window-rule {
+//   match app-id="org.mozilla.firefox"
+//   match app-id="com.spotify.Client"
+//   match app-id="org.audacityteam.Audacity"
+//   match app-id="org.blender.Blender"
+//   match app-id="org.gimp.GIMP"
+//   match app-id="org.inkscape.Inkscape"
+//   open-on-workspace "4"
+// }
 
-window-rule {
-  match app-id="org.freecad.FreeCAD"
-  match app-id="org.kicad.KiCad"
-  match app-id="org.librecad.librecad"
-  match app-id="org.openscad.OpenSCAD"
-  match app-id="com.prusa3d.PrusaSlicer"
-  match app-id="com.connorcode.mslicer"
-  open-on-workspace "6:engineering"
-}
+// window-rule {
+//   match app-id="org.freecad.FreeCAD"
+//   match app-id="org.kicad.KiCad"
+//   match app-id="org.librecad.librecad"
+//   match app-id="org.openscad.OpenSCAD"
+//   match app-id="com.prusa3d.PrusaSlicer"
+//   match app-id="com.connorcode.mslicer"
+//   open-on-workspace "6"
+// }
 
-window-rule {
-  match app-id="org.libreoffice.LibreOffice"
-  match app-id="io.github.alainm23.planify"
-  match app-id="io.github.flattool.Warehouse"
-  match app-id="com.github.tchx84.Flatseal"
-  match app-id="io.github.giantpinkrobots.flatsweep"
-  match app-id="page.tesk.Refine"
-  open-on-workspace "5:scratch"
-}
+// window-rule {
+//   match app-id="org.libreoffice.LibreOffice"
+//   match app-id="io.github.alainm23.planify"
+//   match app-id="io.github.flattool.Warehouse"
+//   match app-id="com.github.tchx84.Flatseal"
+//   match app-id="io.github.giantpinkrobots.flatsweep"
+//   match app-id="page.tesk.Refine"
+//   open-on-workspace "5"
+// }
 
 // Tier 3: Extras (commented placeholder)
 // - Optional QoL features

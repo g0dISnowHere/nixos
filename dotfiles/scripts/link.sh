@@ -13,6 +13,7 @@ link_path() {
 }
 
 link_path "${ROOT_DIR}/modules/compositor/niri/config.kdl" "${TARGET_BASE}/niri/config.kdl"
+link_path "${ROOT_DIR}/modules/compositor/niri/swaylock-noctalia.sh" "${TARGET_BASE}/niri/swaylock-noctalia.sh"
 link_path "${ROOT_DIR}/modules/compositor/nirinit" "${TARGET_BASE}/nirinit"
 link_path "${ROOT_DIR}/modules/ui/waybar" "${TARGET_BASE}/waybar"
 link_path "${ROOT_DIR}/modules/ui/mako" "${TARGET_BASE}/mako"

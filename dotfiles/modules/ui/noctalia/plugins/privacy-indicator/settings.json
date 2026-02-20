@@ -2,6 +2,6 @@
   "hideInactive": true,
   "iconSpacing": 4,
   "removeMargins": false,
-  "activeColor": "primary",
+  "activeColor": "error",
   "inactiveColor": "none"
 }
