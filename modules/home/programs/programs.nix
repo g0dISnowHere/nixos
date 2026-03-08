@@ -16,6 +16,7 @@
       enable = true;
       enableBashIntegration = true; # see note on other shells below
       enableZshIntegration = true;
+      # Let Home Manager generate direnvrc and source its managed nix-direnv hook.
       nix-direnv.enable = true;
     };
 
