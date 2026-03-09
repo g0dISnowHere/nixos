@@ -15,7 +15,7 @@ echo "=== NixOS Flake Configuration Validation ==="
 echo ""
 
 # Check for dconf2nix argument
-REGENERATE_DCONF=0
+REGENERATE_DCONF=1
 if [ "$1" = "--dconf2nix" ]; then
     REGENERATE_DCONF=1
     echo "⚠️  --dconf2nix flag detected: Will regenerate dconf.nix"
