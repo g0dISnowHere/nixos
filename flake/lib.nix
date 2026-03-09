@@ -2,7 +2,7 @@
 let
   inherit (inputs)
     nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable
-    nixpkgs-broken;
+    nixpkgs-broken nixpkgs-gnome48;
 in {
   flake.lib = {
     # Helper function to create a NixOS system configuration
@@ -56,6 +56,10 @@ in {
         specialArgs = {
           inherit inputs hostname desktop;
           pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
+          pkgs-gnome48 = import nixpkgs-gnome48 {
             inherit system;
             config.allowUnfree = true;
           };

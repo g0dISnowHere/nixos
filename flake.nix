@@ -5,6 +5,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     # Nixpkgs unstable for packages that need newer versions
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Pin GNOME core packages to a known-good GNOME 48.x nixpkgs rev
+    nixpkgs-gnome48.url =
+      "github:nixos/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d";
     # Use nixpkgs commit from previous working flake.lock
     nixpkgs-broken.url =
       "github:nixos/nixpkgs/ce01daebf8489ba97bd1609d185ea276efdeb121";
