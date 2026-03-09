@@ -7,6 +7,7 @@
     ./hardware-configuration.nix
     ./bootloader.nix
     ./other-hardware.nix
+    ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/system/my-options.nix # Custom 'my' namespace options    ../../../modules/nixos/system/nix-settings.nix # Explicitly import nix-settings
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
     # ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network

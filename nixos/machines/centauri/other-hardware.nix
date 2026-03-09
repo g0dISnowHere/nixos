@@ -52,38 +52,7 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
-  ########################### Audio ############################
-
-  security.rtkit.enable = true; # for realtime sound settings.
-
-  # Enable sound with pipewire.
-  services.pulseaudio = {
-    enable = false;
-    # support32Bit = true; # Needed for steam
-  };
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    jack.enable = false;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    # media-session.enable = true;
-
-  };
-
-  # (systemctl --user restart wireplumber pipewire pipewire-pulse), then reconnect the headphones. If needed, manually switch the device profile with wpctl set-profile 90 a2dp-sink (replace 90 with the device id from wpctl status).
-  services.pipewire.wireplumber = { enable = true; };
-
-  # services.jack.jackd.enable = true; # Enable JACK support (for audio production apps)
-
   environment.systemPackages = with pkgs; [
-    pavucontrol # PulseAudio Volume Control, works with PipeWire
-    qpwgraph # Qt JACK control GUI
-
     piper # For configuring Logitech devices
     libratbag # daemon for configuring gaming mice
 

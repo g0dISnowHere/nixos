@@ -12,13 +12,15 @@
   };
 
   # Audio (PipeWire)
-  security.rtkit.enable = true;
+  # Keep desktop audio available by default, but allow machine-specific modules
+  # to override these values for low-latency setups.
+  security.rtkit.enable = lib.mkDefault true;
   services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    jack.enable = false;
+    enable = lib.mkDefault true;
+    alsa.enable = lib.mkDefault true;
+    alsa.support32Bit = lib.mkDefault true;
+    pulse.enable = lib.mkDefault true;
+    jack.enable = lib.mkDefault false;
   };
 
   # Printing
