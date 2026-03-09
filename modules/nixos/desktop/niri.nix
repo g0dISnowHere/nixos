@@ -11,6 +11,9 @@
 
   programs.niri.enable = true;
 
+  services.udisks2.enable = true;
+  services.gvfs.enable = true;
+
   services.noctalia-shell = {
     enable = true;
     target = "niri.service";
@@ -31,6 +34,56 @@
         }/bin/nirinit --config %h/.config/nirinit/config.toml"
       ];
       Restart = "always";
+    };
+  };
+
+  systemd.user.services.udiskie = {
+    description = "Udiskie automount";
+    wantedBy = [ "niri.service" ];
+    after = [ "niri.service" "graphical-session.target" "dbus.service" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.udiskie}/bin/udiskie --no-tray";
+      Restart = "on-failure";
+    };
+  };
+
+  systemd.user.services.swayidle-ac = {
+    description = "Swayidle (AC)";
+    partOf = [ "niri.service" ];
+    wantedBy = [ "niri.service" ];
+    after = [ "niri.service" ];
+    unitConfig = {
+      ConditionACPower = "true";
+      Conflicts = [ "swayidle-battery.service" ];
+    };
+    serviceConfig = {
+      ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
+        + "timeout 900 '${pkgs.wlopm}/bin/wlopm --off' "
+        + "resume '${pkgs.wlopm}/bin/wlopm --on' "
+        + "timeout 1800 '${pkgs.swaylock}/bin/swaylock -f' "
+        + "timeout 3600 '${pkgs.systemd}/bin/systemctl suspend' "
+        + "before-sleep '${pkgs.swaylock}/bin/swaylock -f'";
+      Restart = "on-failure";
+    };
+  };
+
+  systemd.user.services.swayidle-battery = {
+    description = "Swayidle (battery)";
+    partOf = [ "niri.service" ];
+    wantedBy = [ "niri.service" ];
+    after = [ "niri.service" ];
+    unitConfig = {
+      ConditionACPower = "false";
+      Conflicts = [ "swayidle-ac.service" ];
+    };
+    serviceConfig = {
+      ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
+        + "timeout 300 '${pkgs.wlopm}/bin/wlopm --off' "
+        + "resume '${pkgs.wlopm}/bin/wlopm --on' "
+        + "timeout 300 '${pkgs.swaylock}/bin/swaylock -f' "
+        + "timeout 600 '${pkgs.systemd}/bin/systemctl suspend' "
+        + "before-sleep '${pkgs.swaylock}/bin/swaylock -f'";
+      Restart = "on-failure";
     };
   };
 
@@ -92,10 +145,15 @@
   '';
   environment.systemPackages = with pkgs; [
     alacritty
+    brightnessctl
     fuzzel
-    polkit_gnome
-    swaylock
     mako
+    polkit_gnome
+    playerctl
+    jq
+    udiskie
+    wlopm
+    swaylock
     swayidle
     swaybg
     xwayland-satellite # XWayland support
