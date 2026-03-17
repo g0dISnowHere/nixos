@@ -18,7 +18,9 @@
       ## This should part of the flatpak module.
       cantarell-fonts
       fira-code
-      # noto-fonts
+      noto-fonts
+      noto-fonts-color-emoji
+      nerd-fonts.jetbrains-mono
       nerd-fonts.open-dyslexic
 
       nautilus

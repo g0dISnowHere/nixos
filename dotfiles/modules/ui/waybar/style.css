@@ -2,7 +2,7 @@
 /* Tier 1: Desktop shell (minimal) */
 /* - Keep visuals quiet and predictable */
 * {
-  font-family: monospace;
+  font-family: "JetBrainsMono Nerd Font Mono";
   font-size: 12px;
 }
 

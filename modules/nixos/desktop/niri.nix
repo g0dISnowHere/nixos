@@ -88,7 +88,6 @@
   };
 
   # Authentication / secrets
-  security.polkit.enable = true;
   services.gnome.gnome-keyring.enable = true; # Secret Service
   security.pam.services.swaylock = { };
   security.pam.services.login.enableGnomeKeyring = true;
@@ -137,9 +136,9 @@
   users.users.djoolz.extraGroups = [ "battery_ctl" ];
   services.udev.extraRules = ''
     # Battery Threshold Control - udev rule
-    # Grants write access to charge_control_end_threshold for users in the
-    # 'battery_ctl' group, only for BAT0
-    SUBSYSTEM=="power_supply", KERNEL=="BAT0", \
+    # Grants write access to any battery threshold sysfs node for users in the
+    # 'battery_ctl' group.
+    SUBSYSTEM=="power_supply", KERNEL=="BAT*", TEST=="charge_control_end_threshold", \
         RUN+="${pkgs.coreutils}/bin/chgrp battery_ctl /sys$devpath/charge_control_end_threshold", \
         RUN+="${pkgs.coreutils}/bin/chmod g+w /sys$devpath/charge_control_end_threshold"
   '';
@@ -148,9 +147,12 @@
     brightnessctl
     fuzzel
     mako
+    # Keep an external polkit agent until the active Noctalia/Quickshell build
+    # exposes Quickshell.Services.Polkit.
     polkit_gnome
     playerctl
     jq
+    seahorse
     udiskie
     wlopm
     swaylock

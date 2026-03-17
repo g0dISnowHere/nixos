@@ -11,6 +11,25 @@
     xkb = { layout = "de"; };
   };
 
+  fonts.packages = with pkgs; [
+    cantarell-fonts
+    noto-fonts
+    noto-fonts-color-emoji
+    nerd-fonts.jetbrains-mono
+  ];
+
+  fonts.fontconfig = {
+    defaultFonts = {
+      monospace = [ "JetBrainsMono Nerd Font Mono" ];
+      sansSerif = [ "Noto Sans" "Cantarell" ];
+      serif = [ "Noto Serif" ];
+      emoji = [ "Noto Color Emoji" ];
+    };
+  };
+
+  # Authorization framework used by desktop-integrated system services.
+  security.polkit.enable = true;
+
   # Audio (PipeWire)
   # Keep desktop audio available by default, but allow machine-specific modules
   # to override these values for low-latency setups.

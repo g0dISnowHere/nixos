@@ -6,6 +6,7 @@
 
   imports = [
     ./common.nix
+    ../../../modules/home/services/keyring-backup.nix
   ]
   # GNOME: dconf settings
     ++ (if desktop == "gnome" then
@@ -27,6 +28,12 @@
 
   # Enable font configuration for GUI apps
   fonts.fontconfig.enable = true;
+  fonts.fontconfig.defaultFonts = {
+    monospace = [ "JetBrainsMono Nerd Font Mono" ];
+    sansSerif = [ "Noto Sans" "Cantarell" ];
+    serif = [ "Noto Serif" ];
+    emoji = [ "Noto Color Emoji" ];
+  };
 
   # Desktop-specific services
   services.syncthing.enable = true;

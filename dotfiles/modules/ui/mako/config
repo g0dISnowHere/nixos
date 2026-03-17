@@ -1,7 +1,7 @@
 # Mako config (dotfiles/modules/ui/mako/config)
 # Tier 1: Desktop shell (minimal)
 # - Keep notifications quiet and predictable
-font=monospace 10
+font=JetBrainsMono Nerd Font Mono 10
 background-color=#141414e6
 text-color=#e6e6e6
 border-color=#303030
