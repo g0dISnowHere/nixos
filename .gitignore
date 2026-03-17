@@ -1,3 +1,5 @@
 *.kismet
 .opencode/
 nixos-switch.log
+dotfiles/modules/ui/noctalia/plugins/
+dotfiles/modules/ui/noctalia/colors.json

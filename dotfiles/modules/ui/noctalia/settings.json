@@ -12,7 +12,7 @@
         "enableSessionSearch": true,
         "enableSettingsSearch": true,
         "enableWindowsSearch": true,
-        "iconMode": "tabler",
+        "iconMode": "native",
         "ignoreMouseInput": false,
         "overviewLayer": false,
         "pinnedApps": [
@@ -63,6 +63,17 @@
         "widgets": {
             "center": [
                 {
+                    "clockColor": "none",
+                    "customFont": "",
+                    "formatHorizontal": "HH:mm ddd, MMM dd",
+                    "formatVertical": "HH mm - dd MM",
+                    "id": "Clock",
+                    "tooltipFormat": "HH:mm ddd, MMM dd",
+                    "useCustomFont": false
+                }
+            ],
+            "left": [
+                {
                     "characterCount": 2,
                     "colorizeIcons": false,
                     "emptyColor": "secondary",
@@ -82,17 +93,6 @@
                     "showLabelsOnlyWhenOccupied": true,
                     "unfocusedIconsOpacity": 1
                 },
-                {
-                    "clockColor": "none",
-                    "customFont": "",
-                    "formatHorizontal": "HH:mm ddd, MMM dd",
-                    "formatVertical": "HH mm - dd MM",
-                    "id": "Clock",
-                    "tooltipFormat": "HH:mm ddd, MMM dd",
-                    "useCustomFont": false
-                }
-            ],
-            "left": [
                 {
                     "icon": "rocket",
                     "iconColor": "none",
@@ -118,16 +118,6 @@
                     "textColor": "none",
                     "useMonospaceFont": true,
                     "usePadding": false
-                },
-                {
-                    "colorizeIcons": false,
-                    "hideMode": "hidden",
-                    "id": "ActiveWindow",
-                    "maxWidth": 145,
-                    "scrollingMode": "hover",
-                    "showIcon": true,
-                    "textColor": "none",
-                    "useFixedWidth": false
                 },
                 {
                     "compactMode": false,
@@ -210,9 +200,117 @@
                     "defaultSettings": {
                         "autoHeight": true,
                         "cheatsheetData": [
+                            {
+                                "binds": [
+                                    {
+                                        "desc": "Terminal",
+                                        "keys": "Super + Return"
+                                    },
+                                    {
+                                        "desc": "App launcher",
+                                        "keys": "Super + D"
+                                    },
+                                    {
+                                        "desc": "Noctalia launcher",
+                                        "keys": "Super + Space"
+                                    },
+                                    {
+                                        "desc": "Control center",
+                                        "keys": "Super + X"
+                                    },
+                                    {
+                                        "desc": "Clipboard history",
+                                        "keys": "Super + V"
+                                    }
+                                ],
+                                "title": "Launchers"
+                            },
+                            {
+                                "binds": [
+                                    {
+                                        "desc": "Close window",
+                                        "keys": "Alt + F4"
+                                    },
+                                    {
+                                        "desc": "Maximize window",
+                                        "keys": "Super + F"
+                                    },
+                                    {
+                                        "desc": "Workspace overview",
+                                        "keys": "Super + Tab"
+                                    },
+                                    {
+                                        "desc": "Shortcut overlay",
+                                        "keys": "Super + Shift + 7"
+                                    }
+                                ],
+                                "title": "Windows"
+                            },
+                            {
+                                "binds": [
+                                    {
+                                        "desc": "Lock screen",
+                                        "keys": "Super + L"
+                                    },
+                                    {
+                                        "desc": "Screenshot",
+                                        "keys": "Print"
+                                    },
+                                    {
+                                        "desc": "Screen sharing",
+                                        "keys": "Fn + F7"
+                                    },
+                                    {
+                                        "desc": "Reload Niri config",
+                                        "keys": "Super + Shift + R"
+                                    },
+                                    {
+                                        "desc": "Exit session",
+                                        "keys": "Super + Shift + E"
+                                    }
+                                ],
+                                "title": "System"
+                            },
+                            {
+                                "binds": [
+                                    {
+                                        "desc": "Brightness up",
+                                        "keys": "Brightness Up"
+                                    },
+                                    {
+                                        "desc": "Brightness down",
+                                        "keys": "Brightness Down"
+                                    },
+                                    {
+                                        "desc": "Keyboard backlight up",
+                                        "keys": "Keyboard Light Up"
+                                    },
+                                    {
+                                        "desc": "Keyboard backlight down",
+                                        "keys": "Keyboard Light Down"
+                                    },
+                                    {
+                                        "desc": "Volume up",
+                                        "keys": "Volume Up"
+                                    },
+                                    {
+                                        "desc": "Volume down",
+                                        "keys": "Volume Down"
+                                    },
+                                    {
+                                        "desc": "Mute output",
+                                        "keys": "Mute"
+                                    },
+                                    {
+                                        "desc": "Mute microphone",
+                                        "keys": "Mic Mute"
+                                    }
+                                ],
+                                "title": "Hardware"
+                            }
                         ],
                         "columnCount": 3,
-                        "detectedCompositor": "",
+                        "detectedCompositor": "niri",
                         "hyprlandConfigPath": "~/.config/hypr/hyprland.conf",
                         "modKeyVariable": "$mod",
                         "niriConfigPath": "~/.config/niri/config.kdl",
@@ -269,15 +367,6 @@
                     "icon": "noctalia",
                     "id": "ControlCenter",
                     "useDistroLogo": false
-                },
-                {
-                    "defaultSettings": {
-                        "activeColor": "primary",
-                        "hideInactive": false,
-                        "inactiveColor": "none",
-                        "removeMargins": false
-                    },
-                    "id": "plugin:privacy-indicator"
                 }
             ]
         }
@@ -305,7 +394,7 @@
     },
     "colorSchemes": {
         "darkMode": true,
-        "generationMethod": "vibrant",
+        "generationMethod": "faithful",
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "monitorForColors": "",
@@ -399,7 +488,7 @@
     },
     "general": {
         "allowPanelsOnScreenWithoutBar": true,
-        "allowPasswordWithFprintd": false,
+        "allowPasswordWithFprintd": true,
         "animationDisabled": false,
         "animationSpeed": 1,
         "autoStartAuth": false,
@@ -506,7 +595,7 @@
         "density": "default",
         "enableBatteryToast": true,
         "enableKeyboardLayoutToast": true,
-        "enableMediaToast": true,
+        "enableMediaToast": false,
         "enabled": true,
         "location": "top_right",
         "lowUrgencyDuration": 3,
@@ -595,13 +684,6 @@
                 "countdownEnabled": true,
                 "enabled": true,
                 "keybind": "6"
-            },
-            {
-                "action": "rebootToUefi",
-                "command": "",
-                "countdownEnabled": true,
-                "enabled": true,
-                "keybind": ""
             }
         ],
         "showHeader": true,
@@ -640,9 +722,9 @@
         "bluetoothDetailsViewMode": "grid",
         "bluetoothHideUnnamedDevices": false,
         "boxBorderEnabled": false,
-        "fontDefault": "Sans Serif",
+        "fontDefault": "JetBrainsMono Nerd Font",
         "fontDefaultScale": 1,
-        "fontFixed": "monospace",
+        "fontFixed": "JetBrainsMono Nerd Font Mono",
         "fontFixedScale": 1,
         "networkPanelView": "wifi",
         "panelBackgroundOpacity": 0.93,
@@ -667,7 +749,7 @@
         "overviewEnabled": true,
         "overviewTint": 0.6,
         "panelPosition": "follow_bar",
-        "randomIntervalSec": 7200,
+        "randomIntervalSec": 86400,
         "setWallpaperOnAllMonitors": true,
         "showHiddenFiles": false,
         "skipStartupTransition": true,
