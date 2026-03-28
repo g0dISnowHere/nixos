@@ -1,6 +1,7 @@
 # NixOS Configuration
 
-A modular NixOS flake using flake-parts, role modules, and optional desktop selection per machine.
+A modular NixOS flake using flake-parts, explicit role composition, and
+standalone or machine-attached Home Manager profiles.
 
 ## Structure
 
@@ -14,9 +15,8 @@ A modular NixOS flake using flake-parts, role modules, and optional desktop sele
 │   │   └── homelabs.nix           # Homelab definitions
 │   └── homes/
 │       ├── djoolz.nix             # Standalone home-manager configs
-│       └── profiles/
-│           ├── common.nix
-│           └── desktop.nix
+│       ├── profiles/              # Reusable HM profile layers
+│       └── users/                 # User-specific HM wrappers
 ├── modules/
 │   ├── nixos/
 │   │   ├── desktop/               # common + DE modules
@@ -24,21 +24,22 @@ A modular NixOS flake using flake-parts, role modules, and optional desktop sele
 │   │   ├── services/              # system services
 │   │   ├── system/                # base system modules
 │   │   └── virtualisation/        # VM/container modules
-│   └── home/                      # home-manager modules
+│   └── home/                      # home-manager modules by concern
 ├── nixos/
 │   └── machines/                  # per-host configs + hardware
+├── dotfiles/                      # repo-managed raw config files
 └── parts/                         # flake-parts modules
 ```
 
 ## Features
 
 - **System Agnostic**: Supports multiple architectures (x86_64-linux, aarch64-linux)
-- **Modular Design**: Easy to add new machines and users
+- **Explicit Modular Design**: Focused modules with no recursive discovery
 - **Flake-parts Integration**: Proper use of flake-parts for multi-system builds
-- **Reusable Modules**: Shared configurations for common functionality
-- **Development Environment**: Per-system development shells with useful tools
-- **Automated Workflows**: Auto-commit flake.lock files and code formatting
-- **Comprehensive Tooling**: Makefile commands, git aliases, and VS Code integration
+- **Reusable Modules**: Shared configurations for roles, desktops, services, and home profiles
+- **Home Manager Layering**: Reusable base profiles plus user-specific wrappers
+- **Dotfiles-First Workflow**: Home Manager manages deployment while raw config remains in `dotfiles/`
+- **Development Environment**: Per-system development shells with formatting and linting tools
 
 ## Adding a New Machine
 
@@ -58,8 +59,9 @@ A modular NixOS flake using flake-parts, role modules, and optional desktop sele
 
 ## Adding a New User
 
-1. Add a home-manager profile under [modules/home](modules/home) or [flake/homes/profiles](flake/homes/profiles).
-2. Reference it from the machine’s [nixos/machines/your-host/default.nix](nixos/machines/your-host/default.nix) under `home-manager.users`.
+1. Add or extend reusable profile layers under [flake/homes/profiles](flake/homes/profiles).
+2. Add a user-specific wrapper under [flake/homes/users](flake/homes/users) if personal identity or user-only settings are needed.
+3. Reference the wrapper from the machine’s [nixos/machines/your-host/default.nix](nixos/machines/your-host/default.nix) under `home-manager.users`, or add a standalone config in [flake/homes/djoolz.nix](flake/homes/djoolz.nix).
 
 ## Supported Systems
 
@@ -82,31 +84,23 @@ This provides tools for:
 - `statix` - Nix static analysis
 - `deadnix` - Dead code detection
 
-### Automated Workflows
+### Validation Workflow
 
-The repository includes comprehensive automation for common tasks:
+The repo is designed around fast evaluation first:
 
 ```bash
-# Quick status check
-make status
-
-# Format code automatically
-make format
-
-# Update flakes with auto-commit
-make update
-
-# Rebuild system
-make rebuild
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
+nix eval .#nixosConfigurations.mirach.config.system.build.toplevel
+nix eval .#homeConfigurations."djoolz@workstation".activationPackage
+nix eval .#homeConfigurations."djoolz@server".activationPackage
 ```
 
-**Git Integration**:
+For broader validation:
 
-- Code is automatically formatted on every commit
-- flake.lock files are automatically staged
-- Pre-push hooks prevent unformatted code from being pushed
-
-**VS Code Integration**: Use Ctrl+Shift+P → "Tasks: Run Task" for GUI access to common operations.
+```bash
+nix flake check
+sh validate.sh
+```
 
 ## Building
 
@@ -139,7 +133,7 @@ deploy .#centauri
 
 ## Adding Services
 
-1. Add a module under [modules/nixos/services](modules/nixos/services) (system services) or [modules/home](modules/home) (user services).
+1. Add a module under [modules/nixos/services](modules/nixos/services) (system services) or [modules/home/services](modules/home/services) (user services).
 2. Import it in the relevant role module or host file:
    - Roles: [modules/nixos/roles](modules/nixos/roles)
    - Hosts: [nixos/machines/your-host/default.nix](nixos/machines/your-host/default.nix)
@@ -174,4 +168,9 @@ nixos-rebuild dry-build --flake .#machine-name
 
 ## Migration Notes
 
-This repository uses flake-parts with explicit imports and role modules. Hosts live under [nixos/machines](nixos/machines), while system modules are under [modules/nixos](modules/nixos) and home-manager modules under [modules/home](modules/home).
+This repository uses flake-parts with explicit imports and role modules. Hosts
+live under [nixos/machines](nixos/machines), system modules live under
+[modules/nixos](modules/nixos), and Home Manager is split across reusable
+profiles in [flake/homes/profiles](flake/homes/profiles), user wrappers in
+[flake/homes/users](flake/homes/users), and focused HM modules under
+[modules/home](modules/home).
