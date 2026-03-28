@@ -58,6 +58,12 @@
 
     # Ensure the physical interface has no IP (bridge takes over)
     interfaces.enp0s25.useDHCP = false;
+
+    # Set a stable MAC address for the bridge to prevent carrier loss
+    # when VMs start/stop. Using the physical interface's MAC.
+    localCommands = ''
+      ${pkgs.iproute2}/bin/ip link set br0 address 3c:97:0e:5b:2d:c2
+    '';
   };
 
   # Define the bridge network for libvirt/virt-manager

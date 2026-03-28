@@ -6,11 +6,13 @@
     # firefox.enable = true;
 
     # basic configuration of git, please change to your own
-    git = {
-      enable = true;
-      userName = "g0disnowhere";
-      userEmail = "jojuble@gmail.com";
-    };
+    # git = {
+    #   enable = true;
+    #   user = {
+    #     name = "g0disnowhere";
+    #     email = "jojuble@gmail.com";
+    #   };
+    # };
 
     # thunderbird = {
     #   enable = true;

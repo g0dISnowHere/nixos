@@ -1,4 +1,4 @@
-{ self, nixpkgs, home-manager, nix-flatpak, nixpkgs-unstable, vscode-server, ... }@inputs:
+{ self, nixpkgs, home-manager, nix-flatpak, vscode-server, ... }@inputs:
 
 let
   # Helper function to create a NixOS system configuration
@@ -20,12 +20,7 @@ let
             useUserPackages = true;
             backupFileExtension = "backup";
             users.djoolz = import ./users/djoolz.nix;
-            extraSpecialArgs = {
-              pkgs-unstable = import nixpkgs-unstable {
-                inherit system;
-                config.allowUnfree = true;
-              };
-            } // extraSpecialArgs;
+            extraSpecialArgs = extraSpecialArgs;
           };
         }
 

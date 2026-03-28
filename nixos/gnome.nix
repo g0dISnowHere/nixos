@@ -3,13 +3,14 @@
 # https://wiki.nixos.org/wiki/KDE
 
 {
+  
+  # Enable the GNOME Desktop Environment.
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
+
   # Enable the X11 windowing system.
   services.xserver = {
     enable = true;
-
-    # Enable the GNOME Desktop Environment.
-    displayManager.gdm.enable = true;
-    desktopManager.gnome.enable = true;
 
     # Configure keymap in X11
     xkb = {
@@ -18,8 +19,9 @@
     };
   };
 
-  security.rtkit.enable = true; # for gnome sound settings
-
+  # Enable real-time scheduling for audio
+  security.rtkit.enable = true;
+  
   # Enable polkit for authentication
   security.polkit.enable = true;
 

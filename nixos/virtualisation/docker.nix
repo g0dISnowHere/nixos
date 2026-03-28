@@ -30,6 +30,8 @@
     5050 # mjpg-streamer mingda
     8085 # octoprint-ender3
     5051 # mjpg-streamer ender3
+    2019 # caddy?
+    8000
   ];
   # # Fix for TLS certificate verification issues with rootless Docker
   # systemd.user.services.docker.environment = {

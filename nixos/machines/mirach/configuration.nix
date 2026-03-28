@@ -19,6 +19,7 @@
     ../../virtualisation/libvirtd.nix
     # ../../virtualisation/podman.nix    
     ./hardware-configuration.nix
+    ./other-hardware.nix
   ];
 
   # Bootloader.
@@ -108,6 +109,9 @@
         #  thunderbird
       ];
   };
+
+  # Enable nix-ld for remote vscode
+  programs.nix-ld.enable = true;
 
   # Install firefox.
   programs.firefox.enable = true;

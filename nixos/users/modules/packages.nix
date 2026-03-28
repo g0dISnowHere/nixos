@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, ... }:
+{ config, pkgs, ... }:
 
 {
   # Packages that should be installed to the user profile.
@@ -45,6 +45,7 @@
       wget
       traceroute
       git
+      gh
       smartmontools
       tmux
       ##############################################################################
@@ -78,7 +79,8 @@
       # rpi-imager
       zigbee2mqtt_2
     ] ++ [
-      pkgs-unstable.devenv # This might go back to stable in the future.
-      pkgs-unstable.vscode # Lol, dev is too fast and plugins depend on the latest version.
+      devenv
+      vscode
+      codex
     ];
 }

@@ -1,4 +1,4 @@
-{ self, home-manager, nixpkgs, nixpkgs-unstable, flake-parts, nix-flatpak
+{ self, home-manager, nixpkgs, flake-parts, nix-flatpak
 , vscode-server, treefmt-nix, systems,
 # nixpkgs-legacy,
 # nixos-conf-editor,
