@@ -3,17 +3,7 @@
 {
   # Packages that should be installed to the user profile.
   home.packages = with pkgs;
-    let
-      codex-latest = pkgs-unstable.codex.overrideAttrs (old: {
-        version = "0.104.0";
-        src = pkgs-unstable.fetchFromGitHub {
-          owner = "openai";
-          repo = "codex";
-          rev = "rust-v0.104.0";
-          hash = "sha256-spWb/msjl9am7E4UkZfEoH0diFbvAfydJKJQM1N1aoI=";
-        };
-      });
-    in [
+    [
       ## Fonts & LibreOffice ##########################################################
       ## This should part of the flatpak module.
       cantarell-fonts
@@ -23,7 +13,6 @@
       nerd-fonts.jetbrains-mono
       nerd-fonts.open-dyslexic
 
-      nautilus
       # libreoffice-qt
       hunspell
       hunspellDicts.de_DE
@@ -137,36 +126,15 @@
       # freecad
 
       chromium
-      #################################################################################
-      ## AI
-      #################################################################################
-      aider-chat-full
-      gemini-cli
-      crush
-      # claude-code # using npm package instead
-      # claude-monitor
-      ripgrep
-      # zed-editor
-      # codex
     ] ++ [
       #################################################################################
       ## Bleeding edge
       #################################################################################
       pkgs-unstable.devenv # This might go back to stable in the future.
       pkgs-unstable.vscode # Lol, dev is too fast and plugins depend on the latest version.
-
-      #################################################################################
-      ## AI
-      #################################################################################
-
-      # codex-latest
-      # pkgs-unstable.codex
-      # pkgs-unstable.aider-chat-full
-      pkgs-unstable.opencode
       pkgs-unstable.gh # github cli
-      pkgs-unstable.fabric-ai
       # pkgs-unstable.kiro
-      pkgs-unstable.antigravity
-
     ];
+
+  # AI packages and tool-specific notes live in `modules/home/packages/ai-tools.nix`.
 }
