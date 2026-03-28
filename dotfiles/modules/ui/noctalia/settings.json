@@ -155,20 +155,6 @@
                     "id": "plugin:network-indicator"
                 },
                 {
-                    "hideWhenZero": true,
-                    "hideWhenZeroUnread": true,
-                    "iconColor": "none",
-                    "id": "NotificationHistory",
-                    "showUnreadBadge": true,
-                    "unreadBadgeColor": "primary"
-                },
-                {
-                    "displayMode": "onhover",
-                    "iconColor": "none",
-                    "id": "Brightness",
-                    "textColor": "none"
-                },
-                {
                     "blacklist": [
                     ],
                     "chevronColor": "none",
@@ -178,13 +164,6 @@
                     "id": "Tray",
                     "pinned": [
                     ]
-                },
-                {
-                    "displayMode": "onhover",
-                    "iconColor": "none",
-                    "id": "Volume",
-                    "middleClickCommand": "pwvucontrol || pavucontrol",
-                    "textColor": "none"
                 },
                 {
                     "defaultSettings": {
@@ -326,6 +305,9 @@
                     "id": "plugin:mini-docker"
                 },
                 {
+                    "id": "plugin:syncthing-status"
+                },
+                {
                     "defaultSettings": {
                         "compactMode": false,
                         "defaultPeerAction": "copy-ip",
@@ -345,6 +327,21 @@
                     "id": "plugin:battery-threshold"
                 },
                 {
+                    "defaultSettings": {
+                        "mode": "region"
+                    },
+                    "id": "plugin:screenshot"
+                },
+                {
+                    "id": "plugin:mirror-mirror"
+                },
+                {
+                    "id": "plugin:mimeapp-gui"
+                },
+                {
+                    "id": "plugin:kde-connect"
+                },
+                {
                     "deviceNativePath": "__default__",
                     "displayMode": "graphic-clean",
                     "hideIfIdle": false,
@@ -354,10 +351,25 @@
                     "showPowerProfiles": false
                 },
                 {
-                    "defaultSettings": {
-                        "mode": "region"
-                    },
-                    "id": "plugin:screenshot"
+                    "displayMode": "onhover",
+                    "iconColor": "none",
+                    "id": "Volume",
+                    "middleClickCommand": "pwvucontrol || pavucontrol",
+                    "textColor": "none"
+                },
+                {
+                    "hideWhenZero": true,
+                    "hideWhenZeroUnread": true,
+                    "iconColor": "none",
+                    "id": "NotificationHistory",
+                    "showUnreadBadge": true,
+                    "unreadBadgeColor": "primary"
+                },
+                {
+                    "displayMode": "onhover",
+                    "iconColor": "none",
+                    "id": "Brightness",
+                    "textColor": "none"
                 },
                 {
                     "colorizeDistroLogo": false,
