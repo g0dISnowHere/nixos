@@ -15,6 +15,7 @@
     # Import home-manager's flake module
     inputs.home-manager.flakeModules.home-manager
     inputs.treefmt-nix.flakeModule
+    ./parts/devshells.nix
     ./parts/formatter.nix
 
     # Library functions and machine definitions
@@ -33,22 +34,11 @@
     # "x86_64-darwin"
   ];
 
-  perSystem = { config, self', inputs', pkgs, lib, system, ... }: {
-    # Per-system attributes can be defined here. The self' and inputs'
-    # module parameters provide easy access to attributes of the same system.
-
-    # Development shells for each system
-    devShells.default = pkgs.mkShell {
-      buildInputs = with pkgs; [ nixpkgs-fmt statix deadnix ];
-      shellHook = ''
-        echo "NixOS configuration development environment"
-        echo "Current system: ${system}"
-      '';
+  perSystem = { ... }:
+    {
+      # System-specific packages could go here
+      # packages.some-tool = pkgs.callPackage ./some-tool.nix {};
     };
-
-    # System-specific packages could go here
-    # packages.some-tool = pkgs.callPackage ./some-tool.nix {};
-  };
 
   flake = {
     # `nixosConfigurations` are defined by importing flake/machines/*.nix
