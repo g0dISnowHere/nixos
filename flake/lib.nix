@@ -14,7 +14,9 @@ in {
           ../modules/nixos/desktop/${desktop}.nix
         else
           { };
-        repoRoot = toString ../.;
+        # Use the live checkout path so Home Manager out-of-store symlinks point
+        # into the working tree instead of the immutable flake snapshot.
+        repoRoot = "/home/djoolz/Documents/01_config/mine";
         dotfilesRoot = "${repoRoot}/dotfiles";
       in nixpkgs.lib.nixosSystem {
         inherit system;

@@ -2,7 +2,9 @@
   imports = [ inputs.home-manager.flakeModules.home-manager ];
 
   flake.homeConfigurations = let
-    repoRoot = toString ../.;
+    # Standalone home-manager profiles need the live checkout path so
+    # mkOutOfStoreSymlink targets the working tree instead of the flake snapshot.
+    repoRoot = "/home/djoolz/Documents/01_config/mine";
     dotfilesRoot = "${repoRoot}/dotfiles";
   in {
     # Standalone home-manager config for djoolz@workstation
