@@ -21,6 +21,12 @@
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
+      oh-my-zsh = {
+        enable = true;
+        plugins =
+          [ "git" "tailscale" "docker" "docker-compose" "vscode" "direnv" ];
+        theme = "robbyrussell";
+      };
 
       history = {
         size = 50000;
