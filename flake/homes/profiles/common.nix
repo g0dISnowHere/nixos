@@ -7,6 +7,7 @@
     # Import user modules
     ../../../modules/home/programs/programs.nix
     ../../../modules/home/packages/packages.nix
+    ../../../modules/home/packages/ai-tools.nix
   ];
 
   # Basic home configuration
