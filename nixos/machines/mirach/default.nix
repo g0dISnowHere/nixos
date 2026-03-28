@@ -6,6 +6,7 @@
   imports = [
     ./hardware-configuration.nix
     ./libvirtd.nix
+    ../../../modules/nixos/services/vscode-remote.nix
     # ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
     ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
@@ -41,5 +42,5 @@
     binfmt = true;
   };
 
-  system.stateVersion = "23.11";
+  system.stateVersion = "25.05";
 }

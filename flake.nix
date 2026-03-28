@@ -42,18 +42,18 @@
     };
 
     ## encrypted key management
-    # sops-nix = {
-    #   url = "github:Mic92/sops-nix";
-    #   # `follows` is the inheritance syntax within inputs. Here, it ensures that sops-nix's `inputs.nixpkgs` aligns with the current flake's inputs.nixpkgs,# avoiding inconsistencies in the dependency's nixpkgs version.
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      # Keep sops-nix on the same nixpkgs revision as the rest of the flake.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    ragenix = {
-      url = "github:yaxitech/ragenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # ragenix = {
+    #   url = "github:yaxitech/ragenix";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     systems.url = "github:nix-systems/default";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
