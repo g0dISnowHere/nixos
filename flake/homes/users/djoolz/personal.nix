@@ -1,8 +1,11 @@
-{ ... }: {
+{ repoRoot, ... }: {
   # User-specific settings that should not live in the reusable baseline
   # profiles under flake/homes/profiles/.
-  programs.git.settings.user = {
-    name = "g0disnowhere";
-    email = "jojuble@gmail.com";
+  programs.git = {
+    settings.user = {
+      name = "g0disnowhere";
+      email = "jojuble@gmail.com";
+    };
+    includes = [{ path = "${repoRoot}/dotfiles/git/config.inc"; }];
   };
 }

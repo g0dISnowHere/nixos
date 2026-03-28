@@ -254,11 +254,21 @@ If a package area grows, split it by responsibility instead.
 - Moved developer environment into Home Manager user space
 - Split the broad package list into explicit domains
 
-## Open Questions
+## Personal Config Policy
 
-The main remaining question is whether additional personal config such as git
-includes or editor config should stay raw-file-based or gain small dedicated
-Home Manager modules.
+Additional personal config should stay raw-file-based by default. Use a small
+Home Manager module only when the setting is stable, structured, and gains
+clear value from package or session integration.
+
+Current policy:
+
+- Git uses a hybrid approach:
+  Home Manager owns enablement and identity, while hand-edited extras live in
+  `dotfiles/git/config.inc`.
+- Editor config stays raw-file-based.
+- Tmux config stays raw-file-based.
+- SSH config should be decided case by case; use Home Manager only if a small
+  structured host setup becomes useful.
 
 ## Success Criteria
 
