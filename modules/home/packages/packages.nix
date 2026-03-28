@@ -21,18 +21,13 @@
       ## CLI Tools ##################################################################
       neofetch
       # nnn # terminal file manager
-      # ripgrep # recursively searches directories for a regex pattern
       # jq # A lightweight and flexible command-line JSON processor
       # yq-go # yaml processor https://github.com/mikefarah/yq
-      # eza # A modern replacement for 'ls'
-      # fzf # A command-line fuzzy finder
       zip
       # xz # currently incompatible with rpi-imager
       unzip
       p7zip
       file
-      which
-      tree
       gnupg
       mtr # A network diagnostic tool
       iperf3
@@ -60,7 +55,6 @@
       traceroute
       git
       smartmontools
-      tmux
       ##############################################################################
 
       ## Nix Tools #################################################################

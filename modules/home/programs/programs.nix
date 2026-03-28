@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+{ ... }: {
   programs = {
     # firefox.enable = true;
 
@@ -13,8 +11,6 @@
       # Let Home Manager generate direnvrc and source its managed nix-direnv hook.
       nix-direnv.enable = true;
     };
-
-    # bash.enable = true; # see note on other shells below
 
     # thunderbird = {
     #   enable = true;

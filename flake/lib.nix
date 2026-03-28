@@ -34,7 +34,7 @@ in {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              backupFileExtension = "backup";
+              backupFileExtension = "hm-backup";
               # Note: Individual machines set home-manager.users.*
               # in their default.nix to reference profile modules
               extraSpecialArgs = {
