@@ -6,6 +6,9 @@
 
   imports = [
     ./common.nix
+    ../../../modules/home/packages/fonts-and-docs.nix
+    ../../../modules/home/packages/desktop-apps.nix
+    ../../../modules/home/packages/maker-tools.nix
     ../../../modules/home/services/keyring-backup.nix
   ]
   # GNOME: dconf settings
@@ -21,9 +24,10 @@
     else
       [ ])
     # Niri: Home Manager-managed links to repo-backed desktop dotfiles
-    ++ (if desktop == "niri" then
-      [ ../../../modules/home/desktop/niri.nix ]
-    else
+    ++ (if desktop == "niri" then [
+      ../../../modules/home/desktop/niri.nix
+      ../../../modules/home/packages/nautilus.nix
+    ] else
       [ ]);
 
   # Enable font configuration for GUI apps
