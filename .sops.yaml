@@ -1,0 +1,27 @@
+keys:
+  - &djoolz age10k89krww75k7jp09atly6xay636673nwy66kwv5s3epupf4zl3lser84gy
+  - &centauri age15w8hg7n8pjyfdlada63zjlsagvgqmt0dgu7x4kjchkznq2nvlgzs4gnehm
+  - &mirach age1replacewithmirachhostkeyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+creation_rules:
+  - path_regex: ^secrets/users/djoolz/.*\.yaml$
+    key_groups:
+      - age:
+          - *djoolz
+          - *centauri
+          - *mirach
+  - path_regex: ^secrets/machines/centauri/.*\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *centauri
+  - path_regex: ^secrets/machines/mirach/.*\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *mirach
+  - path_regex: ^secrets/services/shared/.*\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *centauri
+          - *mirach

@@ -7,6 +7,7 @@
     # Import user modules
     ../../../modules/home/programs/programs.nix
     ../../../modules/home/programs/developer-tools.nix
+    ../../../modules/home/programs/ssh.nix
     ../../../modules/home/programs/shell.nix
     ../../../modules/home/packages/system-utils.nix
     ../../../modules/home/packages/nix-tools.nix

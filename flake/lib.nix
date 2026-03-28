@@ -1,7 +1,7 @@
 { inputs, ... }:
 let
   inherit (inputs)
-    nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable
+    nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable sops-nix
     nixpkgs-broken;
 in {
   flake.lib = {
@@ -65,6 +65,7 @@ in {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              sharedModules = [ sops-nix.homeManagerModules.sops ];
               # Note: Individual machines set home-manager.users.*
               # in their default.nix to reference profile modules
               extraSpecialArgs = {
@@ -79,9 +80,11 @@ in {
 
           # Flatpak support
           nix-flatpak.nixosModules.nix-flatpak
+          sops-nix.nixosModules.sops
 
           # Global Nix daemon settings
           ../modules/nixos/system/nix-settings.nix
+          ../modules/nixos/system/secrets.nix
           { nixpkgs.config.allowUnfree = true; }
         ] ++ modules;
 
