@@ -6,6 +6,7 @@
 - `flake/` defines flake outputs, including machine sets and home-manager profiles.
 - `modules/nixos/` contains reusable NixOS modules grouped by concern: `desktop/`, `roles/`, `services/`, `system/`, and `virtualisation/`.
 - `modules/home/` contains reusable home-manager modules grouped by concern: `dconf/`, `desktop/`, `packages/`, `plasma/`, `programs/`, and `services/`.
+- Keep AI tooling isolated in `modules/home/packages/ai-tools.nix`; keep package installs and any related notes/settings together there instead of mixing them back into the general package list.
 - `nixos/machines/<hostname>/` stores host-specific configuration and hardware scans.
 - Keep modules self-contained and imported explicitly. Do not add recursive module discovery.
 - Prefer role modules for shared machine behavior and keep machine-specific logic out of shared modules.
