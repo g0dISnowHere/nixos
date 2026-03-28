@@ -1,8 +1,5 @@
-{ config, lib, pkgs, ... }:
-let
-  dotfilesRoot =
-    "${config.home.homeDirectory}/Documents/01_config/mine/dotfiles";
-  linkScript = "${dotfilesRoot}/scripts/link.sh";
+{ dotfilesRoot, lib, pkgs, ... }:
+let linkScript = "${dotfilesRoot}/scripts/link.sh";
 in {
   home.activation.linkNiriDotfiles =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''

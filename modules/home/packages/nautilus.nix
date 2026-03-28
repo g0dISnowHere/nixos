@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, dotfilesRoot, pkgs, ... }:
 
 {
   home.packages = with pkgs; [
@@ -20,10 +20,10 @@
 
   home.file.".local/share/nautilus/scripts".source =
     config.lib.file.mkOutOfStoreSymlink
-    "${config.home.homeDirectory}/Documents/01_config/mine/dotfiles/modules/nautilus/scripts";
+    "${dotfilesRoot}/modules/nautilus/scripts";
   home.file.".local/share/nautilus-python/extensions".source =
     config.lib.file.mkOutOfStoreSymlink
-    "${config.home.homeDirectory}/Documents/01_config/mine/dotfiles/modules/nautilus/extensions";
+    "${dotfilesRoot}/modules/nautilus/extensions";
 
   xdg.mimeApps.enable = true;
   xdg.mimeApps.defaultApplications = {

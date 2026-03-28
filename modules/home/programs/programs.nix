@@ -1,16 +1,10 @@
 { config, pkgs, ... }:
 
 {
-  # Install firefox.
   programs = {
     # firefox.enable = true;
 
-    # basic configuration of git, please change to your own
-    git = {
-      enable = true;
-      settings.user.email = "g0disnowhere";
-      settings.user.name = "jojuble";
-    };
+    git = { enable = true; };
 
     direnv = {
       enable = true;
@@ -66,8 +60,7 @@
     #     #       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
     #     #       urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
 
-    #     update =
-    #       "cd ~/Documents/01_config/mine && sudo nixos-rebuild switch --flake ~/Documents/01_config/mine#";
+    #     update = "cd /path/to/flake && sudo nixos-rebuild switch --flake /path/to/flake#";
     #   };
     # };
   };

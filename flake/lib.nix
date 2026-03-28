@@ -14,6 +14,8 @@ in {
           ../modules/nixos/desktop/${desktop}.nix
         else
           { };
+        repoRoot = toString ../.;
+        dotfilesRoot = "${repoRoot}/dotfiles";
       in nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
@@ -36,7 +38,7 @@ in {
               # Note: Individual machines set home-manager.users.*
               # in their default.nix to reference profile modules
               extraSpecialArgs = {
-                inherit desktop inputs;
+                inherit desktop dotfilesRoot inputs repoRoot;
                 pkgs-unstable = import nixpkgs-unstable {
                   inherit system;
                   config.allowUnfree = true;
@@ -54,7 +56,7 @@ in {
         ] ++ modules;
 
         specialArgs = {
-          inherit inputs hostname desktop;
+          inherit inputs hostname desktop repoRoot dotfilesRoot;
           pkgs-unstable = import nixpkgs-unstable {
             inherit system;
             config.allowUnfree = true;

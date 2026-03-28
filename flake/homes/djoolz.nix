@@ -1,7 +1,10 @@
 { inputs, ... }: {
   imports = [ inputs.home-manager.flakeModules.home-manager ];
 
-  flake.homeConfigurations = {
+  flake.homeConfigurations = let
+    repoRoot = toString ../.;
+    dotfilesRoot = "${repoRoot}/dotfiles";
+  in {
     # Standalone home-manager config for djoolz@workstation
     # Usage: home-manager switch --flake .#djoolz@workstation
     "djoolz@workstation" = inputs.home-manager.lib.homeManagerConfiguration {
@@ -12,7 +15,7 @@
 
       extraSpecialArgs = {
         desktop = "niri";
-        inherit inputs;
+        inherit dotfilesRoot inputs repoRoot;
         pkgs-unstable = import inputs.nixpkgs-unstable {
           system = "x86_64-linux";
           config.allowUnfree = true;
@@ -38,7 +41,7 @@
 
       extraSpecialArgs = {
         desktop = null;
-        inherit inputs;
+        inherit dotfilesRoot inputs repoRoot;
         pkgs-unstable = import inputs.nixpkgs-unstable {
           system = "x86_64-linux";
           config.allowUnfree = true;

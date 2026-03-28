@@ -7,6 +7,9 @@ You are working in a modular NixOS flake repository.
 - Use explicit imports only (no recursive discovery).
 - Prefer role modules for shared config; avoid machine-specific config in shared modules.
 - Desktop environments are self-contained and import the shared desktop module: modules/nixos/desktop/common.nix.
+- Home Manager is a portable user-environment layer here, not a mandate to rewrite all dotfiles in Nix.
+- Prefer linking files from `dotfiles/` with `home.file` or `xdg.configFile` before re-expressing them as Home Manager config.
+- Keep shared Home Manager modules portable; avoid hardcoded personal identity or machine-local assumptions in reusable baselines.
 
 ## Fast Validation (Preferred)
 - Use `nix eval` and `nix flake check` for quick validation; avoid `nixos-rebuild switch` for iteration.
@@ -15,6 +18,7 @@ You are working in a modular NixOS flake repository.
 - Flake entry: flake.nix
 - Orchestration: outputs.nix
 - Flake outputs: flake/
+- Flake-parts modules: parts/
 - Reusable NixOS modules: modules/nixos/
 - Home-Manager modules: modules/home/
 - Machine configs: nixos/machines/
