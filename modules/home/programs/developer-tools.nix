@@ -1,6 +1,7 @@
 { pkgs, pkgs-unstable, ... }: {
   home.packages = with pkgs; [
     # Python
+    python3
     python3Packages.pip
     python3Packages.setuptools
     python3Packages.wheel
