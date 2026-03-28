@@ -1,16 +1,13 @@
 { self, inputs, ... }: {
   flake.nixosConfigurations = {
-    # Mirach - Homelab server with optional GUI
+    # Mirach - Homelab server with the same desktop stack as centauri
     # Runs Home Assistant VM, Docker services, media server
     mirach = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "mirach";
       role = "homelab";
-      desktop = "gnome";
+      desktop = "niri";
       modules = [
-        # Virtualization for Home Assistant VM
-        ../../modules/nixos/virtualisation/libvirtd.nix
-
         # Docker for services
         ../../modules/nixos/virtualisation/docker.nix
 

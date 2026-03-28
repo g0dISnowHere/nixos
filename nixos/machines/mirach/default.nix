@@ -1,24 +1,20 @@
-{ config, pkgs, hostname, ... }: {
+{ hostname, pkgs, ... }: {
   # Mirach - Homelab server
   # Hardware: [describe hardware]
   # Role: Homelab (VMs, Docker services, Home Assistant)
 
   imports = [
     ./hardware-configuration.nix
-    ../../../modules/nixos/system/my-options.nix # Custom 'my' namespace options
+    ./libvirtd.nix
+    # ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
     ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
-
+    # ../../../modules/nixos/services/scanner.nix # SANE scanner support
+    # ../../../modules/nixos/services/flatpak.nix # Flatpak sandboxed apps
   ];
 
   # Hostname
   networking.hostName = hostname;
-
-  # Libvirt bridge interface configuration
-  my.libvirt = {
-    bridgeInterface = "br0";
-    physicalInterface = "enp0s31f6";
-  };
 
   # Boot configuration
   boot.loader.grub.enable = true;
@@ -26,26 +22,24 @@
   boot.loader.grub.useOSProber = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # Networking
-  networking.networkmanager.enable = true;
-
   # User configuration
   users.users.djoolz = {
     isNormalUser = true;
     description = "djoolz";
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
+    # Shared modules add service-specific groups like libvirtd and docker.
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
   };
 
   # Home-manager configuration for this machine
-  # Uses the user-specific desktop profile wrapper since we need GUI for management.
+  # Match centauri's user environment and desktop applications.
   home-manager.users.djoolz =
     import ../../../flake/homes/users/djoolz/desktop.nix;
 
-  # Machine-specific packages
-  environment.systemPackages = with pkgs;
-    [
-      # Add homelab-specific tools here
-    ];
+  # Match centauri's AppImage support.
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
 
   system.stateVersion = "23.11";
 }

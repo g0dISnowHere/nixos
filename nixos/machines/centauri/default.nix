@@ -8,12 +8,10 @@
     ./bootloader.nix
     ./other-hardware.nix
     ../../../modules/nixos/services/audio.nix
-    ../../../modules/nixos/system/my-options.nix # Custom 'my' namespace options    ../../../modules/nixos/system/nix-settings.nix # Explicitly import nix-settings
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
     # ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
     ../../../modules/nixos/services/scanner.nix # SANE scanner support
     ../../../modules/nixos/services/flatpak.nix # Flatpak sandboxed apps
-    # ../../../modules/nixos/virtualisation/libvirtd.nix # Libvirt/KVM virtualization with bridge networking
   ];
 
   # Bootloader.
@@ -22,12 +20,6 @@
 
   # Hostname
   networking.hostName = hostname;
-
-  # Libvirt bridge interface configuration
-  my.libvirt = {
-    bridgeInterface = "br0";
-    physicalInterface = "enp0s31f6";
-  };
 
   # User configuration
   users.users.djoolz = {
