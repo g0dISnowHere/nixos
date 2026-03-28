@@ -23,7 +23,7 @@
       };
 
       modules = [
-        ./profiles/desktop.nix
+        ./users/djoolz/desktop.nix
         {
           home.username = "djoolz";
           home.homeDirectory = "/home/djoolz";
@@ -49,7 +49,7 @@
       };
 
       modules = [
-        ./profiles/common.nix
+        ./users/djoolz/common.nix
         {
           home.username = "djoolz";
           home.homeDirectory = "/home/djoolz";

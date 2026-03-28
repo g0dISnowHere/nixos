@@ -4,8 +4,9 @@ Date: 2026-02-14
 
 ## Decision
 - Track Noctalia config in `dotfiles/modules/ui/noctalia/`.
-- Symlink `~/.config/noctalia` to the dotfiles copy via `dotfiles/scripts/link.sh`.
+- Link `~/.config/noctalia` to the dotfiles copy via Home Manager.
 
 ## Notes
 - This keeps Noctalia settings, plugins, and themes under version control.
-- Use `dotfiles/scripts/link.sh` after Noctalia GUI changes to persist updates.
+- Use `home-manager switch` to refresh the managed link after Noctalia GUI
+  changes.

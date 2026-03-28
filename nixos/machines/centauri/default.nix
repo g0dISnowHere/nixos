@@ -37,8 +37,9 @@
   };
 
   # Home-manager configuration for this machine
-  # References the desktop profile (GUI + dev tools)
-  home-manager.users.djoolz = import ../../../flake/homes/profiles/desktop.nix;
+  # References the user-specific desktop profile wrapper.
+  home-manager.users.djoolz =
+    import ../../../flake/homes/users/djoolz/desktop.nix;
 
   # AppImage support
   programs.appimage = {

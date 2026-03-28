@@ -37,8 +37,9 @@
   };
 
   # Home-manager configuration for this machine
-  # Uses desktop profile since we need GUI for management
-  home-manager.users.djoolz = import ../../../flake/homes/profiles/desktop.nix;
+  # Uses the user-specific desktop profile wrapper since we need GUI for management.
+  home-manager.users.djoolz =
+    import ../../../flake/homes/users/djoolz/desktop.nix;
 
   # Machine-specific packages
   environment.systemPackages = with pkgs;

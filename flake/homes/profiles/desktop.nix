@@ -20,7 +20,7 @@
       [ ../../../modules/home/plasma/plasma.nix ]
     else
       [ ])
-    # Niri: dotfiles link script + compositor-specific home setup
+    # Niri: Home Manager-managed links to repo-backed desktop dotfiles
     ++ (if desktop == "niri" then
       [ ../../../modules/home/desktop/niri.nix ]
     else
