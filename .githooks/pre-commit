@@ -49,7 +49,7 @@ echo ""
 
 # === Validate Configuration ===
 echo "2️⃣  Running validation script..."
-if sh validate.sh > /tmp/validate-output.txt 2>&1; then
+if sh ./scripts/validate.sh > /tmp/validate-output.txt 2>&1; then
     cat /tmp/validate-output.txt | grep "^  ✓\|^  ✗\|^==="
     echo ""
 else
