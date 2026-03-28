@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, pkgs-unstable, ... }: {
   home.packages = with pkgs; [
     # Python
     python3Packages.pip
@@ -31,6 +31,11 @@
     gcc
     gnumake
     cmake
+
+    # Developer-focused newer packages
+    pkgs-unstable.devenv
+    pkgs-unstable.vscode
+    pkgs-unstable.gh
   ];
 
   home.sessionVariables = {
