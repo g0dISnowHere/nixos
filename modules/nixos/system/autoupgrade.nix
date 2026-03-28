@@ -1,11 +1,14 @@
-{ config, lib, ... }:
+{ config, lib, repoRoot ? null, ... }:
 
 let
   username = "djoolz";
   homeDir =
     lib.attrByPath [ "users" "users" username "home" ] "/home/${username}"
     config;
-  flakePath = "${homeDir}/Documents/01_config/mine";
+  flakePath = if repoRoot != null then
+    repoRoot
+  else
+    "${homeDir}/Documents/01_config/mine";
 in {
   # https://nixos.wiki/wiki/Automatic_system_upgrades
   # Automatic upgrades, pointing at the locally maintained flake.

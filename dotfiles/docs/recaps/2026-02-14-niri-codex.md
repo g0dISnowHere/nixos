@@ -2,6 +2,10 @@
 
 Context: continued the niri desktop workflow discussion and verified the repo already contains the `dotfiles/` layout, health checks, and docs from the prior plan.
 
+Note: this recap is historical. The current repo no longer uses
+`home.activation` to run `dotfiles/scripts/link.sh` for the Niri desktop.
+Home Manager now declares the relevant `xdg.configFile` links directly.
+
 ## Repo State Verified
 - `dotfiles/` exists with: `docs/`, `state/`, `health/`, `modules/`, `scripts/`, and `README_FOR_AI.md`.
 - Key files present:
@@ -45,4 +49,3 @@ This will execute `dotfiles/scripts/link.sh` and establish the `.config` symlink
 ## Open Questions / Next Options
 - Add an alias `djoolz@centauri` home configuration (optional).
 - If the repo path changes, update `modules/home/desktop/niri.nix`.
-

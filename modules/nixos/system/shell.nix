@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, repoRoot ? null, ... }:
 
 {
   users.defaultUserShell = pkgs.zsh; # Make zsh the default shell for all users.
@@ -88,13 +88,15 @@
     # shellAliases = {
     #   # ll = "ls -l";
 
-    #   update = "cd ~/Documents/01_config/mine && nix flake update";
+    #   update = "cd ${
+    #     if repoRoot != null then repoRoot else "/path/to/flake"
+    #   } && nix flake update";
 
     #   switch =
-    #     "cd ~/Documents/01_config/mine && sudo nixos-rebuild switch --flake .#";
+    #     "cd ${if repoRoot != null then repoRoot else "/path/to/flake"} && sudo nixos-rebuild switch --flake .#";
 
     #   test =
-    #     "cd ~/Documents/01_config/mine && sudo nixos-rebuild test --flake .#";
+    #     "cd ${if repoRoot != null then repoRoot else "/path/to/flake"} && sudo nixos-rebuild test --flake .#";
 
     # };
     # history.size = 10000;
