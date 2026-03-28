@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+selection="${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS-}"
+[ -n "$selection" ] || exit 0
+
+printf '%s\n' "$selection" | wl-copy

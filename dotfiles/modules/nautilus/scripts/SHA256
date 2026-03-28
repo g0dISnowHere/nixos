@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+selection="${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS-}"
+[ -n "$selection" ] || exit 0
+
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+while IFS= read -r path; do
+  sha256sum "$path"
+done <<EOF > "$tmp"
+$selection
+EOF
+
+wl-copy < "$tmp"
+
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "SHA256 copied" "Checksums copied to clipboard."
+fi

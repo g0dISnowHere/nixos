@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+selection="${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS-}"
+[ -n "$selection" ] || exit 0
+
+while IFS= read -r path; do
+  [ -f "$path" ] || continue
+  dir="$(dirname "$path")"
+  base="$(basename "$path")"
+  name="${base%.*}"
+  ext="${base##*.}"
+  output="$dir/${name}-1920.${ext}"
+  magick "$path" -resize '1920x1920>' "$output"
+done <<EOF
+$selection
+EOF
+
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "Resize complete" "Created 1920px variants next to the originals."
+fi

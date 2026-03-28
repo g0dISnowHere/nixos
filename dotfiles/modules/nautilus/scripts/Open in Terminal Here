@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target="${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS-}"
+
+if [ -n "$target" ]; then
+  first="$(printf '%s\n' "$target" | sed -n '1p')"
+  if [ -d "$first" ]; then
+    dir="$first"
+  else
+    dir="$(dirname "$first")"
+  fi
+else
+  dir="${NAUTILUS_SCRIPT_CURRENT_URI#file://}"
+fi
+
+[ -n "${dir-}" ] || exit 1
+
+exec alacritty --working-directory "$dir"
