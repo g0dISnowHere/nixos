@@ -1,13 +1,13 @@
 # Nirinit config (dotfiles/modules/compositor/nirinit/config.toml)
-# Tier 2: Persistence (autosave/restore only)
-# - Keep mappings empty until Tier 2.5
+# Tier 2: Persistence
+# - Save interval is passed by the systemd unit via --save-interval.
+# - Keep launch mappings empty until Tier 2.5 unless restore needs a known shim.
 
-# interval in seconds between autosaves (default is usually fine)
-save_interval = 30
-
-# Tier 2.5: Deterministic restore (commented placeholder)
-# [mappings]
-# "2:research" = ["Vivaldi-flatpak", "org.mozilla.firefox"]
 # Tier 2.5: Ignore transient windows (commented placeholder)
-[ignore]
-app_id = ["pavucontrol", "blueman-manager"]
+[skip]
+apps = ["pavucontrol", "blueman-manager"]
+
+# Tier 2.5: App-specific launch overrides (commented placeholder)
+[launch]
+# "Vivaldi-flatpak" = "flatpak run com.vivaldi.Vivaldi"
+# "org.signal.Signal" = "flatpak run org.signal.Signal"

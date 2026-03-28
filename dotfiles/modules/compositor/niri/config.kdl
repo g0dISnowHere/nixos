@@ -44,7 +44,7 @@ binds {
   Mod+Shift+E { quit; }             // exit session
   Mod+F { maximize-window-to-edges; } // maximize current window, keep bar
   Mod+Tab { toggle-overview; }      // overview (grid of workspaces/windows)
-  Mod+L { spawn "~/.config/niri/swaylock-noctalia.sh"; } // lock screen (Noctalia wallpaper/colors)
+  Mod+L { spawn "sh" "-lc" "\"$HOME/.config/niri/swaylock-noctalia.sh\""; } // lock screen (Noctalia wallpaper/colors)
 
   // ThinkPad T480s Fn keys (enabled)
   XF86MonBrightnessUp { spawn "brightnessctl" "set" "5%+"; }

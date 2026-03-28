@@ -41,7 +41,11 @@ line="#00000000"
 separator="#00000000"
 
 exec swaylock \
-  --indicator \
+  --daemonize \
+  --indicator-caps-lock \
+  --show-keyboard-layout \
+  --scaling fill \
+  --show-failed-attempts \
   --indicator-radius 90 \
   --indicator-thickness 3 \
   --inside-color "$inside" \
@@ -50,5 +54,4 @@ exec swaylock \
   --line-color "$line" \
   --separator-color "$separator" \
   --text-color "$text" \
-  --fade-in 0.2 \
   "${image_args[@]}"

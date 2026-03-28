@@ -19,4 +19,12 @@
   # Battery power management and monitoring
   # services.upower.enable = true;
   # services.tlp.enable = true;
+
+  services.logind.settings.Login = {
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
+    HandleLidSwitchDocked = "ignore";
+    HandlePowerKey = "suspend";
+    HandleSuspendKey = "suspend";
+  };
 }

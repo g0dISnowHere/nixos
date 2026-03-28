@@ -1,4 +1,11 @@
-{ config, inputs, lib, pkgs, ... }: {
+{ config, inputs, lib, pkgs, ... }:
+let
+  niriLockScript = "%h/.config/niri/swaylock-noctalia.sh";
+  fallbackLockCommand = "${pkgs.swaylock}/bin/swaylock -f";
+  lockCommand = ''
+    ${pkgs.bash}/bin/bash -lc 'if [ -x "${niriLockScript}" ]; then exec "${niriLockScript}"; else exec ${fallbackLockCommand}; fi'
+  '';
+in {
   # Niri Desktop Environment — Self-Contained
   # Imports shared desktop infrastructure from common.nix
   # Provides: Niri compositor + Wayland tooling + shared desktop stack
@@ -27,11 +34,14 @@
     after = lib.mkForce [ "niri.service" ];
     wantedBy = lib.mkForce [ "niri.service" ];
     serviceConfig = {
+      Environment = [
+        "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
+      ];
       ExecStart = lib.mkForce [
         ""
         "${
           inputs.nirinit.packages.${pkgs.stdenv.hostPlatform.system}.default
-        }/bin/nirinit --config %h/.config/nirinit/config.toml"
+        }/bin/nirinit --save-interval 30 --config %h/.config/nirinit/config.toml"
       ];
       Restart = "always";
     };
@@ -47,42 +57,21 @@
     };
   };
 
-  systemd.user.services.swayidle-ac = {
-    description = "Swayidle (AC)";
+  systemd.user.services.swayidle = {
+    description = "Swayidle";
     partOf = [ "niri.service" ];
     wantedBy = [ "niri.service" ];
     after = [ "niri.service" ];
-    unitConfig = {
-      ConditionACPower = "true";
-      Conflicts = [ "swayidle-battery.service" ];
-    };
     serviceConfig = {
+      Environment = [
+        "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
+      ];
       ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
-        + "timeout 900 '${pkgs.wlopm}/bin/wlopm --off' "
+        + "timeout 300 '${lockCommand}' "
+        + "timeout 330 '${pkgs.wlopm}/bin/wlopm --off' "
         + "resume '${pkgs.wlopm}/bin/wlopm --on' "
-        + "timeout 1800 '${pkgs.swaylock}/bin/swaylock -f' "
-        + "timeout 3600 '${pkgs.systemd}/bin/systemctl suspend' "
-        + "before-sleep '${pkgs.swaylock}/bin/swaylock -f'";
-      Restart = "on-failure";
-    };
-  };
-
-  systemd.user.services.swayidle-battery = {
-    description = "Swayidle (battery)";
-    partOf = [ "niri.service" ];
-    wantedBy = [ "niri.service" ];
-    after = [ "niri.service" ];
-    unitConfig = {
-      ConditionACPower = "false";
-      Conflicts = [ "swayidle-ac.service" ];
-    };
-    serviceConfig = {
-      ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
-        + "timeout 300 '${pkgs.wlopm}/bin/wlopm --off' "
-        + "resume '${pkgs.wlopm}/bin/wlopm --on' "
-        + "timeout 300 '${pkgs.swaylock}/bin/swaylock -f' "
-        + "timeout 600 '${pkgs.systemd}/bin/systemctl suspend' "
-        + "before-sleep '${pkgs.swaylock}/bin/swaylock -f'";
+        + "timeout 1800 '${pkgs.systemd}/bin/systemctl suspend' "
+        + "before-sleep '${lockCommand}' " + "lock '${lockCommand}'";
       Restart = "on-failure";
     };
   };
@@ -159,6 +148,15 @@
     swayidle
     swaybg
     xwayland-satellite # XWayland support
+    # Nirinit saves a per-window launch_command from the Niri window identity it
+    # sees in IPC. In practice this matches app_id here, which is not always an
+    # executable on PATH, so provide stable compatibility shims for restore.
+    (writeShellScriptBin "Vivaldi-flatpak" ''
+      exec com.vivaldi.Vivaldi "$@"
+    '')
+    (writeShellScriptBin "org.gnome.Nautilus" ''
+      exec nautilus "$@"
+    '')
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
