@@ -1,42 +1,69 @@
-# Operations Overview
 
-This section explains the operational side of the repo at a design level. It is
-less about memorizing commands and more about understanding the kinds of work
-the repo supports and how those workflows fit together.
+  # Just some useful commands
 
-## Operational Model
+  I use often, to avoid having to search for them in the terminal history or in the documentation.
 
-The repo favors a layered workflow:
+  ## show usefull error output when nixos-rebuild fails
 
-- evaluate early
-- validate before larger changes
-- apply only once the system shape is understood
+  ```bash
+  sudo nixos-rebuild switch &>nixos-switch.log || (cat nixos-switch.log | grep --color error && exit 1)
+  ```
 
-That mirrors the architecture of the repo itself: composition first, then
-verification, then activation.
+  ## show usefull error output when nixos-rebuild fails, with more context
 
-## Main Areas
+  ```bash
+  sudo nixos-rebuild switch &>nixos-switch.log || (echo "NixOS rebuild failed with the following error:" && cat nixos-switch.log | grep --color error && exit 1)
+  ```
+  ## keep a copy of upgrade logs
+  
+  ```bash
+  sudo nixos-rebuild switch --flake .# 2>&1 | tee nixos-switch.log || { grep --color error nixos-switch.log && exit 1; }
+  ```
+  ## rollback
 
-- validation and evaluation
-  - checking flake outputs and machine shape before doing heavier work
-- local rebuild and rollback
-  - applying and recovering machine state
-- user-session operations
-  - the runtime side of the configured environment
-- store maintenance
-  - keeping the local Nix environment healthy
-- VPS install flow
-  - the remote-install and migration-specific operational path
 
-## Why This Section Exists
+  sudo nixos-rebuild switch --flake .# --rollback
 
-Operational docs change more often than architecture docs, but they still
-benefit from a stable overview. This section gives the map, while the scripts,
-machine docs, and findings carry the more tactical details.
+  ## list generated system generations
 
-## Where To Look Next
+  sudo nixos-rebuild list-generations
 
-- [README.md](../../README.md)
-- [validate.sh](../../validate.sh)
-- [nixos/machines/albaldah/README.md](../../nixos/machines/albaldah/README.md)
-- [docs/vps/README.md](../vps/README.md)
+  ## update dconf.nix
+
+  dconf dump / | dconf2nix > modules/home/dconf/dconf.nix
+
+  ## Check if D-Bus activation file exists
+
+  find /nix/store -path "*/share/dbus-1/services/*kdeconnect*" 2>/dev/null
+
+  ## See recent system updates
+
+  nix profile diff-closures --profile /nix/var/nix/profiles/system | tail -n 50
+
+  ## logout
+
+  loginctl terminate-user djoolz
+
+  ## restart noctalia
+
+  systemctl --user restart noctalia-shell
+
+  ## build albaldah locally to warm the local nix store
+
+  nix build .#nixosConfigurations.albaldah.config.system.build.toplevel
+
+  ## install albaldah on the STRATO VPS with nixos-anywhere using the local nix store
+
+  nix build .#nixosConfigurations.albaldah.config.system.build.toplevel && \
+  nix run github:nix-community/nixos-anywhere -- \
+    --build-on local \
+    --flake /home/djoolz/Documents/01_config/mine#albaldah \
+    --target-host root@YOUR_SERVER_IP
+
+  ## test albaldah install with nixos-anywhere using the local nix store
+
+  nix build .#nixosConfigurations.albaldah.config.system.build.toplevel && \
+  nix run github:nix-community/nixos-anywhere -- \
+    --flake /home/djoolz/Documents/01_config/mine#albaldah \
+    --vm-test
+
