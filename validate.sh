@@ -78,7 +78,7 @@ echo "NixOS Configurations:"
 
 # Centauri
 echo "  Centauri:"
-echo "    - hostname: $(nix eval .#nixosConfigurations.centauri.config.networking.hostName 2>/dev/null | tr -d '"')"
+# echo "    - hostname: $(nix eval .#nixosConfigurations.centauri.config.networking.hostName 2>/dev/null | tr -d '"')"
 echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.centauri.config.services.desktopManager.gnome.enable 2>/dev/null))"
 echo "    - docker: $(nix eval .#nixosConfigurations.centauri.config.virtualisation.docker.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
@@ -86,7 +86,7 @@ echo "    - system evaluates: ✓"
 # Mirach
 echo "  Mirach:"
 echo "    - hostname: $(nix eval .#nixosConfigurations.mirach.config.networking.hostName 2>/dev/null | tr -d '"')"
-echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.mirach.config.services.desktopManager.gnome.enable 2>/dev/null))"
+# echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.mirach.config.services.desktopManager.gnome.enable 2>/dev/null))"
 echo "    - libvirtd: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.libvirtd.enable 2>/dev/null)"
 echo "    - docker: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.docker.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
