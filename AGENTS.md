@@ -4,12 +4,14 @@
 - `flake.nix` declares inputs; `outputs.nix` wires flake-parts modules.
 - `parts/` is the home for flake-parts per-system modules such as formatting, dev shells, packages, systems, and checks. Some of that wiring may still live inline in `outputs.nix` during refactors; prefer moving it into focused files rather than growing `outputs.nix`.
 - `flake/` defines flake outputs, including machine sets and home-manager profiles.
+- `secrets/` holds SOPS-managed secret templates, examples, and encrypted files; keep shared secret layout explicit by scope (`users/`, `machines/`, `services/`) instead of scattering secret metadata through machine files.
 - `modules/nixos/` contains reusable NixOS modules grouped by concern: `desktop/`, `roles/`, `services/`, `system/`, and `virtualisation/`.
 - `modules/home/` contains reusable home-manager modules grouped by concern: `dconf/`, `desktop/`, `packages/`, `plasma/`, `programs/`, and `services/`.
 - Keep AI tooling isolated in `modules/home/packages/ai-tools.nix`; keep package installs and any related notes/settings together there instead of mixing them back into the general package list.
 - `nixos/machines/<hostname>/` stores host-specific configuration and hardware scans.
 - Keep modules self-contained and imported explicitly. Do not add recursive module discovery.
 - Prefer role modules for shared machine behavior and keep machine-specific logic out of shared modules.
+- Keep shared secret plumbing in focused modules and keep concrete secret declarations close to their owning scope (shared user secrets under `secrets/users/`, host-only secrets under `secrets/machines/`, service secrets under `secrets/services/`).
 
 ## Architecture Rules
 - Desktop environments are self-contained and should import shared desktop infrastructure from `modules/nixos/desktop/common.nix`.
@@ -33,6 +35,7 @@
 - Prefer fast evals during iteration:
   - `nix eval .#nixosConfigurations.centauri.config.system.build.toplevel`
   - `nix eval .#nixosConfigurations.mirach.config.system.build.toplevel`
+  - `nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel`
   - `nix eval .#homeConfigurations."djoolz@workstation".activationPackage`
   - `nix eval .#homeConfigurations."djoolz@server".activationPackage`
 - `sh validate.sh` runs the broader validation flow for NixOS and home-manager.
@@ -53,9 +56,11 @@
 - Pre-commit hooks in `.githooks/pre-commit` enforce formatting and validation before commits.
 
 ## Change Management
-- Review `plan.md` when working on larger refactors, migrations, or structural changes.
-- Review `plan-home-manager-dotfiles-strategy.md` when changing how home-manager and raw dotfiles are split.
-- Preserve explicit structure and avoid reintroducing older mixed-concern layouts described in `plan.md`.
+- Keep enduring repository documentation under `docs/`; do not add new canonical docs at the repo root.
+- Review `docs/architecture/home-manager-dotfiles-strategy.md` when changing how home-manager and raw dotfiles are split.
+- Move incomplete plans and proposals into `docs/future-ideas/` rather than leaving them mixed with current documentation.
+- Preserve explicit structure and avoid reintroducing older mixed-concern layouts described in `docs/future-ideas/flake-refactor-plan.md`.
+- Update `docs/README.md` when adding a new documentation area or changing what is considered canonical.
 - If you add new machines or major module families, update this file so it remains the canonical agent guide.
 
 ## Agent-Specific Instructions

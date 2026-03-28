@@ -1,0 +1,179 @@
+metadata:
+  generated_at_utc: "2026-03-28"
+  generated_by: "Codex"
+  host_context:
+    provider: "STRATO VPS"
+    working_directory: "/root/docker"
+    current_user: "root"
+system:
+  hostname:
+    current: "ubuntu"
+    dhcp_hostname: "42dfdcbb-75f0-4420-b15c-4971cd469d82"
+  os:
+    name: "Ubuntu"
+    version: "24.04.4 LTS"
+    version_id: "24.04"
+    codename: "noble"
+    kernel: "Linux ubuntu 6.8.0-106-generic #106-Ubuntu SMP PREEMPT_DYNAMIC Fri Mar 6 07:58:08 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux"
+  virtualization:
+    detected: "microsoft"
+  resources:
+    memory_total: "7.7Gi"
+    memory_used: "1.9Gi"
+    memory_available: "5.8Gi"
+    swap_total: "8.0Gi"
+    swap_used: "105Mi"
+boot:
+  current_mode:
+    firmware_efi_runtime_present: false
+    inferred_boot_mode: "BIOS"
+    evidence:
+      - "/sys/firmware/efi is absent"
+      - "/boot/grub/i386-pc exists"
+  partition_table:
+    disk: "/dev/vda"
+    scheme: "gpt"
+    flags_present:
+      - "bios_grub"
+      - "esp"
+  bootloader:
+    current_bootloader: "GRUB"
+    grub_version: "2.12-1ubuntu7.3"
+    kernel_cmdline: "BOOT_IMAGE=/vmlinuz-6.8.0-106-generic root=UUID=71a4deb2-1007-4c38-848d-e5a1e5ee30fb ro console=tty1 console=ttyS0"
+    recommendation_for_nixos: "Preserve BIOS GRUB boot support on reinstall."
+storage:
+  disks:
+    - name: "/dev/vda"
+      model: "Virtio Block Device"
+      size: "300G"
+      partitions:
+        - name: "/dev/vda14"
+          size: "4M"
+          role: "bios_grub"
+          filesystem: null
+          mountpoint: null
+          part_flags:
+            - "bios_grub"
+        - name: "/dev/vda15"
+          size: "106M"
+          role: "EFI system partition"
+          filesystem: "vfat"
+          label: "UEFI"
+          uuid: "91AD-CC9A"
+          partuuid: "2b50006a-2457-4d2e-96d9-4cd0e4e7ef6e"
+          mountpoint: "/boot/efi"
+          mount_options: "rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro"
+          part_flags:
+            - "boot"
+            - "esp"
+        - name: "/dev/vda16"
+          size: "913M"
+          role: "/boot"
+          filesystem: "ext4"
+          label: "BOOT"
+          uuid: "e975251b-c4d7-4771-92b7-8516439f085c"
+          partuuid: "9b0c5ae8-8419-4bf9-a41a-fd0036e5a8ce"
+          mountpoint: "/boot"
+          mount_options: "rw,relatime"
+          part_name: "bls_boot"
+        - name: "/dev/vda1"
+          size: "299G"
+          role: "/"
+          filesystem: "ext4"
+          label: "cloudimg-rootfs"
+          uuid: "71a4deb2-1007-4c38-848d-e5a1e5ee30fb"
+          partuuid: "7796776e-3113-446e-8658-35b39fe33a6d"
+          mountpoint: "/"
+          mount_options: "rw,relatime,discard,errors=remount-ro,commit=30"
+  fstab:
+    - "LABEL=cloudimg-rootfs / ext4 discard,commit=30,errors=remount-ro 0 1"
+    - "LABEL=BOOT /boot ext4 defaults 0 2"
+    - "LABEL=UEFI /boot/efi vfat umask=0077 0 1"
+    - "/swapfile none swap sw 0 0"
+  usage:
+    root:
+      filesystem: "/dev/vda1"
+      size: "290G"
+      used: "124G"
+      available: "166G"
+    boot:
+      filesystem: "/dev/vda16"
+      size: "881M"
+      used: "117M"
+      available: "703M"
+    boot_efi:
+      filesystem: "/dev/vda15"
+      size: "105M"
+      used: "6.2M"
+      available: "99M"
+network:
+  primary_interface: "ens6"
+  active_configuration:
+    source: "/etc/netplan/50-cloud-init.yaml"
+    renderer: "networkd"
+    match: "en*"
+    dhcp4: true
+    dhcp6: true
+  ipv4:
+    address: "85.215.175.36"
+    netmask: "255.255.255.255"
+    cidr_inferred: "/32"
+    gateway: "85.215.175.1"
+  ipv6:
+    global_addresses:
+      - "2a01:239:37c:2e00::1"
+    link_local_gateway_likely_required: true
+  dns:
+    ipv4:
+      - "212.227.123.16"
+      - "212.227.123.17"
+    ipv6:
+      - "2001:8d8:fe:53:72ec::1"
+      - "2001:8d8:fe:53:72ec::2"
+  routes_from_proc_net_route:
+    default_route:
+      interface: "ens6"
+      gateway_hex_le: "01AFD755"
+      gateway_decoded: "85.215.175.1"
+  local_interfaces_seen:
+    - "ens6"
+    - "lo"
+    - "docker0"
+    - "br-50b1ce5e913b"
+    - "br-6cedec7efcb0"
+    - "tailscale0"
+  implication_for_nixos: "Bring up ens6 via DHCP for IPv4 and IPv6 unless intentionally replacing with static configuration."
+remote_access:
+  ssh:
+    listening:
+      - "0.0.0.0:22"
+      - "[::]:22"
+    root_user_present: true
+    authorized_keys_count: 2
+    authorized_keys_comments:
+      - "djoolz@mirach"
+      - "coolify"
+    password_authentication:
+      sshd_config_default_comment_present: true
+      cloud_init_dropins_disable_password_auth: true
+  serial_console:
+    kernel_cmdline_contains_ttyS0: true
+    implication: "Serial/VNC recovery should remain available if provider supports it."
+nixos_install_assessment:
+  suitability_for_remote_reinstall: true
+  recommended_method: "Run nixos-anywhere from a separate machine over SSH."
+  do_not_do:
+    - "Do not try to overwrite the running OS from the same machine."
+    - "Do not assume UEFI boot for the new NixOS config."
+  important_constraints:
+    - "Preserve BIOS GRUB boot support."
+    - "Preserve SSH authorized keys in the initial NixOS config."
+    - "Ensure ens6 comes up on DHCP after first boot."
+  candidate_disko_shape:
+    disk: "/dev/vda"
+    minimal_safe_layout:
+      - "bios_grub partition"
+      - "ext4 /boot partition"
+      - "ext4 / root partition"
+    optional:
+      - "ESP can be preserved, but BIOS boot is the current authoritative boot path."

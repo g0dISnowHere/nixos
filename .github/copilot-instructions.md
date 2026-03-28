@@ -19,9 +19,11 @@ You are working in a modular NixOS flake repository.
 - Orchestration: outputs.nix
 - Flake outputs: flake/
 - Flake-parts modules: parts/
+- Secrets: secrets/
 - Reusable NixOS modules: modules/nixos/
 - Home-Manager modules: modules/home/
 - Machine configs: nixos/machines/
+- Human docs: docs/ (use docs/README.md as the entry point)
 
 ## Desktop Interchangeability
 - Desktop selection is via `desktop` in mkNixosSystem.
@@ -32,3 +34,4 @@ You are working in a modular NixOS flake repository.
 ## Commit & Quality
 - Pre-commit hooks run nix fmt and validate.sh.
 - Keep commits focused and validated.
+- Keep current documentation in docs/ and move incomplete plans into docs/future-ideas/.
