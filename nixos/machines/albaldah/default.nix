@@ -56,7 +56,7 @@
 
   home-manager.users.djoolz = {
     imports = [ ../../../flake/homes/users/djoolz/server.nix ];
-    home.stateVersion = "24.11";
+    home.stateVersion = "25.11";
   };
 
   environment.systemPackages = with pkgs; [ curl git htop tmux vim ];
