@@ -112,9 +112,10 @@ This script:
 
 - creates `~/.config/sops/age/keys.txt` if missing
 - creates `~/.ssh/id_ed25519` if missing
-- prints the operator `age` public key
-- prints the SSH public key
-- prints the SSH key converted to an `age` recipient
+- manages local key material only; SSH client config still belongs in Home Manager
+- prints the operator `age` public key for `.sops.yaml`
+- prints the SSH public key for remote `authorized_keys`
+- prints the SSH key converted to an `age` recipient for `.sops.yaml`
 
 For now you need at least:
 

@@ -23,6 +23,11 @@
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  hardware.firmware = [ pkgs.linux-firmware ];
+  swapDevices = [{
+    device = "/var/lib/swapfile";
+    size = 16 * 1024;
+  }];
 
   # User configuration
   users.users.djoolz = {
