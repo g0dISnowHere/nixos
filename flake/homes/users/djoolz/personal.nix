@@ -8,4 +8,17 @@
     };
     includes = [{ path = "${repoRoot}/dotfiles/git/config.inc"; }];
   };
+
+  programs.ssh.matchBlocks = {
+    centauri = {
+      hostname = "centauri";
+      user = "djoolz";
+      identitiesOnly = true;
+    };
+    mirach = {
+      hostname = "mirach";
+      user = "djoolz";
+      identitiesOnly = true;
+    };
+  };
 }

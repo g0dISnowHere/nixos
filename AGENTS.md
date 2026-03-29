@@ -5,7 +5,7 @@
 - `parts/` is the home for flake-parts per-system modules such as formatting, dev shells, packages, systems, and checks. Some of that wiring may still live inline in `outputs.nix` during refactors; prefer moving it into focused files rather than growing `outputs.nix`.
 - `flake/` defines flake outputs, including machine sets and home-manager profiles.
 - `secrets/` holds SOPS-managed secret templates, examples, and encrypted files; keep shared secret layout explicit by scope (`users/`, `machines/`, `services/`) instead of scattering secret metadata through machine files.
-- `modules/nixos/` contains reusable NixOS modules grouped by concern: `desktop/`, `roles/`, `services/`, `system/`, and `virtualisation/`.
+- `modules/nixos/` contains reusable NixOS modules grouped by concern: `desktop/`, `roles/`, `services/`, `system/`, `users/`, and `virtualisation/`.
 - `modules/home/` contains reusable home-manager modules grouped by concern: `dconf/`, `desktop/`, `packages/`, `plasma/`, `programs/`, and `services/`.
 - Keep AI tooling isolated in `modules/home/packages/ai-tools.nix`; keep package installs and any related notes/settings together there instead of mixing them back into the general package list.
 - `nixos/machines/<hostname>/` stores host-specific configuration and hardware scans.
