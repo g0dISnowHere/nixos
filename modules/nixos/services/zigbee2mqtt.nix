@@ -7,6 +7,7 @@
       ExecStart =
         "${pkgs.zigbee2mqtt_2}/bin/zigbee2mqtt --data /home/djoolz/.z2m";
       User = "djoolz";
+      SupplementaryGroups = [ "dialout" ];
       Restart = "on-failure";
     };
     preStart = ''

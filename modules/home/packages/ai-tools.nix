@@ -38,7 +38,7 @@
       pkgs-unstable.antigravity # Antigravity desktop AI client
 
       # codex-latest
-      # pkgs-unstable.codex
+      pkgs-unstable.codex
       # pkgs-unstable.aider-chat-full
     ];
 }

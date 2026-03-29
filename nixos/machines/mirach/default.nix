@@ -12,7 +12,7 @@
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
     ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
     # ../../../modules/nixos/services/scanner.nix # SANE scanner support
-    # ../../../modules/nixos/services/flatpak.nix # Flatpak sandboxed apps
+    ../../../modules/nixos/services/flatpak.nix # Flatpak sandboxed apps
   ];
 
   # Hostname

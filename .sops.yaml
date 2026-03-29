@@ -1,7 +1,7 @@
 keys:
   - &djoolz age10k89krww75k7jp09atly6xay636673nwy66kwv5s3epupf4zl3lser84gy
   - &centauri age15w8hg7n8pjyfdlada63zjlsagvgqmt0dgu7x4kjchkznq2nvlgzs4gnehm
-  - &mirach age1replacewithmirachhostkeyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  - &mirach age1lf6v64kedcpx76h5x3as99lq4jndtyq44s7cq88rzx56y85zd9aq6q4uw6
 creation_rules:
   - path_regex: ^secrets/users/djoolz/.*\.yaml$
     key_groups:
