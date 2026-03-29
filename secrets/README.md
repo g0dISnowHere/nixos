@@ -125,14 +125,14 @@ scripts/ssh-pubkey-to-age.sh --force
 
 This script:
 
-- creates `~/.config/sops/age/keys.txt` if missing
 - creates `/var/lib/sops-nix/key.txt` if missing
-- creates `~/.ssh/id_ed25519` if missing
-- manages local key material only; SSH client config still belongs in Home Manager
-- prints the operator `age` public key for `.sops.yaml`
+- rotates only `/var/lib/sops-nix/key.txt` when run with `--force`
+- never creates or modifies `~/.config/sops/age/keys.txt`
+- never creates or modifies `~/.ssh/id_ed25519`
+- prints any existing operator `age` public key for `.sops.yaml`
 - prints the machine `sops-nix` age public key for `.sops.yaml`
-- prints the SSH public key for remote `authorized_keys`
-- prints the SSH key converted to an `age` recipient as an optional separate value
+- prints any existing SSH public key for remote `authorized_keys`
+- prints the SSH-derived `age` recipient only as an optional separate value
 
 For now you need at least:
 
@@ -141,6 +141,24 @@ For now you need at least:
 - one machine `sops-nix` recipient for `mirach`
 
 Later add more recipients for future hosts like the VPS.
+
+For the low-friction host registration path, use:
+
+```bash
+scripts/register-sops-host.sh
+```
+
+That script:
+
+- infers the current host alias from `hostname -s` by default
+- reads the machine recipient from `/var/lib/sops-nix/key.txt`
+- updates only that host entry in `.sops.yaml`
+- rekeys shared user secrets, shared service secrets, and machine-local secrets
+  for that host
+- verifies the host can decrypt those secrets with its own `sops-nix` key
+
+Use `--dry-run` to preview and `--force-host-rotate` only when you are
+intentionally changing a host recipient.
 
 ### 2. Update `.sops.yaml`
 

@@ -25,8 +25,11 @@ Nix module.
 
 Current secret helpers include:
 
-- `scripts/ssh-pubkey-to-age.sh` for operator age bootstrap, machine
-  `sops-nix` key bootstrap, and local SSH key bootstrap
+- `scripts/ssh-pubkey-to-age.sh` for machine `sops-nix` key bootstrap and
+  inspection of existing operator and SSH keys
+- `scripts/register-sops-host.sh` for low-friction host registration: update
+  one host recipient in `.sops.yaml`, rekey the relevant secrets, and verify
+  host-side decryption
 - `scripts/set-user-password-secret.sh` for provisioning or rotating the
   encrypted `secrets/users/<name>/password.yaml` secret
 

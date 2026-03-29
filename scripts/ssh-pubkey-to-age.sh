@@ -6,13 +6,15 @@ usage() {
   cat <<'EOF'
 Usage: scripts/ssh-pubkey-to-age.sh [--force]
 
-Generate local operator key material, the machine `sops-nix` age key, and the
-local SSH keypair, then print the public values you need to wire into
-`.sops.yaml`, `authorized_keys`, and the local `~/.config/sops/age/keys.txt`
-setup.
+Generate or rotate only the machine `sops-nix` age key, then print the public
+values you need to wire into `.sops.yaml`.
 
-This script manages local key material only. It does not manage `~/.ssh/config`
-or other SSH client settings from Home Manager.
+This script does not create, rotate, relabel, or overwrite:
+
+- `~/.config/sops/age/keys.txt`
+- `~/.ssh/id_ed25519`
+
+It only manages `/var/lib/sops-nix/key.txt`.
 
 Examples:
   scripts/ssh-pubkey-to-age.sh
@@ -40,21 +42,35 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-for cmd in age-keygen ssh-keygen ssh-to-age grep hostname date; do
+for cmd in age-keygen ssh-to-age grep; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     printf '%s is required but not on PATH\n' "$cmd" >&2
     exit 1
   fi
 done
 
-age_dir="${HOME}/.config/sops/age"
-age_key_file="${age_dir}/keys.txt"
+invoking_user="${SUDO_USER:-$USER}"
+invoking_home="$(getent passwd "${invoking_user}" | cut -d: -f6)"
+if [[ -z "${invoking_home}" ]]; then
+  printf 'Could not resolve home directory for user: %s\n' "${invoking_user}" >&2
+  exit 1
+fi
+
+read_host_public_key() {
+  local key_file="$1"
+
+  if [[ -r "${key_file}" ]]; then
+    grep '^# public key:' "${key_file}"
+  else
+    sudo grep '^# public key:' "${key_file}"
+  fi
+}
+
+age_key_file="${invoking_home}/.config/sops/age/keys.txt"
 system_age_dir="/var/lib/sops-nix"
 system_age_key_file="${system_age_dir}/key.txt"
-ssh_dir="${HOME}/.ssh"
-ssh_key_file="${ssh_dir}/id_ed25519"
+ssh_key_file="${invoking_home}/.ssh/id_ed25519"
 ssh_pub_file="${ssh_key_file}.pub"
-ssh_comment="${USER}@$(hostname)-$(date +%F)"
 tmp_system_age_key=""
 
 cleanup() {
@@ -64,17 +80,6 @@ cleanup() {
 }
 
 trap cleanup EXIT
-
-mkdir -p "$age_dir" "$ssh_dir"
-chmod 700 "$ssh_dir"
-
-if [[ -e "$age_key_file" && "$force" -ne 1 ]]; then
-  printf 'Keeping existing age key: %s\n' "$age_key_file"
-else
-  rm -f "$age_key_file"
-  age-keygen -o "$age_key_file"
-  chmod 600 "$age_key_file"
-fi
 
 if [[ -e "$system_age_key_file" && "$force" -ne 1 ]]; then
   printf 'Keeping existing sops-nix host age key: %s\n' "$system_age_key_file"
@@ -94,52 +99,40 @@ else
   tmp_system_age_key=""
 fi
 
-if [[ -e "$ssh_key_file" && "$force" -ne 1 ]]; then
-  printf 'Keeping existing SSH key: %s\n' "$ssh_key_file"
-else
-  rm -f "$ssh_key_file" "$ssh_pub_file"
-  ssh-keygen -t ed25519 -a 64 -f "$ssh_key_file" -C "$ssh_comment" -N ""
-  chmod 600 "$ssh_key_file"
-  chmod 644 "$ssh_pub_file"
-fi
-
-read -r ssh_key_type ssh_key_data ssh_key_comment < "$ssh_pub_file"
-
 printf '\n=== Local age identity ===\n'
-printf 'Stored in: %s\n' "$age_key_file"
-printf 'Use this age public key as an operator recipient in .sops.yaml:\n'
-grep '^# public key:' "$age_key_file"
+if [[ -e "$age_key_file" ]]; then
+  printf 'Stored in: %s\n' "$age_key_file"
+  printf 'Existing operator recipient from this file:\n'
+  grep '^# public key:' "$age_key_file"
+else
+  printf 'Not found: %s\n' "$age_key_file"
+  printf 'This script does not create or modify the operator age key.\n'
+fi
 
 printf '\n=== sops-nix host age identity ===\n'
 printf 'Stored in: %s\n' "$system_age_key_file"
 printf 'Use this age public key as the machine recipient in .sops.yaml:\n'
-grep '^# public key:' "$system_age_key_file"
+read_host_public_key "$system_age_key_file"
 
 printf '\n=== SSH keypair ===\n'
-printf 'Stored in: %s\n' "$ssh_key_file"
-printf 'Home Manager should manage SSH client config; this script only creates or inspects the keypair.\n'
-printf 'Use this SSH public key for remote authorized_keys:\n'
-if [[ -n "${ssh_key_type:-}" && -n "${ssh_key_data:-}" ]]; then
-  printf '%s %s %s\n' "$ssh_key_type" "$ssh_key_data" "$ssh_comment"
-else
-  cat "$ssh_pub_file"
-fi
-
-if [[ "${ssh_key_comment:-}" != "$ssh_comment" ]]; then
-  printf '\nSSH key comment note:\n'
-  printf 'The existing SSH key comment does not match the preferred format.\n'
-  printf 'Current comment:   %s\n' "${ssh_key_comment:-<none>}"
-  printf 'Preferred comment: %s\n' "$ssh_comment"
-  printf 'Relabel without rotating the key? [y/N]: '
-  read -r relabel_reply
-  if [[ "$relabel_reply" =~ ^[Yy]$ ]]; then
-    ssh-keygen -c -P "" -f "$ssh_key_file" -C "$ssh_comment"
+if [[ -e "$ssh_key_file" && -e "$ssh_pub_file" ]]; then
+  read -r ssh_key_type ssh_key_data ssh_key_comment < "$ssh_pub_file"
+  printf 'Stored in: %s\n' "$ssh_key_file"
+  printf 'Existing SSH public key for remote authorized_keys:\n'
+  if [[ -n "${ssh_key_type:-}" && -n "${ssh_key_data:-}" ]]; then
+    printf '%s %s %s\n' "$ssh_key_type" "$ssh_key_data" "${ssh_key_comment:-}"
   else
-    printf 'Skipped relabel. Run manually if needed:\n'
-    printf 'ssh-keygen -c -f %s -C \"%s\"\n' "$ssh_key_file" "$ssh_comment"
+    cat "$ssh_pub_file"
   fi
+else
+  printf 'Not found: %s\n' "$ssh_key_file"
+  printf 'This script does not create or modify the SSH keypair.\n'
 fi
 
 printf '\n=== SSH-derived age recipient ===\n'
-printf 'This is optional and separate from the sops-nix host key above:\n'
-ssh-to-age < "$ssh_pub_file"
+if [[ -e "$ssh_pub_file" ]]; then
+  printf 'Optional and separate from the sops-nix host key above:\n'
+  ssh-to-age < "$ssh_pub_file"
+else
+  printf 'SSH public key not found, so no SSH-derived age recipient is available.\n'
+fi
