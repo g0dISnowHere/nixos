@@ -12,6 +12,12 @@
     startMenuLaunchers = true;
   };
 
+  # Hardware configuration for NVIDIA GPU support in containers
+  hardware.nvidia-container-toolkit = {
+    enable = true;
+    suppressNvidiaDriverAssertion = true;  # Suppress assertion since NVIDIA driver is provided by WSL/Windows host
+  };
+
   users.users.djoolz = {
     isNormalUser = true;
     description = "djoolz";
