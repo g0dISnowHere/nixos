@@ -18,14 +18,12 @@
     suppressNvidiaDriverAssertion = true;  # Suppress assertion since NVIDIA driver is provided by WSL/Windows host
   };
 
-  users.users.djoolz = {
-    isNormalUser = true;
-    description = "djoolz";
-    extraGroups = [ "wheel" ];
-  };
+  users.users.djoolz.extraGroups = [ "wheel" ];
 
-  home-manager.users.djoolz =
-    import ../../../flake/homes/users/djoolz/server.nix;
+  home-manager.users.djoolz = {
+    imports = [ ../../../flake/homes/users/djoolz/server.nix ];
+    home.stateVersion = "25.11";
+  };
 
   environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
 

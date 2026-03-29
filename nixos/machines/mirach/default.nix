@@ -6,7 +6,6 @@
   imports = [
     ./hardware-configuration.nix
     ./libvirtd.nix
-    ../../../modules/nixos/services/vscode-remote.nix
     ../../../modules/nixos/services/zigbee2mqtt.nix
     # ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
@@ -30,17 +29,15 @@
   }];
 
   # User configuration
-  users.users.djoolz = {
-    isNormalUser = true;
-    description = "djoolz";
-    # Shared modules add service-specific groups like libvirtd and docker.
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
-  };
+  # Shared modules add service-specific groups like libvirtd and docker.
+  users.users.djoolz.extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
 
   # Home-manager configuration for this machine
   # Match centauri's user environment and desktop applications.
-  home-manager.users.djoolz =
-    import ../../../flake/homes/users/djoolz/desktop.nix;
+  home-manager.users.djoolz = {
+    imports = [ ../../../flake/homes/users/djoolz/desktop.nix ];
+    home.stateVersion = "24.11";
+  };
 
   # Match centauri's AppImage support.
   programs.appimage = {

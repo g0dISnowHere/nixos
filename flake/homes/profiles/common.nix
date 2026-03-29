@@ -13,8 +13,4 @@
     ../../../modules/home/packages/nix-tools.nix
     ../../../modules/home/packages/ai-tools.nix
   ];
-
-  # Basic home configuration
-  # Note: Individual configs can override this
-  home.stateVersion = lib.mkDefault "25.11";
 }

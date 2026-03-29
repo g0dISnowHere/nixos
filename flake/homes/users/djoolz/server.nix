@@ -1,1 +1,1 @@
-{ ... }: { imports = [ ../../profiles/common.nix ./personal.nix ]; }
+{ ... }: { imports = [ ./common.nix ]; }

@@ -8,15 +8,6 @@
   ];
 
   my.tailscale.enableSSH = true;
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = "no";
-    };
-  };
-
   # NixOS-WSL configuration for frictionless experience
   wsl = {
     enable = true;

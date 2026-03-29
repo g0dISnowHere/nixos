@@ -22,16 +22,15 @@
   networking.hostName = hostname;
 
   # User configuration
-  users.users.djoolz = {
-    isNormalUser = true;
-    description = "djoolz";
-    extraGroups = [ "networkmanager" "wheel" "docker" "scanner" "lp" ];
-  };
+  users.users.djoolz.extraGroups =
+    [ "networkmanager" "wheel" "docker" "scanner" "lp" ];
 
   # Home-manager configuration for this machine
   # References the user-specific desktop profile wrapper.
-  home-manager.users.djoolz =
-    import ../../../flake/homes/users/djoolz/desktop.nix;
+  home-manager.users.djoolz = {
+    imports = [ ../../../flake/homes/users/djoolz/desktop.nix ];
+    home.stateVersion = "24.11";
+  };
 
   # AppImage support
   programs.appimage = {

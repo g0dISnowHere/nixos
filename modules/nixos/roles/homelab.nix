@@ -20,26 +20,18 @@
     # Services
     ../services/ssh.nix
     ../services/tailscale.nix
+    ../services/vscode-remote.nix
 
     # Note: Desktop environment (for management), virtualization,
     # and machine-specific services are imported by the machine config
   ];
 
   # Networking
-  networking.networkmanager.enable = true;
+  networking.networkmanager.enable = lib.mkDefault true;
   networking.firewall.enable = true;
 
   my.tailscale = {
     enableSSH = true;
     advertiseExitNode = true;
-  };
-
-  # SSH with secure defaults
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = "no";
-    };
   };
 }

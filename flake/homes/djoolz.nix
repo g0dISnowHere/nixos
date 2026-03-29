@@ -29,6 +29,7 @@
         {
           home.username = "djoolz";
           home.homeDirectory = "/home/djoolz";
+          home.stateVersion = "25.11";
         }
       ];
     };
@@ -55,6 +56,7 @@
         {
           home.username = "djoolz";
           home.homeDirectory = "/home/djoolz";
+          home.stateVersion = "25.11";
         }
       ];
     };

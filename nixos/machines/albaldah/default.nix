@@ -10,7 +10,7 @@
 
   # The shared homelab role assumes NetworkManager. This VPS should stay on
   # provider-style networkd + DHCP for remote reliability.
-  networking.networkmanager.enable = lib.mkForce false;
+  networking.networkmanager.enable = false;
   networking.useDHCP = lib.mkDefault false;
   networking.enableIPv6 = true;
 
@@ -48,16 +48,16 @@
   ];
 
   users.users.djoolz = {
-    isNormalUser = true;
-    description = "djoolz";
     extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIItFDRkSHQOn8MlPIjHx/kSPDYSpElw+SozdUIjMMDGe djoolz@mirach"
     ];
   };
 
-  home-manager.users.djoolz =
-    import ../../../flake/homes/users/djoolz/common.nix;
+  home-manager.users.djoolz = {
+    imports = [ ../../../flake/homes/users/djoolz/server.nix ];
+    home.stateVersion = "24.11";
+  };
 
   environment.systemPackages = with pkgs; [ curl git htop tmux vim ];
 
