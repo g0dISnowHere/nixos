@@ -19,9 +19,9 @@
       #################################################################################
       ## AI
       #################################################################################
-      aider-chat-full # terminal pair-programming assistant
+      # aider-chat-full # terminal pair-programming assistant
       gemini-cli # Google Gemini CLI
-      crush # local AI TUI assistant
+      # crush # local AI TUI assistant
       ripgrep # shared dependency used by multiple AI CLI workflows
       bubblewrap # sandbox helper used by some AI tooling
 
