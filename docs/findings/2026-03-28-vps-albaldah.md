@@ -36,6 +36,7 @@ from [flake/machines/homelabs.nix](../../flake/machines/homelabs.nix) as a `home
 ## Current Shape
 
 - single-disk `disko` layout on `/dev/vda`
+- declarative `8 GiB` swapfile on the root filesystem
 - BIOS/GRUB boot path
 - `systemd-networkd` on `ens6` with DHCP and IPv6
 - SSH-first remote administration

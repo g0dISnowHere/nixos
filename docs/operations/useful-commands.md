@@ -57,6 +57,20 @@
   loginctl terminate-user djoolz
   ```
 
+  ## rotate the declarative djoolz password
+
+  ```bash
+  EDITOR=nano sops secrets/users/djoolz/password.yaml
+  ```
+
+  The file stores `hashedPassword`, not a plaintext password hash.
+
+  ## apply the declarative djoolz password on a host
+
+  ```bash
+  sudo nixos-rebuild switch --flake .#centauri
+  ```
+
   ## restart noctalia
 
   ```bash

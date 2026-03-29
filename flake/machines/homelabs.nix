@@ -23,6 +23,7 @@
       role = "homelab";
       modules = [
         inputs.disko.nixosModules.disko
+        ../../modules/nixos/system/disko-install-test-compat.nix
         ../../nixos/machines/albaldah/disko.nix
         # Docker for services
         ../../modules/nixos/virtualisation/docker.nix
