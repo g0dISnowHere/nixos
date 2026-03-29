@@ -25,4 +25,9 @@
 
   # Networking
   networking.networkmanager.enable = true;
+
+  my.tailscale = {
+    enableSSH = false;
+    acceptRoutes = true;
+  };
 }

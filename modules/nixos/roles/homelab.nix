@@ -29,6 +29,11 @@
   networking.networkmanager.enable = true;
   networking.firewall.enable = true;
 
+  my.tailscale = {
+    enableSSH = true;
+    advertiseExitNode = true;
+  };
+
   # SSH with secure defaults
   services.openssh = {
     enable = true;

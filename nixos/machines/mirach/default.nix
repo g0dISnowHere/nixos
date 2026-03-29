@@ -43,5 +43,7 @@
     binfmt = true;
   };
 
+  my.tailscale.advertiseRoutes = [ "192.168.3.0/24" ];
+
   system.stateVersion = "25.05";
 }
