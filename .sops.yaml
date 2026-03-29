@@ -1,7 +1,7 @@
 keys:
   - &djoolz age10k89krww75k7jp09atly6xay636673nwy66kwv5s3epupf4zl3lser84gy
-  - &centauri age1hus8yrj5y6aa0fntqp8glv7pqxqnhczt8y0xhaxznxvk6e2s4vls5v2dcc
-  - &mirach age1d860j0aa5d2fru0rfpyp4mxtyzwt6fw8crvlzerw542gqtfnnd3qfprgw2
+  - &centauri age15w8hg7n8pjyfdlada63zjlsagvgqmt0dgu7x4kjchkznq2nvlgzs4gnehm
+  - &mirach age1089ktlqhw7fh82pps74m8upuxp2m2ljzl73ya9ujtyr8s8nf8e6s2u5gvh
 creation_rules:
   - path_regex: ^secrets/users/djoolz/.*\.yaml$
     key_groups:
