@@ -23,6 +23,13 @@ Nix module.
 - status and workflow helpers
 - older personal automation
 
+Current secret helpers include:
+
+- `scripts/ssh-pubkey-to-age.sh` for operator age bootstrap, machine
+  `sops-nix` key bootstrap, and local SSH key bootstrap
+- `scripts/set-user-password-secret.sh` for provisioning or rotating the
+  encrypted `secrets/users/<name>/password.yaml` secret
+
 ## Reading This Directory
 
 Treat these scripts as convenience layers around the core design. If you are

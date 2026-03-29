@@ -60,7 +60,7 @@ Recommended: keep one operator key outside the repo at:
 ~/.config/sops/age/keys.txt
 ```
 
-### Host key
+### Machine sops-nix key
 
 Each machine also needs a recipient.
 
@@ -73,6 +73,21 @@ age identity at:
 
 That host-local key is used at activation time to decrypt secrets assigned to
 that machine.
+
+Use the public key from `/var/lib/sops-nix/key.txt` as the machine recipient in
+`.sops.yaml`.
+
+### SSH key
+
+The normal SSH keypair at `~/.ssh/id_ed25519` is separate.
+
+Use it for:
+
+- SSH client authentication
+- populating remote `authorized_keys`
+
+Do not treat it as the default `sops-nix` machine decryption key unless you
+intentionally redesign the host secret model around that choice.
 
 ## SSH Guidance
 
@@ -111,17 +126,19 @@ scripts/ssh-pubkey-to-age.sh --force
 This script:
 
 - creates `~/.config/sops/age/keys.txt` if missing
+- creates `/var/lib/sops-nix/key.txt` if missing
 - creates `~/.ssh/id_ed25519` if missing
 - manages local key material only; SSH client config still belongs in Home Manager
 - prints the operator `age` public key for `.sops.yaml`
+- prints the machine `sops-nix` age public key for `.sops.yaml`
 - prints the SSH public key for remote `authorized_keys`
-- prints the SSH key converted to an `age` recipient for `.sops.yaml`
+- prints the SSH key converted to an `age` recipient as an optional separate value
 
 For now you need at least:
 
 - one operator recipient for `djoolz`
-- one recipient for `centauri`
-- one recipient for `mirach`
+- one machine `sops-nix` recipient for `centauri`
+- one machine `sops-nix` recipient for `mirach`
 
 Later add more recipients for future hosts like the VPS.
 
@@ -143,8 +160,8 @@ Example after replacement:
 ```yaml
 keys:
   - &djoolz age1operatorrecipient
-  - &centauri age1centaurirecipient
-  - &mirach age1mirachrecipient
+  - &centauri age1centauri-sops-nix-machine-recipient
+  - &mirach age1mirach-sops-nix-machine-recipient
 ```
 
 The creation rules in `.sops.yaml` determine which recipients can decrypt which
@@ -166,6 +183,17 @@ Then edit it before encrypting:
 ```bash
 $EDITOR secrets/services/shared/example.env
 ```
+
+For the shared `djoolz` login password secret, prefer the helper script instead
+of editing hashes manually:
+
+```bash
+scripts/set-user-password-secret.sh
+```
+
+That command securely prompts for the password, hashes it with `mkpasswd`,
+and rewrites `secrets/users/djoolz/password.yaml` with `sops`. Re-running the
+same script later rotates the password secret in place.
 
 ### 4. Encrypt a file
 
@@ -237,6 +265,15 @@ Then point your service at the rendered secret file path in `/run/secrets/...`.
 
 For file-shaped secrets like YAML, `.env`, or INI, prefer mounting or pointing
 services at the generated file rather than copying plaintext into Nix strings.
+
+For local operator-side validation, this repo also includes
+`scripts/validate-sops.sh`. It decrypts:
+
+- `secrets/services/shared/sops-test.yaml`
+- `secrets/users/djoolz/password.yaml`
+
+and verifies the decrypted YAML contains the expected fields before any secret
+is wired into a NixOS option such as `users.users.<name>.hashedPasswordFile`.
 
 ## Typical Workflow
 

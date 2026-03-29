@@ -4,12 +4,12 @@ in {
   sops = {
     defaultSopsFormat = "yaml";
 
-    # Generate a stable host-local age identity on first activation so each
-    # machine can decrypt repo-managed secrets after bootstrap.
+    # Keep a dedicated machine-local age identity for sops-nix so each host can
+    # decrypt repo-managed secrets during activation without depending on SSH
+    # host keys or user-managed keys.
     age = {
       generateKey = true;
       keyFile = ageKeyFile;
-      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     };
   };
 }

@@ -116,6 +116,14 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+# === SOPS SECRETS ===
+echo ""
+if sh "$(dirname "$0")/validate-sops.sh"; then
+    :
+else
+    FAILED=$((FAILED + 1))
+fi
+
 # === FLAKE CHECKS ===
 # echo ""
 # echo "Flake Checks:"

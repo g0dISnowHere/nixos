@@ -6,9 +6,10 @@ usage() {
   cat <<'EOF'
 Usage: scripts/ssh-pubkey-to-age.sh [--force]
 
-Generate local operator/host key material for sops and SSH, then print the
-public values you need to wire into `.sops.yaml`, `authorized_keys`, and the
-local `~/.config/sops/age/keys.txt` setup.
+Generate local operator key material, the machine `sops-nix` age key, and the
+local SSH keypair, then print the public values you need to wire into
+`.sops.yaml`, `authorized_keys`, and the local `~/.config/sops/age/keys.txt`
+setup.
 
 This script manages local key material only. It does not manage `~/.ssh/config`
 or other SSH client settings from Home Manager.
@@ -48,10 +49,21 @@ done
 
 age_dir="${HOME}/.config/sops/age"
 age_key_file="${age_dir}/keys.txt"
+system_age_dir="/var/lib/sops-nix"
+system_age_key_file="${system_age_dir}/key.txt"
 ssh_dir="${HOME}/.ssh"
 ssh_key_file="${ssh_dir}/id_ed25519"
 ssh_pub_file="${ssh_key_file}.pub"
 ssh_comment="${USER}@$(hostname)-$(date +%F)"
+tmp_system_age_key=""
+
+cleanup() {
+  if [[ -n "$tmp_system_age_key" ]]; then
+    rm -f "$tmp_system_age_key"
+  fi
+}
+
+trap cleanup EXIT
 
 mkdir -p "$age_dir" "$ssh_dir"
 chmod 700 "$ssh_dir"
@@ -62,6 +74,24 @@ else
   rm -f "$age_key_file"
   age-keygen -o "$age_key_file"
   chmod 600 "$age_key_file"
+fi
+
+if [[ -e "$system_age_key_file" && "$force" -ne 1 ]]; then
+  printf 'Keeping existing sops-nix host age key: %s\n' "$system_age_key_file"
+elif [[ "$EUID" -eq 0 ]]; then
+  mkdir -p "$system_age_dir"
+  rm -f "$system_age_key_file"
+  age-keygen -o "$system_age_key_file"
+  chmod 600 "$system_age_key_file"
+else
+  tmp_system_age_key="$(mktemp)"
+  age-keygen -o "$tmp_system_age_key"
+
+  printf '\nInstalling sops-nix host age key to %s (sudo may prompt)...\n' "$system_age_key_file"
+  sudo mkdir -p "$system_age_dir"
+  sudo install -m 600 "$tmp_system_age_key" "$system_age_key_file"
+  rm -f "$tmp_system_age_key"
+  tmp_system_age_key=""
 fi
 
 if [[ -e "$ssh_key_file" && "$force" -ne 1 ]]; then
@@ -79,6 +109,11 @@ printf '\n=== Local age identity ===\n'
 printf 'Stored in: %s\n' "$age_key_file"
 printf 'Use this age public key as an operator recipient in .sops.yaml:\n'
 grep '^# public key:' "$age_key_file"
+
+printf '\n=== sops-nix host age identity ===\n'
+printf 'Stored in: %s\n' "$system_age_key_file"
+printf 'Use this age public key as the machine recipient in .sops.yaml:\n'
+grep '^# public key:' "$system_age_key_file"
 
 printf '\n=== SSH keypair ===\n'
 printf 'Stored in: %s\n' "$ssh_key_file"
@@ -106,5 +141,5 @@ if [[ "${ssh_key_comment:-}" != "$ssh_comment" ]]; then
 fi
 
 printf '\n=== SSH-derived age recipient ===\n'
-printf 'Use this converted recipient in .sops.yaml if you want this SSH key to decrypt secrets:\n'
+printf 'This is optional and separate from the sops-nix host key above:\n'
 ssh-to-age < "$ssh_pub_file"
