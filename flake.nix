@@ -47,6 +47,8 @@
       # Keep sops-nix on the same nixpkgs revision as the rest of the flake.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
