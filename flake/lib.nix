@@ -84,6 +84,7 @@ in {
 
           # Global Nix daemon settings
           ../modules/nixos/system/nix-settings.nix
+          ../modules/nixos/system/ssh-authorized-keys.nix
           ../modules/nixos/system/secrets.nix
           { nixpkgs.config.allowUnfree = true; }
         ] ++ modules;

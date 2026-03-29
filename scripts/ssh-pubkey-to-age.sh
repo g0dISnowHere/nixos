@@ -69,11 +69,26 @@ else
   chmod 644 "$ssh_pub_file"
 fi
 
+read -r ssh_key_type ssh_key_data ssh_key_comment < "$ssh_pub_file"
+
 printf '\nOperator age public key:\n'
 grep '^# public key:' "$age_key_file"
 
 printf '\nSSH public key:\n'
-cat "$ssh_pub_file"
+if [[ -n "${ssh_key_type:-}" && -n "${ssh_key_data:-}" ]]; then
+  printf '%s %s %s\n' "$ssh_key_type" "$ssh_key_data" "$ssh_comment"
+else
+  cat "$ssh_pub_file"
+fi
+
+if [[ "${ssh_key_comment:-}" != "$ssh_comment" ]]; then
+  printf '\nSSH key comment check:\n'
+  printf 'Existing key comment does not match preferred format.\n'
+  printf 'Current: %s\n' "${ssh_key_comment:-<none>}"
+  printf 'Wanted:  %s\n' "$ssh_comment"
+  printf 'Relabel without rotating the key:\n'
+  printf 'ssh-keygen -c -f %s -C \"%s\"\n' "$ssh_key_file" "$ssh_comment"
+fi
 
 printf '\nSSH recipient for .sops.yaml:\n'
 ssh-to-age < "$ssh_pub_file"
