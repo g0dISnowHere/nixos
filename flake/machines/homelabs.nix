@@ -15,6 +15,20 @@
       ];
     };
 
+    # STRATO VPS - headless remote server
+    # Runs on a single virtio disk and DHCP networking on ens6
+    albaldah = self.lib.mkNixosSystem {
+      system = "x86_64-linux";
+      hostname = "albaldah";
+      role = "homelab";
+      modules = [
+        inputs.disko.nixosModules.disko
+        ../../nixos/machines/albaldah/disko.nix
+        # Docker for services
+        ../../modules/nixos/virtualisation/docker.nix
+      ];
+    };
+
     alhena = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "alhena";

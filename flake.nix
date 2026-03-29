@@ -41,6 +41,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ## encrypted key management
     sops-nix = {
       url = "github:Mic92/sops-nix";

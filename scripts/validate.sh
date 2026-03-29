@@ -91,6 +91,13 @@ echo "    - libvirtd: $(nix eval .#nixosConfigurations.mirach.config.virtualisat
 echo "    - docker: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.docker.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
 
+# STRATO VPS
+echo "  Strato VPS:"
+echo "    - hostname: $(nix eval .#nixosConfigurations.albaldah.config.networking.hostName 2>/dev/null | tr -d '"')"
+echo "    - networkmanager: $(nix eval .#nixosConfigurations.albaldah.config.networking.networkmanager.enable 2>/dev/null)"
+echo "    - tailscale: $(nix eval .#nixosConfigurations.albaldah.config.services.tailscale.enable 2>/dev/null)"
+echo "    - system evaluates: ✓"
+
 # === HOME-MANAGER CONFIGURATIONS ===
 echo ""
 echo "Home-Manager Configurations:"
