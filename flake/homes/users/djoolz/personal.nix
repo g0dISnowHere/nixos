@@ -15,9 +15,34 @@
       user = "djoolz";
       identitiesOnly = true;
     };
-    mirach = {
-      hostname = "mirach";
+    albaldah = {
+      hostname = "85.215.175.36";
       user = "djoolz";
+      identitiesOnly = true;
+    };
+    albaldah-root = {
+      hostname = "85.215.175.36";
+      user = "root";
+      identitiesOnly = true;
+    };
+    mirach = {
+      hostname = "192.168.3.223";
+      user = "djoolz";
+      identitiesOnly = true;
+    };
+    mirach-root = {
+      hostname = "192.168.3.223";
+      user = "root";
+      identitiesOnly = true;
+    };
+    alhena = {
+      hostname = "192.168.3.211";
+      user = "djoolz";
+      identitiesOnly = true;
+    };
+    alhena-root = {
+      hostname = "192.168.3.211";
+      user = "root";
       identitiesOnly = true;
     };
   };
