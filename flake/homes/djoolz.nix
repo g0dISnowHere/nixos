@@ -16,7 +16,7 @@
       };
 
       extraSpecialArgs = {
-        desktop = "niri";
+        desktop = "gnome";
         inherit dotfilesRoot inputs repoRoot;
         pkgs-unstable = import inputs.nixpkgs-unstable {
           system = "x86_64-linux";

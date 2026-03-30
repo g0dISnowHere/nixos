@@ -6,7 +6,7 @@
       system = "x86_64-linux";
       hostname = "mirach";
       role = "homelab";
-      desktop = "niri";
+      desktop = "gnome";
       modules = [
         # Docker for services
         ../../modules/nixos/virtualisation/docker.nix
