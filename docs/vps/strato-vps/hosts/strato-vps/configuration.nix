@@ -34,5 +34,6 @@
 
   environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
 
-  system.stateVersion = "24.11";
+  # Do not change casually. See ../../../architecture/state-version-reasons.md.
+  system.stateVersion = "25.11";
 }

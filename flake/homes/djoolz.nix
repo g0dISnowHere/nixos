@@ -29,6 +29,7 @@
         {
           home.username = "djoolz";
           home.homeDirectory = "/home/djoolz";
+          # Do not change casually. See docs/architecture/state-version-reasons.md.
           home.stateVersion = "25.11";
         }
       ];
@@ -56,6 +57,7 @@
         {
           home.username = "djoolz";
           home.homeDirectory = "/home/djoolz";
+          # Do not change casually. See docs/architecture/state-version-reasons.md.
           home.stateVersion = "25.11";
         }
       ];

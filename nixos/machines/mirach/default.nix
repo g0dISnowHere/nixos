@@ -36,7 +36,8 @@
   # Match centauri's user environment and desktop applications.
   home-manager.users.djoolz = {
     imports = [ ../../../flake/homes/users/djoolz/desktop.nix ];
-    home.stateVersion = "24.11";
+    # Do not change casually. See docs/architecture/state-version-reasons.md.
+    home.stateVersion = "25.11";
   };
 
   # Match centauri's AppImage support.
@@ -47,5 +48,6 @@
 
   my.tailscale.advertiseRoutes = [ "192.168.3.0/24" ];
 
-  system.stateVersion = "25.05";
+  # Do not change casually. See docs/architecture/state-version-reasons.md.
+  system.stateVersion = "25.11";
 }
