@@ -34,6 +34,11 @@
     efiSupport = false;
   };
 
+  swapDevices = [{
+    device = "/var/lib/swapfile";
+    size = 8 * 1024;
+  }];
+
   # Keep serial console access aligned with the audited host.
   boot.kernelParams = [ "console=tty1" "console=ttyS0" ];
 
