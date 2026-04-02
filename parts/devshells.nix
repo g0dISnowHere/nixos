@@ -10,7 +10,7 @@
           builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
         GREET = "nixos config";
         ZDOTDIR = "/etc/zsh";
-        HISTFILE = toString ../. + "/.zsh_history";
+        # HISTFILE = toString ../. + "/.zsh_history";
 
         shellHook = ''
           export REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"

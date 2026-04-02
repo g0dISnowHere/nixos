@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, pkgs-unstable, desktop ? null, ... }:
 
 {
   # AI assistant tooling lives here so installs and tool-specific notes stay together.
@@ -35,8 +35,12 @@
       #################################################################################
       pkgs-unstable.opencode # OpenCode CLI
       pkgs-unstable.fabric-ai # Fabric prompt/automation toolkit
-      pkgs-unstable.antigravity # Antigravity desktop AI client
 
+      # GUI-only AI client; keep it off headless/server profiles.
+      # codex-latest
+    ] ++ pkgs.lib.optionals (desktop != null) [
+      pkgs-unstable.antigravity # Antigravity desktop AI client
+    ] ++ [
       # codex-latest
       pkgs-unstable.codex
       # pkgs-unstable.aider-chat-full

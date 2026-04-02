@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, ... }: {
+{ pkgs, pkgs-unstable, desktop ? null, ... }: {
   home.packages = with pkgs; [
     # Python
     python3
@@ -35,8 +35,9 @@
 
     # Developer-focused newer packages
     pkgs-unstable.devenv
-    pkgs-unstable.vscode
     pkgs-unstable.gh
+  ] ++ pkgs.lib.optionals (desktop != null) [
+    pkgs-unstable.vscode
   ];
 
   home.sessionVariables = {
