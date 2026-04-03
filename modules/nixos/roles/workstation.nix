@@ -17,6 +17,7 @@
     ../system/services.nix
 
     # Services
+    ../services/mosh.nix
     ../services/tailscale.nix
 
     # Note: Desktop environment (and its dependencies like audio, printing, bluetooth)
