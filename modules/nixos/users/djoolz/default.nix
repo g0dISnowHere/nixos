@@ -1,7 +1,5 @@
 { ... }: {
-  imports = [
-    ./password.nix
-  ];
+  imports = [ ./password.nix ];
 
   users.users.djoolz = {
     isNormalUser = true;
