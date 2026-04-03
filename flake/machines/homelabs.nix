@@ -6,7 +6,8 @@
       system = "x86_64-linux";
       hostname = "mirach";
       role = "homelab";
-      desktop = "gnome";
+      desktopEnvironment = "gnome";
+      enableHomeManager = true;
       modules = [
         # Docker for services
         ../../modules/nixos/virtualisation/docker.nix

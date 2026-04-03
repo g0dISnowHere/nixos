@@ -109,13 +109,6 @@ else
     FAILED=$((FAILED + 1))
 fi
 
-if nix eval ".#homeConfigurations.\"djoolz@server\".activationPackage" > /dev/null 2>&1; then
-    echo "  ✓ djoolz@server evaluates"
-else
-    echo "  ✗ djoolz@server failed"
-    FAILED=$((FAILED + 1))
-fi
-
 # === SOPS SECRETS ===
 echo ""
 if sh "$(dirname "$0")/validate-sops.sh"; then

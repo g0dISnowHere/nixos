@@ -1,7 +1,7 @@
 { config, lib, pkgs, pkgs-unstable, ... }: {
-  # Common home-manager configuration
-  # Shared across all profiles - provides CLI essentials
-  # Use this profile for headless servers
+  # Base home-manager configuration.
+  # Shared across all profiles and provides CLI essentials.
+  # This is the minimal profile for headless systems.
 
   imports = [
     # Import user modules

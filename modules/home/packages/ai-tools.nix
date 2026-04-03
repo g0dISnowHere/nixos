@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, desktop ? null, ... }:
+{ pkgs, pkgs-unstable, desktopEnvironment ? null, ... }:
 
 {
   # AI assistant tooling lives here so installs and tool-specific notes stay together.
@@ -38,7 +38,7 @@
 
       # GUI-only AI client; keep it off headless/server profiles.
       # codex-latest
-    ] ++ pkgs.lib.optionals (desktop != null) [
+    ] ++ pkgs.lib.optionals (desktopEnvironment != null) [
       pkgs-unstable.antigravity # Antigravity desktop AI client
     ] ++ [
       # codex-latest

@@ -6,7 +6,8 @@
       system = "x86_64-linux";
       hostname = "centauri";
       role = "workstation";
-      desktop = "gnome";
+      desktopEnvironment = "gnome";
+      enableHomeManager = true;
       modules = [
         # Virtualization for development
         ../../modules/nixos/virtualisation/docker_rootless.nix

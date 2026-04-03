@@ -1,30 +1,30 @@
-{ config, pkgs, pkgs-unstable, inputs, desktop ? null, ... }: {
-  # Desktop profile
-  # Extends common profile with GUI applications and DE-specific settings
+{ config, pkgs, pkgs-unstable, inputs, desktopEnvironment ? null, ... }: {
+  # GUI profile
+  # Extends the base profile with GUI applications and DE-specific settings
   # Use this profile for workstations and GUI-enabled machines
   # DE-specific settings are conditionally imported based on the active desktop environment
 
   imports = [
-    ./common.nix
+    ./base.nix
     ../../../modules/home/packages/fonts-and-docs.nix
     ../../../modules/home/packages/desktop-apps.nix
     ../../../modules/home/packages/maker-tools.nix
     ../../../modules/home/services/keyring-backup.nix
   ]
   # GNOME: dconf settings
-    ++ (if desktop == "gnome" then
+    ++ (if desktopEnvironment == "gnome" then
       [
         # ../../../modules/home/dconf/dconf.nix 
       ]
     else
       [ ])
     # Plasma: plasma-manager settings
-    ++ (if desktop == "plasma" then
+    ++ (if desktopEnvironment == "plasma" then
       [ ../../../modules/home/plasma/plasma.nix ]
     else
       [ ])
     # Niri: Home Manager-managed links to repo-backed desktop dotfiles
-    ++ (if desktop == "niri" then [
+    ++ (if desktopEnvironment == "niri" then [
       ../../../modules/home/desktop/niri.nix
       ../../../modules/home/packages/nautilus.nix
     ] else

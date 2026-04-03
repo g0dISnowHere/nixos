@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, desktop ? null, ... }: {
+{ pkgs, pkgs-unstable, desktopEnvironment ? null, ... }: {
   home.packages = with pkgs;
     [
       # Python
@@ -37,7 +37,8 @@
       # Developer-focused newer packages
       pkgs-unstable.devenv
       pkgs-unstable.gh
-    ] ++ pkgs.lib.optionals (desktop != null) [ pkgs-unstable.vscode ];
+    ]
+    ++ pkgs.lib.optionals (desktopEnvironment != null) [ pkgs-unstable.vscode ];
 
   home.sessionVariables = {
     GOPATH = "$HOME/go";

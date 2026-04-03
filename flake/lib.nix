@@ -7,30 +7,15 @@ in {
   flake.lib = {
     # Helper function to create a NixOS system configuration
     # Provides consistent setup for all machines with role-based defaults
-    mkNixosSystem = { system, hostname, role, desktop ? null, modules ? [ ]
-      , extraSpecialArgs ? { } }:
+    mkNixosSystem = { system, hostname, role, desktopEnvironment ? null
+      , enableHomeManager ? false, modules ? [ ], extraSpecialArgs ? { } }:
       let
-        desktopModule = if desktop != null then
-          ../modules/nixos/desktop/${desktop}.nix
+        desktopEnvironmentModule = if desktopEnvironment != null then
+          ../modules/nixos/desktop/${desktopEnvironment}.nix
         else
           { };
-        # Use the live checkout path so Home Manager out-of-store symlinks point
-        # into the working tree instead of the immutable flake snapshot.
-        repoRoot = "/home/djoolz/Documents/01_config/mine";
-        dotfilesRoot = "${repoRoot}/dotfiles";
-      in nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          # Machine-specific hardware and config
-          ../nixos/machines/${hostname} # This is where the default.nix for centauri is imported
-
-          # Role-based defaults (workstation, homelab, etc.)
-          ../modules/nixos/roles/${role}.nix
-
-          # Desktop environment (if specified)
-          desktopModule
-
-          # Home-manager integration
+        homeManagerModule = if enableHomeManager then [
+          # Home Manager integration
           home-manager.nixosModules.home-manager
           ({ pkgs, ... }: {
             home-manager.backupCommand =
@@ -66,10 +51,8 @@ in {
               useGlobalPkgs = true;
               useUserPackages = true;
               sharedModules = [ sops-nix.homeManagerModules.sops ];
-              # Note: Individual machines set home-manager.users.*
-              # in their default.nix to reference profile modules
               extraSpecialArgs = {
-                inherit desktop dotfilesRoot inputs repoRoot;
+                inherit desktopEnvironment dotfilesRoot inputs repoRoot;
                 pkgs-unstable = import nixpkgs-unstable {
                   inherit system;
                   config.allowUnfree = true;
@@ -77,6 +60,23 @@ in {
               };
             };
           }
+        ] else
+          [ ];
+        # Use the live checkout path so Home Manager out-of-store symlinks point
+        # into the working tree instead of the immutable flake snapshot.
+        repoRoot = "/home/djoolz/Documents/01_config/mine";
+        dotfilesRoot = "${repoRoot}/dotfiles";
+      in nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          # Machine-specific hardware and config
+          ../nixos/machines/${hostname} # This is where the default.nix for centauri is imported
+
+          # Role-based defaults (workstation, homelab, etc.)
+          ../modules/nixos/roles/${role}.nix
+
+          # Desktop environment (if specified)
+          desktopEnvironmentModule
 
           # Flatpak support
           nix-flatpak.nixosModules.nix-flatpak
@@ -88,10 +88,10 @@ in {
           ../modules/nixos/users/djoolz/default.nix
           ../modules/nixos/users/djoolz/ssh.nix
           { nixpkgs.config.allowUnfree = true; }
-        ] ++ modules;
+        ] ++ homeManagerModule ++ modules;
 
         specialArgs = {
-          inherit inputs hostname desktop repoRoot dotfilesRoot;
+          inherit inputs hostname desktopEnvironment repoRoot dotfilesRoot;
           pkgs-unstable = import nixpkgs-unstable {
             inherit system;
             config.allowUnfree = true;

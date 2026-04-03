@@ -26,9 +26,9 @@
     [ "networkmanager" "wheel" "docker" "scanner" "lp" ];
 
   # Home-manager configuration for this machine
-  # References the user-specific desktop profile wrapper.
+  # References the user-specific GUI profile wrapper.
   home-manager.users.djoolz = {
-    imports = [ ../../../flake/homes/users/djoolz/desktop.nix ];
+    imports = [ ../../../flake/homes/users/djoolz/workstation.nix ];
     # Do not change casually. See docs/architecture/state-version-reasons.md.
     home.stateVersion = "25.11";
   };
