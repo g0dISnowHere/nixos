@@ -1,5 +1,9 @@
 # Secrets
 
+This README is the subtree guide for `secrets/`. Keep repo-wide documentation
+policy in `docs/` and `AGENTS.md`; keep this file focused on secret handling in
+this directory.
+
 This repo uses `sops-nix` with `age` recipients.
 
 For day-to-day operator use, the `sops` CLI should be available on hosts where

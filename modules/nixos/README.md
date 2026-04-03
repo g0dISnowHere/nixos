@@ -19,4 +19,6 @@ shared machine behavior that can be composed into multiple hosts.
 ## Design Intent
 
 This directory is where shared system policy belongs. Machine-specific behavior
-should stay out unless the module is explicitly tied to a single host.
+should stay out unless the module is explicitly tied to a single host. Keep
+repo-wide design rationale in `docs/`; this README should stay scoped to
+`modules/nixos/`.

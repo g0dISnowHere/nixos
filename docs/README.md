@@ -1,34 +1,56 @@
 # Documentation
 
-`docs/` explains the architecture and design of the repo at a stable level. The
-goal is to document how the major areas fit together and what each area is for,
-without forcing the docs to change every time an implementation detail moves.
+`docs/` is the human documentation system for this repo. It is organized by
+document role so stable explanations, quick lookup material, and incubator
+notes do not blur together.
 
-## Documentation Layers
+## Entry Points
 
 - `README.md`
-  - quick project overview for someone landing in the repo
-- `docs/`
-  - stable design and structure notes
-- `docs/findings/`
-  - detailed investigations, recaps, and point-in-time analysis
-- `docs/future-ideas/`
-  - proposals, plans, and work that is not yet canonical
+  - repo landing page and first-stop overview
+- `docs/README.md`
+  - documentation taxonomy and navigation
+- `AGENTS.md`
+  - canonical AI guidance for coding agents
+
+## Document Types
+
+- canonical docs
+  - stable repo structure, architecture, and operator workflows
+- reference docs
+  - short lookup material such as commands and checklists
+- incubator docs
+  - findings, proposals, and future work that are not canonical yet
+- local-area docs
+  - docs that belong to one subtree and stay near that code
 
 ## Sections
 
 - `architecture/`
-  - repo-level design boundaries and patterns
-- `operations/`
-  - the operational side of the system and how workflows are framed
+  - canonical design boundaries and structure decisions
+- `reference/`
+  - quick lookup material for common commands and operational snippets
 - `vps/`
-  - the VPS-specific architectural slice and migration area
+  - canonical VPS-specific context and runbooks
 - `dotfiles/`
-  - the role of raw config files in the overall design
+  - canonical explanation of the role of `dotfiles/` in the repo design
+- `findings/`
+  - incubator investigations and dated analysis
+- `future-ideas/`
+  - incubator proposals, drafts, and backlog material
+
+## Placement Rules
+
+- Put stable repo documentation in `docs/`.
+- Put quick command lists and checklists in `docs/reference/`.
+- Put incomplete plans and backlog ideas in `docs/future-ideas/`.
+- Put dated investigations and point-in-time analysis in `docs/findings/`.
+- Keep subtree-specific docs near their owning area when they are not useful as
+  repo-wide canonical docs.
 
 ## Documentation Philosophy
 
 - explain ownership, intent, and boundaries
 - prefer stable concepts over volatile implementation detail
-- let `findings/` and `future-ideas/` carry the more detailed and time-sensitive
-  material
+- promote incubator material into canonical docs only after the design is
+  current and intentional
