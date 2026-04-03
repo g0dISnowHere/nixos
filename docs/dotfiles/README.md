@@ -4,6 +4,8 @@ The `dotfiles/` tree is the repo’s plain-file layer. It exists so application
 and desktop config can stay close to the formats those programs already use,
 while still being versioned and wired into the declarative environment.
 
+This is canonical documentation for how `dotfiles/` fits into the repo design.
+
 ## Role In The Architecture
 
 This tree is not a second module system and not a dumping ground. Its role is

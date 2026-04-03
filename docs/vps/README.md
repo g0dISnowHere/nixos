@@ -4,6 +4,10 @@ This section covers the VPS-specific slice of the repo. It connects the
 integrated `albaldah` machine with the migration history and the surrounding
 service-preservation work.
 
+This is canonical documentation for the VPS area. Dated investigations and
+historical migration notes remain separate from this section's role as the VPS
+entrypoint.
+
 ## Why This Section Exists
 
 The VPS story is structurally different from the local workstation and homelab

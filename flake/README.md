@@ -27,4 +27,5 @@ policy or implementation detail.
 
 Keep this layer readable. A person looking at `flake/` should be able to tell
 how the repo is composed without chasing hidden behavior through opaque helper
-logic.
+logic. Repo-wide architecture guidance belongs in `docs/`; this README should
+stay focused on the role of `flake/` itself.

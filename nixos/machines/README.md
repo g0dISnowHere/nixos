@@ -16,4 +16,5 @@ Machine directories are where shared composition meets reality:
 
 Keep these directories small. Shared behavior should come from reusable modules
 and flake composition, while the machine folder should only express what the
-shared layers cannot.
+shared layers cannot. Keep broader architecture explanation in `docs/`; this
+README should stay about host-local ownership.

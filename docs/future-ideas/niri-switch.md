@@ -196,7 +196,6 @@ This plan migrates an existing Niri-based desktop setup into a structured, versi
   * [x] new features commented out
   * [x] minimal diffs
   * [x] run `scripts/doctor.sh` before edits
-* [x] Add `docs/codex-bootstrap.md` with a copy/paste prompt
 * [ ] Verify Codex behavior:
 
   * [ ] Codex reads docs first
