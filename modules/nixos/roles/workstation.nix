@@ -12,7 +12,7 @@
   imports = [
     # System essentials
     ../system/locale.nix
-    ../system/login-shell.nix
+    ../system/shell.nix
     ../system/powermanagement.nix
     ../system/services.nix
 

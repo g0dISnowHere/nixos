@@ -105,14 +105,19 @@ generic config backup:
 
 ## Zsh Findings
 
-`~/.zshrc` is currently Home Manager-generated from
-`modules/home/programs/shell.nix`.
+The shared zsh baseline now lives at the NixOS layer in
+`modules/nixos/system/shell.nix` for NixOS machines, including headless
+systems.
+
+`modules/home/programs/shell.nix` remains only as the standalone Home Manager
+fallback for non-NixOS-integrated Home Manager evaluations.
 
 Current behavior includes:
 
-- `HISTFILE=~/.zsh_history`
 - `SHARE_HISTORY` enabled
 - `HIST_IGNORE_DUPS` enabled
+- history size and save size set to `50000`
+- aliases and shell tooling wired through the system shell module
 
 Effect of `SHARE_HISTORY`:
 
