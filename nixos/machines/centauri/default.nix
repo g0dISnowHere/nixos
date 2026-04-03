@@ -7,6 +7,7 @@
     ./hardware-configuration.nix
     ./bootloader.nix
     ./other-hardware.nix
+    ../../../modules/nixos/system/autoupgrade.nix
     ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
     # ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
@@ -44,6 +45,12 @@
     [
       # Add machine-specific tools here
     ];
+
+  my.autoUpdate = {
+    enable = true;
+    mode = "consumer";
+    onCalendar = "daily";
+  };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
   system.stateVersion = "25.11";
