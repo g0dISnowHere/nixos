@@ -13,6 +13,7 @@
 
   imports = [
     # System essentials
+    ../system/ai-tools.nix
     ../system/locale.nix
     ../system/login-shell.nix
     ../system/services.nix
