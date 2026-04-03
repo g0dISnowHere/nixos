@@ -58,18 +58,26 @@
 - Pre-commit hooks in `.githooks/pre-commit` enforce formatting and validation before commits.
 
 ## Documentation
-- Keep enduring repository documentation under `docs/`; do not add new canonical docs at the repo root.
-- Write documentation around stable concepts and workflows, not temporary refactor steps.
-- Update nearby docs when architecture, module boundaries, or operator workflows change.
+- The repo uses explicit documentation types; do not treat all markdown as one flat docs bucket.
+- Human canonical docs live in `README.md`, `docs/README.md`, and stable sections under `docs/`.
+- Human reference docs are short lookup material such as command lists and checklists under `docs/reference/`.
+- Incubator docs are non-canonical by default:
+  - `docs/findings/` for dated investigations and point-in-time analysis
+  - `docs/future-ideas/` for proposals, backlog items, and incomplete plans
+- Local-area docs stay near the code they describe when they are scoped to one subtree, such as `dotfiles/` notes or directory READMEs.
+- Keep enduring repository documentation under `docs/`; do not add new canonical repo docs elsewhere unless the file is an intentional entrypoint like `README.md`.
+- Write canonical docs around stable concepts, ownership, and workflows rather than temporary refactor steps.
+- Reference docs should optimize for retrieval speed, not explanation; keep them short and current.
+- Update nearby docs when architecture, module boundaries, operator workflows, or doc taxonomy change.
 - Review `docs/architecture/home-manager-dotfiles-strategy.md` when changing how Home Manager and raw dotfiles are split.
-- Update `docs/README.md` when adding a new documentation area or changing what is considered canonical.
+- Update `docs/README.md` when adding a new documentation area, changing the taxonomy, or promoting incubator material into canonical docs.
 
 ## Change Management
-- Move incomplete plans and proposals into `docs/future-ideas/` rather than leaving them mixed with current documentation.
+- Move incomplete plans and proposals into `docs/future-ideas/` rather than leaving them mixed with canonical documentation.
 - Preserve explicit structure and avoid reintroducing older mixed-concern layouts described in `docs/future-ideas/flake-refactor-plan.md`.
 - If you add new machines or major module families, update this file so it remains the canonical agent guide.
 
 ## Agent-Specific Instructions
 - Treat `AGENTS.md` as the canonical repository guidance for automated coding agents.
-- `.github/copilot-instructions.md` contains a shorter companion summary; keep it consistent with this file when architecture rules change.
+- `.github/copilot-instructions.md` is a short companion mirror; keep it consistent with this file and avoid letting it become a second source of truth.
 - Do not rely on `CLAUDE.md` or `GEMINI.md` containing separate guidance; they should resolve to this file.

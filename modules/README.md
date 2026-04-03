@@ -15,4 +15,5 @@ host or user profile.
 
 Modules should express focused concerns and be imported explicitly. This keeps
 shared behavior visible and prevents host files from turning into large,
-duplicated policy bundles.
+duplicated policy bundles. Repo-wide architecture explanation belongs in
+`docs/`; this README should stay scoped to `modules/`.

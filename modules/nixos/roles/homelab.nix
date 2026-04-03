@@ -13,11 +13,13 @@
 
   imports = [
     # System essentials
+    ../system/ai-tools.nix
     ../system/locale.nix
-    ../system/login-shell.nix
+    ../system/shell.nix
     ../system/services.nix
 
     # Services
+    ../services/mosh.nix
     ../services/ssh.nix
     ../services/tailscale.nix
     ../services/vscode-remote.nix

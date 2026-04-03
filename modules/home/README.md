@@ -25,4 +25,5 @@ assumptions.
 When a feature also exists at the NixOS layer, keep the Home Manager side
 explicitly user-level. Prefer names like `gui` or `workstation-home` for
 profile composition, and reserve desktop-environment naming for the NixOS
-system layer.
+system layer. Repo-wide documentation rules live in `docs/` and `AGENTS.md`;
+this README should stay focused on `modules/home/`.

@@ -53,6 +53,7 @@ in {
               sharedModules = [ sops-nix.homeManagerModules.sops ];
               extraSpecialArgs = {
                 inherit desktopEnvironment dotfilesRoot inputs repoRoot;
+                isNixosIntegrated = true;
                 pkgs-unstable = import nixpkgs-unstable {
                   inherit system;
                   config.allowUnfree = true;

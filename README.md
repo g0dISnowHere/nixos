@@ -16,7 +16,7 @@ If you are new to this repo, the short version is:
 - NixOS modules describe shared system behavior
 - Home Manager modules describe shared user behavior
 - `dotfiles/` keeps most hand-maintained application config as normal files
-- `docs/` explains how the pieces fit together
+- `docs/` holds the human documentation system
 
 ## What This Repo Optimizes For
 
@@ -100,8 +100,9 @@ If you are new to this repo, the short version is:
 - host-specific behavior belongs in `nixos/machines/<hostname>/`
 - desktop and application config lives primarily in `dotfiles/`
 - Home Manager is used for packages, activation, services, and link management
-- documentation is split between lightweight overviews in `docs/` and detailed
-  investigations in `docs/findings/` and `docs/future-ideas/`
+- canonical human docs live in `README.md`, `docs/README.md`, and stable sections under `docs/`
+- quick lookup material lives under `docs/reference/`
+- incubator material lives under `docs/findings/` and `docs/future-ideas/`
 - the goal is not to force everything into Nix, but to make the useful parts
   reproducible while keeping the system comfortable to work in
 
@@ -176,7 +177,9 @@ sudo nixos-rebuild switch --flake .#centauri
 ## Where To Read More
 
 - [docs/README.md](docs/README.md)
-  - documentation index
+  - human documentation index and taxonomy
+- [docs/reference/useful-commands.md](docs/reference/useful-commands.md)
+  - quick command lookup
 - [docs/architecture/home-manager-dotfiles-strategy.md](docs/architecture/home-manager-dotfiles-strategy.md)
   - Home Manager and dotfiles split
 - [docs/vps/README.md](docs/vps/README.md)

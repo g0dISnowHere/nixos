@@ -26,7 +26,7 @@ from [flake/machines/homelabs.nix](../../flake/machines/homelabs.nix) as a `home
   - repo-level overview
 - [docs/README.md](../README.md)
   - docs index
-- [docs/operations/useful-commands.md](../operations/useful-commands.md)
+- [docs/reference/useful-commands.md](../reference/useful-commands.md)
   - install and test commands for `albaldah`
 - [docs/vps/nixos-migration-audit-2026-03-28.md](../vps/nixos-migration-audit-2026-03-28.md)
   - VPS audit and migration context

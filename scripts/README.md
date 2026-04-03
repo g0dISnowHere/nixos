@@ -51,4 +51,4 @@ then use the scripts as examples of how the system is operated in practice.
 
 - [README.md](../README.md)
 - [docs/auto-commit-flake-lock.md](../docs/auto-commit-flake-lock.md)
-- [docs/operations/useful-commands.md](../docs/operations/useful-commands.md)
+- [docs/reference/useful-commands.md](../docs/reference/useful-commands.md)

@@ -1,7 +1,8 @@
 { ... }: {
   imports = [
+    ../system/ai-tools.nix
     ../system/locale.nix
-    ../system/login-shell.nix
+    ../system/shell.nix
     ../system/services.nix
     ../services/ssh.nix
     ../services/tailscale.nix

@@ -12,7 +12,7 @@ contains the `dotfiles/` layout, health checks, and docs for the desktop setup.
   - `dotfiles/health/doctor.sh` + checks
 - `dotfiles/modules/compositor/niri/config.kdl`
 - `dotfiles/modules/ui/waybar/*`, `dotfiles/modules/ui/mako/*`
-- `.github/copilot-instructions.md` and `CLAUDE.md` were read and followed.
+- `.github/copilot-instructions.md` and local AI guidance were read and followed.
 
 ## Current Implementation
 ### 1) Home Manager desktop wiring
