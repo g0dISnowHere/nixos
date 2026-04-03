@@ -23,6 +23,14 @@ Nix module.
 - status and workflow helpers
 - older personal automation
 
+Current update helpers include:
+
+- `scripts/update-system.sh` for branch-safe scheduled and manual update flows
+  in `updater` and `consumer` modes
+  - the timer/service path runs as root for `nixos-rebuild switch`
+  - git operations still run as the configured repo user so existing SSH keys
+    remain usable
+
 Current secret helpers include:
 
 - `scripts/ssh-pubkey-to-age.sh` for machine `sops-nix` key bootstrap and

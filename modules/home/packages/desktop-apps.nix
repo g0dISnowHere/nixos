@@ -3,6 +3,7 @@
     vlc
     wireshark
     webcamoid
+    libnotify
     bitwarden-desktop
     moonlight-qt
     nextcloud-client

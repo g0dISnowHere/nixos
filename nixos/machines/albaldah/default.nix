@@ -3,7 +3,10 @@
   # Remote x86_64 server currently documented under vps docs/
   # Role: headless VPS with SSH, Tailscale, and container workloads
 
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ../../../modules/nixos/system/autoupgrade.nix
+  ];
 
   networking.hostName = hostname;
   time.timeZone = lib.mkForce "Etc/UTC";
@@ -60,6 +63,12 @@
   };
 
   environment.systemPackages = with pkgs; [ curl git htop tmux vim ];
+
+  my.autoUpdate = {
+    enable = true;
+    mode = "updater";
+    onCalendar = "weekly";
+  };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
   system.stateVersion = "25.11";

@@ -6,6 +6,7 @@
   imports = [
     ./hardware-configuration.nix
     ./libvirtd.nix
+    ../../../modules/nixos/system/autoupgrade.nix
     ../../../modules/nixos/services/zigbee2mqtt.nix
     # ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
@@ -47,6 +48,13 @@
   };
 
   my.tailscale.advertiseRoutes = [ "192.168.3.0/24" ];
+
+  my.autoUpdate = {
+    enable = true;
+    mode = "consumer";
+    onCalendar = "daily";
+    randomizedDelaySec = "90min";
+  };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
   system.stateVersion = "25.11";
