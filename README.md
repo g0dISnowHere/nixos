@@ -1,8 +1,8 @@
 # NixOS Configuration
 
 This repo is a modular NixOS flake built around explicit machine definitions,
-focused reusable modules, standalone Home Manager profiles, and a dotfiles-first
-user environment model. If you are new to NixOS, the official starting points
+focused reusable modules, a standalone workstation Home Manager profile, and a
+dotfiles-first user environment model. If you are new to NixOS, the official starting points
 are the [NixOS Manual](https://nixos.org/manual/nixos/stable/) and the
 [Nix language reference](https://nix.dev/manual/nix/2.28/language/).
 
@@ -57,8 +57,6 @@ If you are new to this repo, the short version is:
 
 - `djoolz@workstation`
   - desktop-oriented standalone profile
-- `djoolz@server`
-  - CLI-oriented standalone profile
 
 ## Main Tools
 
@@ -67,7 +65,7 @@ If you are new to this repo, the short version is:
 - `nixos-rebuild`
   - applies a NixOS system configuration to a machine
 - `home-manager`
-  - applies standalone user environment configurations
+  - applies the standalone workstation user environment configuration
 - `flake-parts`
   - structures the flake outputs into smaller modules
 - `sops-nix`
@@ -160,7 +158,6 @@ nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
 nix eval .#nixosConfigurations.mirach.config.system.build.toplevel
 nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel
 nix eval .#homeConfigurations."djoolz@workstation".activationPackage
-nix eval .#homeConfigurations."djoolz@server".activationPackage
 ```
 
 Broader checks:

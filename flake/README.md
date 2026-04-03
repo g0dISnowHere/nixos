@@ -19,7 +19,7 @@ policy or implementation detail.
 - `machines/`
   - groups machine definitions by role
 - `homes/`
-  - standalone Home Manager outputs and profile composition
+  - standalone Home Manager outputs and user-level profile composition
 - `lib.nix`
   - helper functions used to wire machines and homes together
 

@@ -2,6 +2,10 @@
 
 This repo uses `sops-nix` with `age` recipients.
 
+For day-to-day operator use, the `sops` CLI should be available on hosts where
+the `djoolz` NixOS user module is applied. That binary now comes from the
+system profile, not from Home Manager.
+
 Use it for:
 
 - shared machine secrets
@@ -59,6 +63,10 @@ Recommended: keep one operator key outside the repo at:
 ```text
 ~/.config/sops/age/keys.txt
 ```
+
+If this file is missing, `sops --decrypt ...` and `scripts/validate-sops.sh`
+will fail even when the machine's `/var/lib/sops-nix/key.txt` still works for
+activation-time decryption.
 
 ### Machine sops-nix key
 
