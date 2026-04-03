@@ -19,6 +19,7 @@
     ../system/services.nix
 
     # Services
+    ../services/mosh.nix
     ../services/ssh.nix
     ../services/tailscale.nix
     ../services/vscode-remote.nix
