@@ -142,11 +142,59 @@ def render_host_list(host_names):
     return " ".join(f'"{name}"' for name in sorted(host_names))
 
 
+def parse_scope_entries(block_text, indent):
+    entries = {}
+    entry_pattern = re.compile(
+        rf"(?m)^{re.escape(indent)}([A-Za-z0-9_-]+) = \{{ hosts = \[ ([^\]]*) \]; \}};\n?"
+    )
+    for match in entry_pattern.finditer(block_text):
+        entries[match.group(1)] = parse_host_list(match.group(2))
+
+    return entries
+
+
+def render_scope_entries(entries, indent):
+    return "".join(
+        f'{indent}{name} = {{ hosts = [ {render_host_list(hosts)} ]; }};\n'
+        for name, hosts in sorted(entries.items())
+    )
+
+
+def parse_host_entries(block_text):
+    entries = {}
+    block_pattern = re.compile(
+        r"(?ms)^    ([A-Za-z0-9_-]+) = \{\n"
+        r'      recipient =\n        "([^"]+)";\n'
+        r'(?:      class = "([^"]+)";\n)?'
+        r"    \};\n"
+    )
+    for match in block_pattern.finditer(block_text):
+        entries[match.group(1)] = {
+            "recipient": match.group(2),
+            "class_name": match.group(3) or "workstation",
+        }
+
+    return entries
+
+
+def render_host_entries(entries):
+    return "".join(
+        (
+            f"    {name} = {{\n"
+            "      recipient =\n"
+            f'        "{data["recipient"]}";\n'
+            f'      class = "{data["class_name"]}";\n'
+            "    };\n"
+        )
+        for name, data in sorted(entries.items())
+    )
+
+
 def replace_policy_host(policy_path, host, recipient, create, class_name):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
     host_pattern = re.compile(
         rf"(?ms)^    {re.escape(host)} = \{{\n"
-        r'      recipient = "([^"]+)";\n'
+        r'      recipient =\n        "([^"]+)";\n'
         r'(?:      class = "([^"]+)";\n)?'
         r"    \};\n"
     )
@@ -163,7 +211,8 @@ def replace_policy_host(policy_path, host, recipient, create, class_name):
 
     host_block = (
         f"    {host} = {{\n"
-        f'      recipient = "{recipient}";\n'
+        "      recipient =\n"
+        f'        "{recipient}";\n'
         f'      class = "{resolved_class_name}";\n'
         "    };\n"
     )
@@ -173,25 +222,12 @@ def replace_policy_host(policy_path, host, recipient, create, class_name):
     if not hosts_match:
         raise SystemExit("could not locate hosts block")
 
-    blocks = {}
-    block_pattern = re.compile(
-        r"(?ms)^    ([A-Za-z0-9_-]+) = \{\n"
-        r'      recipient = "([^"]+)";\n'
-        r'(?:      class = "([^"]+)";\n)?'
-        r"    \};\n"
-    )
-    for block_match in block_pattern.finditer(hosts_match.group(1)):
-        alias = block_match.group(1)
-        existing_class = block_match.group(3) or "workstation"
-        blocks[alias] = (
-            f"    {alias} = {{\n"
-            f'      recipient = "{block_match.group(2)}";\n'
-            f'      class = "{existing_class}";\n'
-            "    };\n"
-        )
-
-    blocks[host] = host_block
-    rendered_hosts = "".join(blocks[name] for name in sorted(blocks))
+    blocks = parse_host_entries(hosts_match.group(1))
+    blocks[host] = {
+        "recipient": recipient,
+        "class_name": resolved_class_name,
+    }
+    rendered_hosts = render_host_entries(blocks)
     updated = text[: hosts_match.start(1)] + rendered_hosts + text[hosts_match.end(1) :]
     pathlib.Path(policy_path).write_text(updated, encoding="utf-8")
 
@@ -228,7 +264,7 @@ def remove_host_from_policy(policy_path, host):
 
     host_block_pattern = re.compile(
         rf"(?ms)^    {re.escape(host)} = \{{\n"
-        r'      recipient = "([^"]+)";\n'
+        r'      recipient =\n        "([^"]+)";\n'
         r'(?:      class = "([^"]+)";\n)?'
         r"    \};\n"
     )
@@ -241,30 +277,29 @@ def remove_host_from_policy(policy_path, host):
     if not scopes_match:
         raise SystemExit("could not locate scopes block")
 
-    def remove_from_scope(scope_text):
-        host_list_pattern = re.compile(r"hosts = \[ ([^\]]*) \];")
-        host_list_match = host_list_pattern.search(scope_text)
-        if not host_list_match:
-            return scope_text
-        host_names = parse_host_list(host_list_match.group(1))
-        host_names = [name for name in host_names if name != host]
-        rendered_hosts_list = render_host_list(host_names)
-        return host_list_pattern.sub(f"hosts = [ {rendered_hosts_list} ];", scope_text)
+    scopes_text = scopes_match.group(1)
+    for section_name in ("users", "services"):
+        section_pattern = re.compile(
+            rf"(?ms)^    {section_name} = \{{\n(.*?)^    \}};\n"
+        )
+        section_match = section_pattern.search(scopes_text)
+        if not section_match:
+            continue
 
-    scope_item_pattern = re.compile(
-        r"(?ms)^      ([A-Za-z0-9_-]+) = \{\n"
-        r"        hosts = \[ [^\]]* \];\n"
-        r"      \};\n"
-    )
-    rebuilt_scopes = "".join(
-        remove_from_scope(scope_match.group(0))
-        for scope_match in scope_item_pattern.finditer(scopes_match.group(1))
-    )
+        entries = parse_scope_entries(section_match.group(1), "      ")
+        updated_entries = {
+            name: [name_host for name_host in hosts if name_host != host]
+            for name, hosts in entries.items()
+        }
+        rendered_section = render_scope_entries(updated_entries, "      ")
+        scopes_text = (
+            scopes_text[: section_match.start(1)]
+            + rendered_section
+            + scopes_text[section_match.end(1) :]
+        )
 
     pathlib.Path(policy_path).write_text(
-        updated[: scopes_match.start(1)]
-        + rebuilt_scopes
-        + updated[scopes_match.end(1) :],
+        updated[: scopes_match.start(1)] + scopes_text + updated[scopes_match.end(1) :],
         encoding="utf-8",
     )
 
@@ -291,47 +326,32 @@ def set_user_scope_hosts(policy_path, user, hosts, create):
     if not users_match:
         raise SystemExit("could not locate users block")
 
-    user_scope_pattern = re.compile(
-        r"(?ms)^      ([A-Za-z0-9_-]+) = \{\n"
-        r"        hosts = \[ ([^\]]*) \];\n"
-        r"      \};\n"
-    )
-
-    blocks = {}
-    for scope_match in user_scope_pattern.finditer(users_match.group(1)):
-        scope_name = scope_match.group(1)
-        scope_hosts = parse_host_list(scope_match.group(2))
-        blocks[scope_name] = (
-            f"      {scope_name} = {{\n"
-            f"        hosts = [ {render_host_list(scope_hosts)} ];\n"
-            "      };\n"
-        )
+    blocks = parse_scope_entries(users_match.group(1), "      ")
 
     if user not in blocks and not create:
         raise SystemExit(f"user scope {user} is missing from policy")
 
-    blocks[user] = (
-        f"      {user} = {{\n"
-        f"        hosts = [ {render_host_list(hosts)} ];\n"
-        "      };\n"
-    )
+    blocks[user] = sorted(set(hosts))
 
-    rebuilt_users = "".join(blocks[name] for name in sorted(blocks))
+    rebuilt_users = render_scope_entries(blocks, "      ")
     updated = text[: users_match.start(1)] + rebuilt_users + text[users_match.end(1) :]
     pathlib.Path(policy_path).write_text(updated, encoding="utf-8")
 
 
 def remove_user_scope(policy_path, user):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
-    user_scope_pattern = re.compile(
-        rf"(?ms)^      {re.escape(user)} = \{{\n"
-        r"        hosts = \[ [^\]]* \];\n"
-        r"      \};\n"
-    )
-    if not user_scope_pattern.search(text):
+    users_pattern = re.compile(r"(?ms)^    users = \{\n(.*?)^    \};\n")
+    users_match = users_pattern.search(text)
+    if not users_match:
+        raise SystemExit("could not locate users block")
+
+    blocks = parse_scope_entries(users_match.group(1), "      ")
+    if user not in blocks:
         raise SystemExit(f"user scope {user} is missing from policy")
 
-    updated = user_scope_pattern.sub("", text, count=1)
+    del blocks[user]
+    rebuilt_users = render_scope_entries(blocks, "      ")
+    updated = text[: users_match.start(1)] + rebuilt_users + text[users_match.end(1) :]
     pathlib.Path(policy_path).write_text(updated, encoding="utf-8")
 
 

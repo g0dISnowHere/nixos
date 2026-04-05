@@ -36,6 +36,26 @@ scripts/secrets recover-access --host <name>
 scripts/secrets recover-access --host <name> --target-operator-recipient age1...
 ```
 
+## Pre-Merge Checks
+
+Run these before merging changes to secrets policy tooling:
+
+```bash
+scripts/tests/secrets-policy-roundtrip.sh
+python3 -m py_compile scripts/secrets-lib/policy.py
+bash scripts/secrets-workflows/validate-policy.sh
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
+nix eval .#homeConfigurations."djoolz@workstation".activationPackage
+```
+
+For policy-mutation changes, also run dry-run smoke tests against the affected workflows:
+
+```bash
+scripts/secrets user-scope --user <existing-scope> --add-host <existing-host> --dry-run
+scripts/secrets user-scope --user <new-scope> --add-host <existing-host> --create --dry-run
+scripts/secrets retire-host --host <existing-host> --dry-run
+```
+
 ## Current Lifecycle Notes
 
 - `add-host` is the onboarding path for new hosts.
