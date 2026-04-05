@@ -37,6 +37,7 @@ target_operator_key_file=""
 target_operator_recipient=""
 dry_run=0
 assume_yes=0
+target_operator_recipients=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -144,6 +145,25 @@ if [[ -z "${target_operator_recipient}" ]]; then
   exit 1
 fi
 
+if [[ -n "${SECRETS_OPERATOR_PUBLIC_KEYS:-}" ]]; then
+  while IFS= read -r existing_recipient; do
+    if [[ -n "${existing_recipient}" ]]; then
+      target_operator_recipients+=("${existing_recipient}")
+    fi
+  done < <(printf '%s\n' "${SECRETS_OPERATOR_PUBLIC_KEYS}" | tr ',' '\n' | sed 's/^ *//; s/ *$//')
+fi
+
+if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -eq 1 ]]; then
+  while IFS= read -r local_recipient; do
+    if [[ -n "${local_recipient}" ]]; then
+      target_operator_recipients+=("${local_recipient}")
+    fi
+  done < <(secrets_read_public_keys "${SECRETS_OPERATOR_KEY_FILE}" || true)
+fi
+
+target_operator_recipients+=("${target_operator_recipient}")
+mapfile -t target_operator_recipients < <(printf '%s\n' "${target_operator_recipients[@]}" | sed '/^$/d' | sort -u)
+
 working_candidates=()
 if [[ -n "${source_key_file}" ]]; then
   working_candidates=("${source_key_file}")
@@ -201,6 +221,7 @@ secrets_ui_kv "Target host" "${host_name}"
 secrets_ui_kv "Source key file" "${source_key_file}"
 secrets_ui_kv "Target operator alias" "${operator_alias}"
 secrets_ui_kv "Target recipient" "${target_operator_recipient}"
+secrets_ui_kv "Final operator recipients" "$(printf '%s ' "${target_operator_recipients[@]}" | sed 's/ $//')"
 printf '\nAffected secrets:\n'
 printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
 
@@ -222,7 +243,7 @@ if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Update policy and rekey 
   exit 1
 fi
 
-secrets_update_policy_operator_recipient "${target_operator_recipient}"
+secrets_update_policy_operator_recipient "${target_operator_recipients[@]}"
 secrets_sync_sops_config
 printf '\nUpdated policy and regenerated .sops.yaml operator recipients.\n'
 

@@ -90,6 +90,15 @@ secrets_list_key_aliases() {
   secrets_policy_tool list-hosts
 }
 
+secrets_list_user_scopes() {
+  secrets_policy_tool list-user-scopes
+}
+
+secrets_get_user_scope_hosts() {
+  local user_name="$1"
+  secrets_policy_tool get-user-scope-hosts --user "${user_name}"
+}
+
 secrets_list_relevant_files() {
   local host_name="$1"
   secrets_policy_tool list-relevant-files --repo-root "${SECRETS_REPO_ROOT}" --host "${host_name}"
@@ -148,6 +157,7 @@ secrets_update_policy_host_recipient() {
   local host_name="$1"
   local recipient="$2"
   local create_flag="${3:-0}"
+  local class_name="${4:-}"
   local args=(
     "${SECRETS_POLICY_TOOL}"
     set-host-recipient
@@ -160,16 +170,59 @@ secrets_update_policy_host_recipient() {
     args+=(--create)
   fi
 
+  if [[ -n "${class_name}" ]]; then
+    args+=(--class-name "${class_name}")
+  fi
+
   python3 "${args[@]}"
   unset SECRETS_POLICY_JSON
 }
 
 secrets_update_policy_operator_recipient() {
-  local recipient="$1"
+  local args=(
+    "${SECRETS_POLICY_TOOL}"
+    set-operator-recipient
+    --policy-file "${SECRETS_POLICY_FILE}"
+  )
+  local recipient=""
+  for recipient in "$@"; do
+    args+=(--recipient "${recipient}")
+  done
+  python3 "${args[@]}"
+  unset SECRETS_POLICY_JSON
+}
+
+secrets_set_user_scope_hosts() {
+  local user_name="$1"
+  shift
+  local create_flag="${1:-0}"
+  shift || true
+  local args=(
+    "${SECRETS_POLICY_TOOL}"
+    set-user-scope-hosts
+    --policy-file "${SECRETS_POLICY_FILE}"
+    --user "${user_name}"
+  )
+
+  if [[ "${create_flag}" -eq 1 ]]; then
+    args+=(--create)
+  fi
+
+  local host_name=""
+  for host_name in "$@"; do
+    args+=(--host "${host_name}")
+  done
+
+  python3 "${args[@]}"
+  unset SECRETS_POLICY_JSON
+}
+
+secrets_remove_user_scope() {
+  local user_name="$1"
   python3 "${SECRETS_POLICY_TOOL}" \
-    set-operator-recipient \
+    remove-user-scope \
     --policy-file "${SECRETS_POLICY_FILE}" \
-    --recipient "${recipient}"
+    --user "${user_name}"
   unset SECRETS_POLICY_JSON
 }
 

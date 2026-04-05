@@ -134,7 +134,19 @@ def shell_quote(value):
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def replace_policy_host(policy_path, host, recipient, create):
+def parse_host_list(raw_hosts):
+    return [
+        item.strip().strip('"')
+        for item in raw_hosts.split()
+        if item.strip()
+    ]
+
+
+def render_host_list(host_names):
+    return " ".join(f'"{name}"' for name in sorted(host_names))
+
+
+def replace_policy_host(policy_path, host, recipient, create, class_name):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
     host_pattern = re.compile(
         rf"(?ms)^    {re.escape(host)} = \{{\n"
@@ -144,16 +156,19 @@ def replace_policy_host(policy_path, host, recipient, create):
     )
     match = host_pattern.search(text)
     if match:
-        class_name = match.group(2) or "workstation"
+        resolved_class_name = match.group(2) or "workstation"
     else:
         if not create:
             raise SystemExit(f"host {host} is missing from policy")
-        class_name = "workstation"
+        resolved_class_name = class_name or "workstation"
+
+    if class_name:
+        resolved_class_name = class_name
 
     host_block = (
         f"    {host} = {{\n"
         f'      recipient = "{recipient}";\n'
-        f'      class = "{class_name}";\n'
+        f'      class = "{resolved_class_name}";\n'
         "    };\n"
     )
 
@@ -182,58 +197,27 @@ def replace_policy_host(policy_path, host, recipient, create):
     blocks[host] = host_block
     rendered_hosts = "".join(blocks[name] for name in sorted(blocks))
     updated = text[: hosts_match.start(1)] + rendered_hosts + text[hosts_match.end(1) :]
-
-    users_pattern = re.compile(r"(?ms)^    users = \{\n(.*?)^    \};\n")
-    users_match = users_pattern.search(updated)
-    if not users_match:
-        raise SystemExit("could not locate users block")
-
-    def add_host_to_scope(scope_text):
-        host_list_pattern = re.compile(r"hosts = \[ ([^\]]*) \];")
-        host_list_match = host_list_pattern.search(scope_text)
-        if not host_list_match:
-            return scope_text
-        host_names = [
-            item.strip().strip('"')
-            for item in host_list_match.group(1).split()
-            if item.strip()
-        ]
-        if host not in host_names:
-            host_names.append(host)
-        host_names = sorted(host_names)
-        rendered_hosts_list = " ".join(f'"{name}"' for name in host_names)
-        return host_list_pattern.sub(f"hosts = [ {rendered_hosts_list} ];", scope_text)
-
-    user_scope_pattern = re.compile(
-        r"(?ms)^      ([A-Za-z0-9_-]+) = \{\n"
-        r"        hosts = \[ [^\]]* \];\n"
-        r"      \};\n"
-    )
-    rebuilt_users = "".join(
-        add_host_to_scope(scope_match.group(0))
-        for scope_match in user_scope_pattern.finditer(users_match.group(1))
-    )
-    updated = (
-        updated[: users_match.start(1)] + rebuilt_users + updated[users_match.end(1) :]
-    )
-
     pathlib.Path(policy_path).write_text(updated, encoding="utf-8")
 
 
-def replace_operator_recipients(policy_path, recipient):
+def replace_operator_recipients(policy_path, recipients):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
     pattern = re.compile(
-        r'(?ms)^  operator = \{\n    alias = "([^"]+)";\n    recipients = \[\n.*?^    \];\n  \};\n'
+        r'(?ms)^  operator = \{\n'
+        r'    alias = "([^"]+)";\n'
+        r"    recipients =(?:\n      \[ [^\n]* \];|\n      \[\n.*?^      \];| \[\n.*?^    \];)\n"
+        r"  \};\n"
     )
     match = pattern.search(text)
     if not match:
         raise SystemExit("could not locate operator block")
 
+    rendered_recipients = "".join(f'      "{recipient}"\n' for recipient in recipients)
     replacement = (
         "  operator = {\n"
         f'    alias = "{match.group(1)}";\n'
         "    recipients = [\n"
-        f'      "{recipient}"\n'
+        f"{rendered_recipients}"
         "    ];\n"
         "  };\n"
     )
@@ -266,13 +250,9 @@ def remove_host_from_policy(policy_path, host):
         host_list_match = host_list_pattern.search(scope_text)
         if not host_list_match:
             return scope_text
-        host_names = [
-            item.strip().strip('"')
-            for item in host_list_match.group(1).split()
-            if item.strip()
-        ]
+        host_names = parse_host_list(host_list_match.group(1))
         host_names = [name for name in host_names if name != host]
-        rendered_hosts_list = " ".join(f'"{name}"' for name in sorted(host_names))
+        rendered_hosts_list = render_host_list(host_names)
         return host_list_pattern.sub(f"hosts = [ {rendered_hosts_list} ];", scope_text)
 
     scope_item_pattern = re.compile(
@@ -291,6 +271,72 @@ def remove_host_from_policy(policy_path, host):
     )
 
 
+def list_user_scopes(policy):
+    for name in sorted(policy["scopes"]["users"]):
+        print(name)
+
+
+def get_user_scope_hosts(policy, user):
+    try:
+        scope = policy["scopes"]["users"][user]
+    except KeyError as exc:
+        raise SystemExit(1) from exc
+
+    for host in sorted(scope.get("hosts", [])):
+        print(host)
+
+
+def set_user_scope_hosts(policy_path, user, hosts, create):
+    text = pathlib.Path(policy_path).read_text(encoding="utf-8")
+    users_pattern = re.compile(r"(?ms)^    users = \{\n(.*?)^    \};\n")
+    users_match = users_pattern.search(text)
+    if not users_match:
+        raise SystemExit("could not locate users block")
+
+    user_scope_pattern = re.compile(
+        r"(?ms)^      ([A-Za-z0-9_-]+) = \{\n"
+        r"        hosts = \[ ([^\]]*) \];\n"
+        r"      \};\n"
+    )
+
+    blocks = {}
+    for scope_match in user_scope_pattern.finditer(users_match.group(1)):
+        scope_name = scope_match.group(1)
+        scope_hosts = parse_host_list(scope_match.group(2))
+        blocks[scope_name] = (
+            f"      {scope_name} = {{\n"
+            f"        hosts = [ {render_host_list(scope_hosts)} ];\n"
+            "      };\n"
+        )
+
+    if user not in blocks and not create:
+        raise SystemExit(f"user scope {user} is missing from policy")
+
+    blocks[user] = (
+        f"      {user} = {{\n"
+        f"        hosts = [ {render_host_list(hosts)} ];\n"
+        "      };\n"
+    )
+
+    rebuilt_users = "".join(blocks[name] for name in sorted(blocks))
+    updated = text[: users_match.start(1)] + rebuilt_users + text[users_match.end(1) :]
+    pathlib.Path(policy_path).write_text(updated, encoding="utf-8")
+
+
+def remove_user_scope(policy_path, user):
+    text = pathlib.Path(policy_path).read_text(encoding="utf-8")
+    user_scope_pattern = re.compile(
+        rf"(?ms)^      {re.escape(user)} = \{{\n"
+        r"        hosts = \[ [^\]]* \];\n"
+        r"      \};\n"
+    )
+    if not user_scope_pattern.search(text):
+        raise SystemExit(f"user scope {user} is missing from policy")
+
+    updated = user_scope_pattern.sub("", text, count=1)
+    pathlib.Path(policy_path).write_text(updated, encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -299,9 +345,13 @@ def main():
     parser_operator_recipients = subparsers.add_parser("get-operator-recipients")
     parser_hosts = subparsers.add_parser("list-hosts")
     parser_scopes = subparsers.add_parser("list-scopes")
+    parser_user_scopes = subparsers.add_parser("list-user-scopes")
 
     parser_host_recipient = subparsers.add_parser("get-host-recipient")
     parser_host_recipient.add_argument("--host", required=True)
+
+    parser_user_scope_hosts = subparsers.add_parser("get-user-scope-hosts")
+    parser_user_scope_hosts.add_argument("--user", required=True)
 
     parser_relevant = subparsers.add_parser("list-relevant-files")
     parser_relevant.add_argument("--repo-root", required=True)
@@ -315,24 +365,53 @@ def main():
     parser_set_host.add_argument("--host", required=True)
     parser_set_host.add_argument("--recipient", required=True)
     parser_set_host.add_argument("--create", action="store_true")
+    parser_set_host.add_argument("--class-name")
 
     parser_set_operator = subparsers.add_parser("set-operator-recipient")
     parser_set_operator.add_argument("--policy-file", required=True)
-    parser_set_operator.add_argument("--recipient", required=True)
+    parser_set_operator.add_argument("--recipient", action="append", required=True)
+
+    parser_set_user_scope = subparsers.add_parser("set-user-scope-hosts")
+    parser_set_user_scope.add_argument("--policy-file", required=True)
+    parser_set_user_scope.add_argument("--user", required=True)
+    parser_set_user_scope.add_argument("--host", action="append", default=[])
+    parser_set_user_scope.add_argument("--create", action="store_true")
 
     parser_remove_host = subparsers.add_parser("remove-host")
     parser_remove_host.add_argument("--policy-file", required=True)
     parser_remove_host.add_argument("--host", required=True)
 
+    parser_remove_user_scope = subparsers.add_parser("remove-user-scope")
+    parser_remove_user_scope.add_argument("--policy-file", required=True)
+    parser_remove_user_scope.add_argument("--user", required=True)
+
     args = parser.parse_args()
 
-    if args.command in {"set-host-recipient", "set-operator-recipient", "remove-host"}:
+    if args.command in {
+        "set-host-recipient",
+        "set-operator-recipient",
+        "set-user-scope-hosts",
+        "remove-host",
+        "remove-user-scope",
+    }:
         if args.command == "set-host-recipient":
             replace_policy_host(
-                args.policy_file, args.host, args.recipient, args.create
+                args.policy_file,
+                args.host,
+                args.recipient,
+                args.create,
+                args.class_name,
             )
         elif args.command == "set-operator-recipient":
-            replace_operator_recipients(args.policy_file, args.recipient)
+            replace_operator_recipients(
+                args.policy_file, sorted(set(args.recipient))
+            )
+        elif args.command == "set-user-scope-hosts":
+            set_user_scope_hosts(
+                args.policy_file, args.user, sorted(set(args.host)), args.create
+            )
+        elif args.command == "remove-user-scope":
+            remove_user_scope(args.policy_file, args.user)
         else:
             remove_host_from_policy(args.policy_file, args.host)
         return
@@ -358,11 +437,17 @@ def main():
         for host in sorted(policy["hosts"]):
             print(f"machines.{host}")
         return
+    if args.command == "list-user-scopes":
+        list_user_scopes(policy)
+        return
     if args.command == "get-host-recipient":
         host = args.host
         if host not in policy["hosts"]:
             raise SystemExit(1)
         print(policy["hosts"][host]["recipient"])
+        return
+    if args.command == "get-user-scope-hosts":
+        get_user_scope_hosts(policy, args.user)
         return
     if args.command == "list-relevant-files":
         for path in relevant_files(policy, args.repo_root, args.host):
