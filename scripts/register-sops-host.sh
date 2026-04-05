@@ -38,12 +38,46 @@ read_host_public_key() {
   fi
 }
 
+read_age_public_keys() {
+  local key_file="$1"
+
+  if [[ -r "${key_file}" ]]; then
+    grep '^# public key:' "${key_file}" | awk '{print $4}'
+  fi
+}
+
+require_operator_decrypt_access() {
+  local key_file="$1"
+  local secret_file="$2"
+
+  if ! SOPS_AGE_KEY_FILE="${key_file}" sops --decrypt "${secret_file}" >/dev/null 2>&1; then
+    printf '\nCannot decrypt %s with the local operator key file.\n' \
+      "${secret_file#${repo_root}/}" >&2
+    printf 'Operator key file: %s\n' "${key_file}" >&2
+
+    if [[ "${#operator_recipients[@]}" -gt 0 ]]; then
+      printf 'Operator public keys loaded from that file:\n' >&2
+      printf '  %s\n' "${operator_recipients[@]}" >&2
+    else
+      printf 'No operator public keys were found in %s\n' "${key_file}" >&2
+    fi
+
+    printf '\nThis script uses sops updatekeys, which requires a private key that\n' >&2
+    printf 'can already decrypt the existing secret before recipients are changed.\n' >&2
+    printf 'Fix the operator key file or recover/re-encrypt the secret with a valid\n' >&2
+    printf 'existing recipient, then run this script again.\n' >&2
+    exit 1
+  fi
+}
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 sops_config="${repo_root}/.sops.yaml"
 host_key_file="/var/lib/sops-nix/key.txt"
+sops_age_key_file="${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
 host_name="$(hostname -s)"
 dry_run=0
 force_host_rotate=0
+operator_recipients=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -141,6 +175,10 @@ else
   printf '  %s\n' "${secret_files[@]#${repo_root}/}"
 fi
 
+if [[ -r "${sops_age_key_file}" ]]; then
+  mapfile -t operator_recipients < <(read_age_public_keys "${sops_age_key_file}")
+fi
+
 if [[ "${dry_run}" -eq 1 ]]; then
   if [[ "${current_recipient}" != "${new_recipient}" ]]; then
     printf '\nWould update .sops.yaml: &%s -> %s\n' "${host_name}" "${new_recipient}"
@@ -154,6 +192,24 @@ if [[ "${dry_run}" -eq 1 ]]; then
   fi
 
   exit 0
+fi
+
+if [[ "${#secret_files[@]}" -gt 0 ]]; then
+  if [[ ! -r "${sops_age_key_file}" ]]; then
+    printf '\nMissing readable operator key file: %s\n' "${sops_age_key_file}" >&2
+    printf 'register-sops-host.sh rekeys secrets with sops updatekeys, so it needs\n' >&2
+    printf 'an operator age identity that can already decrypt the existing files.\n' >&2
+    exit 1
+  fi
+
+  if [[ "${#operator_recipients[@]}" -eq 0 ]]; then
+    printf '\nNo operator public keys found in %s\n' "${sops_age_key_file}" >&2
+    exit 1
+  fi
+
+  for secret_file in "${secret_files[@]}"; do
+    require_operator_decrypt_access "${sops_age_key_file}" "${secret_file}"
+  done
 fi
 
 if [[ "${current_recipient}" != "${new_recipient}" ]]; then
@@ -182,7 +238,7 @@ fi
 
 for secret_file in "${secret_files[@]}"; do
   printf 'Rekeying %s\n' "${secret_file#${repo_root}/}"
-  sops updatekeys --yes "${secret_file}"
+  SOPS_AGE_KEY_FILE="${sops_age_key_file}" sops updatekeys --yes "${secret_file}"
 done
 
 for secret_file in "${secret_files[@]}"; do

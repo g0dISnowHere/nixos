@@ -32,13 +32,14 @@ Design rules:
 - keep destructive or state-changing operations behind explicit confirmation
 - separate diagnosis from mutation even when one command can guide both
 
-For script families that grow beyond one or two files, prefer a scoped subtree:
+For script families that grow beyond one or two files, prefer a scoped layout:
 
 - `scripts/<domain>`
-- `scripts/<domain>/lib/`
-- `scripts/<domain>/workflows/`
+- `scripts/<domain>-lib/`
+- `scripts/<domain>-workflows/`
 
-That keeps the root readable while preserving explicit ownership.
+This keeps the root readable while still reserving the top-level domain name for
+the operator-facing entrypoint.
 
 ## Current Direction
 

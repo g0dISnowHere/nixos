@@ -43,25 +43,24 @@ For the secrets domain, the intended layout is:
 ```text
 scripts/
   secrets
-  secrets/
-    lib/
-      inspect.sh
-      ui.sh
-    workflows/
-      bootstrap-operator.sh
-      register-host.sh
-      create-secret.sh
-      rotate-host-key.sh
-      retire-host.sh
-      validate.sh
+  secrets-lib/
+    inspect.sh
+    ui.sh
+  secrets-workflows/
+    bootstrap-operator.sh
+    register-host.sh
+    create-secret.sh
+    rotate-host-key.sh
+    retire-host.sh
+    validate.sh
 ```
 
 Design rules:
 
 - `scripts/secrets` is the operator entrypoint
 - the default subcommand should be `doctor`
-- `lib/` holds shared inspection and prompt logic
-- `workflows/` holds focused state-changing or validation flows
+- `scripts/secrets-lib/` holds shared inspection and prompt logic
+- `scripts/secrets-workflows/` holds focused state-changing or validation flows
 - orchestration and mutation must stay separate
 
 ## Roles And Trust Boundaries
@@ -295,3 +294,96 @@ Priority order:
 
 The existing `register-sops-host.sh` logic can inform the new workflow but
 should not define the long-term shape by itself.
+
+# Minimal Nix Secrets Inventory, Not a Policy Engine
+
+  ## Summary
+
+  Implement a small, explicit Nix secrets inventory that becomes the source of truth for public secret policy and renders the committed .sops.yaml. Keep the model intentionally
+  minimal so it does not turn into a policy engine: no rule language, no implicit role-based access, no dynamic derivation for secret grants.
+
+  The core split stays:
+
+  - Nix owns intended public policy and fleet structure
+  - scripts own mutation, rekeying, recovery, and guided workflows
+
+  This directly supports your goals:
+
+  - add/remove machines without remembering machine-specific setup history
+  - keep one portable user environment everywhere by default
+  - share Docker/service secrets safely as the number of secrets grows
+  - make systems feel as identical as possible unless an exception is explicit
+
+  ## Key Changes
+
+  - Add one canonical data file, flake/secrets-policy.nix, containing only:
+      - operator
+          - explicit single operator alias
+          - one or more operator public recipients
+      - hosts
+          - hostname
+          - host public recipient
+          - optional minimal display metadata only, such as class label for UI/validation
+      - scopes
+          - users.<name> with explicit host membership
+          - services.<name> with explicit host membership
+          - machines.<hostname> implicit per host, not manually enumerated as a separate policy object
+  - Generate and commit .sops.yaml from that inventory.
+      - remove hand-maintained anchors and creation rules
+      - remove services/shared/ entirely except for migrating the current placeholder file
+      - replace it with named service scopes under services/<name>/...
+  - Add flake library helpers:
+      - self.lib.secretsPolicy for normalized structured policy
+      - self.lib.renderSopsConfig for deterministic .sops.yaml rendering
+  - Add one policy reconciliation command:
+      - scripts/secrets sync-policy
+      - --check fails on drift
+      - --diff shows the generated delta
+      - default mode updates the committed .sops.yaml
+  - Update scripts/secrets to consume the Nix policy instead of guessing from YAML.
+      - use the explicit operator alias
+      - use policy-defined host inventory for doctor/recovery/onboarding prompts
+      - use scope membership from policy for named services and user scopes
+  - Rewrite or remove old one-off scripts as needed.
+
+
+  - Do not build a policy engine.
+  - Do not use host roles or metadata to grant secret access.
+  - Do not invent a general expression language for scope membership.
+  - Do not let mkNixosSystem or machine-role logic become the secret-policy source.
+  - Do not move private keys or rekey operations into Nix.
+
+  Access decisions in v1 are always explicit:
+
+  - a service scope lists allowed hosts
+  - a user scope lists allowed hosts
+  - a machine scope belongs to exactly one host
+
+  ## Test Plan
+
+  - Deterministic generation
+      - rendering .sops.yaml from flake/secrets-policy.nix is stable
+      - scripts/secrets sync-policy --check passes only when committed output matches rendered output
+  - Scope behavior
+      - users.<name> renders recipients for operator plus explicitly listed hosts
+      - services.<name> renders recipients for operator plus explicitly listed hosts
+      - machines.<hostname> renders recipients for operator plus that host only
+  - Migration behavior
+      - services/shared/ is removed safely
+      - the placeholder secrets/services/shared/sops-test.yaml is migrated to a named service scope, e.g. services/fleet-test/
+  - Orchestrator behavior
+      - doctor no longer infers operator alias from key order
+      - recovery guidance points to the explicit operator alias and relevant scope membership
+      - host add/remove guidance follows policy inventory, not ad hoc YAML parsing
+  - Validation behavior
+      - host in inventory but missing recipient fails validation
+      - scope referencing unknown host fails validation
+      - orphaned machine path or policy drift is reported cleanly
+
+  ## Assumptions And Defaults
+
+  - One explicit primary operator alias is sufficient for v1.
+  - Service scopes list allowed hosts explicitly; hosts do not opt themselves into services.
+  - services/shared/ can be removed because it is only a placeholder now.
+  - Host metadata stays minimal and is only for validation or UI, never for access policy.
+  - One portable user environment remains the baseline everywhere; machine exceptions stay explicit and outside the secret-policy model unless needed for validation.

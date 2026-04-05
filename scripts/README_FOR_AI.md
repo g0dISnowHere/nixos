@@ -25,8 +25,8 @@ canonical docs.
 When a script family grows, prefer:
 
 - `scripts/<domain>`
-- `scripts/<domain>/lib/`
-- `scripts/<domain>/workflows/`
+- `scripts/<domain>-lib/`
+- `scripts/<domain>-workflows/`
 
 Put only domain entrypoints at the root when they are intended to be run
 directly by an operator.
