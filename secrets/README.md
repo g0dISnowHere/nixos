@@ -169,6 +169,15 @@ That script:
   for that host
 - verifies the host can decrypt those secrets with its own `sops-nix` key
 
+Important:
+
+- `scripts/register-sops-host.sh` is not a cold-start recovery path
+- it uses `sops updatekeys`, so your local operator key file at
+  `~/.config/sops/age/keys.txt` must already decrypt the targeted secrets
+- if your operator key has changed and no longer matches the recipients already
+  embedded in those files, recover them with a valid existing key first, then
+  re-run the registration flow
+
 Use `--dry-run` to preview and `--force-host-rotate` only when you are
 intentionally changing a host recipient.
 

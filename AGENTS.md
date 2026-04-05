@@ -81,3 +81,9 @@
 - Treat `AGENTS.md` as the canonical repository guidance for automated coding agents.
 - `.github/copilot-instructions.md` is a short companion mirror; keep it consistent with this file and avoid letting it become a second source of truth.
 - Do not rely on `CLAUDE.md` or `GEMINI.md` containing separate guidance; they should resolve to this file.
+- Local-area AI docs may exist for subtree-specific implementation rules, but
+  they must stay scoped and must not override repo-wide guidance in
+  `AGENTS.md`.
+- When working under `scripts/`, review `scripts/README.md` for operator-facing
+  structure and `scripts/README_FOR_AI.md` for subtree-local implementation
+  guidance.
