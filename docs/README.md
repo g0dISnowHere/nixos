@@ -26,6 +26,8 @@ notes do not blur together.
 
 ## Sections
 
+- `secrets-workflows.md`
+  - canonical operator guide for the SOPS lifecycle
 - `architecture/`
   - canonical design boundaries and structure decisions
 - `reference/`
@@ -42,6 +44,7 @@ notes do not blur together.
 ## Placement Rules
 
 - Put stable repo documentation in `docs/`.
+- Put the canonical SOPS operator workflow in `docs/secrets-workflows.md`.
 - Put quick command lists and checklists in `docs/reference/`.
 - Put incomplete plans and backlog ideas in `docs/future-ideas/`.
 - Put dated investigations and point-in-time analysis in `docs/findings/`.

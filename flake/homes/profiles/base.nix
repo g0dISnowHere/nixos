@@ -11,7 +11,6 @@
     ../../../modules/home/packages/system-utils.nix
     ../../../modules/home/packages/nix-tools.nix
     ../../../modules/home/packages/ai-tools.nix
-  ] ++ lib.optionals (!isNixosIntegrated) [
-    ../../../modules/home/programs/shell.nix
-  ];
+  ] ++ lib.optionals (!isNixosIntegrated)
+    [ ../../../modules/home/programs/shell.nix ];
 }

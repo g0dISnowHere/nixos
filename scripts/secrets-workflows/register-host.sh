@@ -14,13 +14,12 @@ usage() {
   cat <<'EOF'
 Usage: scripts/secrets register-host [options]
 
-Register or refresh a host recipient in flake/secrets-policy.nix, sync
-.sops.yaml, then rekey the relevant
-secrets and verify host decryption.
+Refresh an existing host recipient in flake/secrets-policy.nix, sync .sops.yaml,
+then rekey the relevant secrets and verify host decryption.
 
 Options:
   --host NAME            Override the host alias
-  --allow-create         Create the host alias and machine rule if missing
+  --allow-create         Deprecated compatibility flag; use add-host instead
   --force-host-rotate    Allow changing an existing configured recipient
   --dry-run              Show the intended changes only
   --yes                  Skip confirmation prompts
@@ -75,13 +74,18 @@ if [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 ]]; then
   exit 1
 fi
 
+if [[ -z "${SECRETS_HOST_PUBLIC_KEY}" ]]; then
+  secrets_ui_error "Could not read the host public key from ${SECRETS_HOST_KEY_FILE}. Run scripts/secrets doctor --full-test if elevated inspection is needed."
+  exit 1
+fi
+
 if [[ ! -f "${SECRETS_POLICY_FILE}" ]]; then
   secrets_ui_error "Missing secrets policy: ${SECRETS_POLICY_FILE}"
   exit 1
 fi
 
 if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 && "${allow_create}" -ne 1 ]]; then
-  secrets_ui_error "Host ${host_name} is not in flake/secrets-policy.nix. Re-run with --allow-create."
+  secrets_ui_error "Host ${host_name} is not in flake/secrets-policy.nix. Use scripts/secrets add-host."
   exit 1
 fi
 
@@ -124,24 +128,12 @@ else
 fi
 
 if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 ]]; then
-  printf '\nPlanned policy changes:\n'
-  printf '  - add host %s -> %s to flake/secrets-policy.nix\n' "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}"
-  printf '  - add %s to user scopes by default\n' "${host_name}"
-  printf '  - regenerate .sops.yaml from policy\n'
-
-  if [[ "${dry_run}" -eq 1 ]]; then
-    printf '\nDry run only. No files were changed.\n'
-    exit 0
+  if [[ "${allow_create}" -eq 1 ]]; then
+    secrets_ui_error "register-host --allow-create is deprecated. Use scripts/secrets add-host for explicit onboarding."
+  else
+    secrets_ui_error "Host ${host_name} is missing from policy. Use scripts/secrets add-host."
   fi
-
-  if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Apply the planned policy changes?"; then
-    printf 'Aborted.\n'
-    exit 1
-  fi
-
-  secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 1
-  secrets_sync_sops_config
-  printf '\nUpdated policy and regenerated .sops.yaml for %s.\n' "${host_name}"
+  exit 1
 elif [[ "${SECRETS_HOST_RECIPIENT_MATCHES}" -ne 1 ]]; then
   if [[ "${dry_run}" -eq 1 ]]; then
     printf '\nWould update flake/secrets-policy.nix and regenerate .sops.yaml.\n'

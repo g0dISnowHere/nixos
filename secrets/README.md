@@ -4,6 +4,11 @@ This README is the subtree guide for `secrets/`. Keep repo-wide documentation
 policy in `docs/` and `AGENTS.md`; keep this file focused on secret handling in
 this directory.
 
+For the canonical operator workflow, use
+[`docs/secrets-workflows.md`](../docs/secrets-workflows.md).
+For a quick command list, use
+[`docs/reference/secrets-commands.md`](../docs/reference/secrets-commands.md).
+
 This repo uses `sops-nix` with `age` recipients.
 
 For day-to-day operator use, the `sops` CLI should be available on hosts where
@@ -155,13 +160,31 @@ For now you need at least:
 
 Later add more recipients for future hosts like the VPS.
 
-For the low-friction host registration path, use:
+For new host onboarding, use:
+
+```bash
+scripts/secrets add-host --host <name>
+```
+
+That workflow:
+
+- reads the machine recipient from `/var/lib/sops-nix/key.txt`
+- adds the host to `flake/secrets-policy.nix`
+- requires explicit user-scope membership selection
+- regenerates `.sops.yaml`
+- rekeys relevant secrets
+- verifies the host can decrypt those secrets with its own `sops-nix` key
+
+Use `--user-scope <name>` for explicit non-interactive onboarding and
+`--no-user-scopes` when the host should not inherit any current user scope.
+
+For existing host registration or refresh, use:
 
 ```bash
 scripts/secrets register-host
 ```
 
-That workflow:
+That workflow currently:
 
 - infers the current host alias from `hostname -s` by default
 - reads the machine recipient from `/var/lib/sops-nix/key.txt`
@@ -181,6 +204,12 @@ Important:
 
 Use `--dry-run` to preview and `--force-host-rotate` only when you are
 intentionally changing a host recipient.
+
+For explicit user scope membership changes, use:
+
+```bash
+scripts/secrets user-scope --user <name> --add-host <host>
+```
 
 For safe host retirement, use:
 

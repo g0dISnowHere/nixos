@@ -135,11 +135,7 @@ def shell_quote(value):
 
 
 def parse_host_list(raw_hosts):
-    return [
-        item.strip().strip('"')
-        for item in raw_hosts.split()
-        if item.strip()
-    ]
+    return [item.strip().strip('"') for item in raw_hosts.split() if item.strip()]
 
 
 def render_host_list(host_names):
@@ -203,7 +199,7 @@ def replace_policy_host(policy_path, host, recipient, create, class_name):
 def replace_operator_recipients(policy_path, recipients):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
     pattern = re.compile(
-        r'(?ms)^  operator = \{\n'
+        r"(?ms)^  operator = \{\n"
         r'    alias = "([^"]+)";\n'
         r"    recipients =(?:\n      \[ [^\n]* \];|\n      \[\n.*?^      \];| \[\n.*?^    \];)\n"
         r"  \};\n"
@@ -231,7 +227,7 @@ def remove_host_from_policy(policy_path, host):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
 
     host_block_pattern = re.compile(
-        rf'(?ms)^    {re.escape(host)} = \{{\n'
+        rf"(?ms)^    {re.escape(host)} = \{{\n"
         r'      recipient = "([^"]+)";\n'
         r'(?:      class = "([^"]+)";\n)?'
         r"    \};\n"
@@ -266,7 +262,9 @@ def remove_host_from_policy(policy_path, host):
     )
 
     pathlib.Path(policy_path).write_text(
-        updated[: scopes_match.start(1)] + rebuilt_scopes + updated[scopes_match.end(1) :],
+        updated[: scopes_match.start(1)]
+        + rebuilt_scopes
+        + updated[scopes_match.end(1) :],
         encoding="utf-8",
     )
 
@@ -403,9 +401,7 @@ def main():
                 args.class_name,
             )
         elif args.command == "set-operator-recipient":
-            replace_operator_recipients(
-                args.policy_file, sorted(set(args.recipient))
-            )
+            replace_operator_recipients(args.policy_file, sorted(set(args.recipient)))
         elif args.command == "set-user-scope-hosts":
             set_user_scope_hosts(
                 args.policy_file, args.user, sorted(set(args.host)), args.create

@@ -77,10 +77,12 @@ Current secret helpers include:
   - `doctor` for guided inspection
   - `sync-policy` for rendering `.sops.yaml` from `flake/secrets-policy.nix`
   - `validate-policy` and `validate-access` for split validation
+  - `add-host` for explicit host onboarding
+  - `user-scope` for `users.<name>` membership management
 - `scripts/ssh-pubkey-to-age.sh` for machine `sops-nix` key bootstrap and
   inspection of existing operator and SSH keys
 - `scripts/register-sops-host.sh` as the lower-level rekey-and-verify helper
-  used by `scripts/secrets register-host`
+  used by `scripts/secrets add-host` and `scripts/secrets register-host`
 - `scripts/set-user-password-secret.sh` for provisioning or rotating the
   encrypted `secrets/users/<name>/password.yaml` secret
 
@@ -99,4 +101,6 @@ source of truth.
 
 - [README.md](../README.md)
 - [docs/auto-commit-flake-lock.md](../docs/auto-commit-flake-lock.md)
+- [docs/secrets-workflows.md](../docs/secrets-workflows.md)
+- [docs/reference/secrets-commands.md](../docs/reference/secrets-commands.md)
 - [docs/reference/useful-commands.md](../docs/reference/useful-commands.md)
