@@ -67,7 +67,9 @@ scripts/secrets doctor
 scripts/secrets sync-policy
 scripts/secrets validate-policy
 scripts/secrets validate-access
+scripts/secrets create
 scripts/secrets register-host
+scripts/secrets retire-host
 scripts/secrets recover-access
 ```
 
@@ -123,14 +125,12 @@ service rule.
 ## Remaining Work
 
 The implemented baseline covers deterministic policy ownership, rendered
-`.sops.yaml`, policy drift detection, host registration on top of policy, and
-split validation.
+`.sops.yaml`, policy drift detection, scope-aware secret creation, host
+registration and retirement on top of policy, and split validation.
 
 Still desirable:
 
-- richer `doctor` guidance for create, rotate, and retire flows
-- a dedicated create-secret workflow that chooses a scope before file creation
-- explicit retire-host workflow that removes host membership safely
+- richer `doctor` guidance for rotate and retire flows
 - better operator-facing docs outside `docs/future-ideas/`
 
 ## Opinionated Defaults

@@ -182,6 +182,19 @@ Important:
 Use `--dry-run` to preview and `--force-host-rotate` only when you are
 intentionally changing a host recipient.
 
+For safe host retirement, use:
+
+```bash
+scripts/secrets retire-host --host <name> --dry-run
+```
+
+That workflow:
+
+- removes the host from policy
+- regenerates `.sops.yaml`
+- rekeys shared secrets to drop that host
+- refuses to proceed while machine-scoped secrets still exist for that host
+
 ### 2. Update policy and render `.sops.yaml`
 
 Edit [flake/secrets-policy.nix](../flake/secrets-policy.nix), then render and
@@ -195,6 +208,22 @@ scripts/secrets validate-policy
 `.sops.yaml` is committed derived state and should match the rendered policy.
 
 ### 3. Create a secret file
+
+Prefer the policy-aware helper:
+
+```bash
+scripts/secrets create --scope services.fleet-test --name example.env
+```
+
+That workflow:
+
+- asks for or accepts an existing scope
+- chooses a valid target path inside that scope
+- seeds a format-appropriate template
+- opens your editor on a plaintext temp file
+- encrypts the result to the correct repo path
+
+Manual creation still works when you need it.
 
 Create a plaintext file in the right location first.
 

@@ -243,6 +243,54 @@ def replace_operator_recipients(policy_path, recipient):
     )
 
 
+def remove_host_from_policy(policy_path, host):
+    text = pathlib.Path(policy_path).read_text(encoding="utf-8")
+
+    host_block_pattern = re.compile(
+        rf'(?ms)^    {re.escape(host)} = \{{\n'
+        r'      recipient = "([^"]+)";\n'
+        r'(?:      class = "([^"]+)";\n)?'
+        r"    \};\n"
+    )
+    if not host_block_pattern.search(text):
+        raise SystemExit(f"host {host} is missing from policy")
+    updated = host_block_pattern.sub("", text, count=1)
+
+    scopes_pattern = re.compile(r"(?ms)^  scopes = \{\n(.*?)^  \};\n")
+    scopes_match = scopes_pattern.search(updated)
+    if not scopes_match:
+        raise SystemExit("could not locate scopes block")
+
+    def remove_from_scope(scope_text):
+        host_list_pattern = re.compile(r"hosts = \[ ([^\]]*) \];")
+        host_list_match = host_list_pattern.search(scope_text)
+        if not host_list_match:
+            return scope_text
+        host_names = [
+            item.strip().strip('"')
+            for item in host_list_match.group(1).split()
+            if item.strip()
+        ]
+        host_names = [name for name in host_names if name != host]
+        rendered_hosts_list = " ".join(f'"{name}"' for name in sorted(host_names))
+        return host_list_pattern.sub(f"hosts = [ {rendered_hosts_list} ];", scope_text)
+
+    scope_item_pattern = re.compile(
+        r"(?ms)^      ([A-Za-z0-9_-]+) = \{\n"
+        r"        hosts = \[ [^\]]* \];\n"
+        r"      \};\n"
+    )
+    rebuilt_scopes = "".join(
+        remove_from_scope(scope_match.group(0))
+        for scope_match in scope_item_pattern.finditer(scopes_match.group(1))
+    )
+
+    pathlib.Path(policy_path).write_text(
+        updated[: scopes_match.start(1)] + rebuilt_scopes + updated[scopes_match.end(1) :],
+        encoding="utf-8",
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -250,6 +298,7 @@ def main():
     parser_operator_alias = subparsers.add_parser("get-operator-alias")
     parser_operator_recipients = subparsers.add_parser("get-operator-recipients")
     parser_hosts = subparsers.add_parser("list-hosts")
+    parser_scopes = subparsers.add_parser("list-scopes")
 
     parser_host_recipient = subparsers.add_parser("get-host-recipient")
     parser_host_recipient.add_argument("--host", required=True)
@@ -271,15 +320,21 @@ def main():
     parser_set_operator.add_argument("--policy-file", required=True)
     parser_set_operator.add_argument("--recipient", required=True)
 
+    parser_remove_host = subparsers.add_parser("remove-host")
+    parser_remove_host.add_argument("--policy-file", required=True)
+    parser_remove_host.add_argument("--host", required=True)
+
     args = parser.parse_args()
 
-    if args.command in {"set-host-recipient", "set-operator-recipient"}:
+    if args.command in {"set-host-recipient", "set-operator-recipient", "remove-host"}:
         if args.command == "set-host-recipient":
             replace_policy_host(
                 args.policy_file, args.host, args.recipient, args.create
             )
-        else:
+        elif args.command == "set-operator-recipient":
             replace_operator_recipients(args.policy_file, args.recipient)
+        else:
+            remove_host_from_policy(args.policy_file, args.host)
         return
 
     policy = load_policy()
@@ -294,6 +349,14 @@ def main():
     if args.command == "list-hosts":
         for host in sorted(policy["hosts"]):
             print(host)
+        return
+    if args.command == "list-scopes":
+        for name in sorted(policy["scopes"]["users"]):
+            print(f"users.{name}")
+        for name in sorted(policy["scopes"]["services"]):
+            print(f"services.{name}")
+        for host in sorted(policy["hosts"]):
+            print(f"machines.{host}")
         return
     if args.command == "get-host-recipient":
         host = args.host
