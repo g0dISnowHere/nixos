@@ -145,13 +145,11 @@ if [[ -z "${target_operator_recipient}" ]]; then
   exit 1
 fi
 
-if [[ -n "${SECRETS_OPERATOR_PUBLIC_KEYS:-}" ]]; then
-  while IFS= read -r existing_recipient; do
-    if [[ -n "${existing_recipient}" ]]; then
-      target_operator_recipients+=("${existing_recipient}")
-    fi
-  done < <(printf '%s\n' "${SECRETS_OPERATOR_PUBLIC_KEYS}" | tr ',' '\n' | sed 's/^ *//; s/ *$//')
-fi
+while IFS= read -r configured_recipient; do
+  if [[ -n "${configured_recipient}" ]]; then
+    target_operator_recipients+=("${configured_recipient}")
+  fi
+done < <(secrets_operator_recipients || true)
 
 if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -eq 1 ]]; then
   while IFS= read -r local_recipient; do

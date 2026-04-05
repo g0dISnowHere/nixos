@@ -1,6 +1,7 @@
 keys:
   - &djoolz age10k89krww75k7jp09atly6xay636673nwy66kwv5s3epupf4zl3lser84gy
-  - &djoolz_1 age1x6l976f6qfq55gfw05qju3vegaa56q43d78mjmmzkv3qgc4z8ahqn9uz39
+  - &djoolz_1 age1sepf5z006mt22nwftm9tgvhqxj4j3jmw4rapre290sze6ecyapeqzjjtle
+  - &djoolz_2 age1x6l976f6qfq55gfw05qju3vegaa56q43d78mjmmzkv3qgc4z8ahqn9uz39
   - &albaldah age1hl3u09qjx5mz5939agcjpr8u0wecsu8vqcqn38ykeq2qswp6s4eqlhz9cq
   - &alhena age1089ktlqhw7fh82pps74m8upuxp2m2ljzl73ya9ujtyr8s8nf8e6s2u5gvh
   - &centauri age1hus8yrj5y6aa0fntqp8glv7pqxqnhczt8y0xhaxznxvk6e2s4vls5v2dcc
@@ -11,6 +12,7 @@ creation_rules:
       - age:
           - *djoolz
           - *djoolz_1
+          - *djoolz_2
           - *albaldah
           - *alhena
           - *centauri
@@ -21,6 +23,7 @@ creation_rules:
       - age:
           - *djoolz
           - *djoolz_1
+          - *djoolz_2
           - *albaldah
           - *alhena
           - *centauri
@@ -31,6 +34,7 @@ creation_rules:
       - age:
           - *djoolz
           - *djoolz_1
+          - *djoolz_2
           - *albaldah
 
   - path_regex: ^secrets/machines/alhena/.*\.(yaml|json|env|ini)$
@@ -38,6 +42,7 @@ creation_rules:
       - age:
           - *djoolz
           - *djoolz_1
+          - *djoolz_2
           - *alhena
 
   - path_regex: ^secrets/machines/centauri/.*\.(yaml|json|env|ini)$
@@ -45,6 +50,7 @@ creation_rules:
       - age:
           - *djoolz
           - *djoolz_1
+          - *djoolz_2
           - *centauri
 
   - path_regex: ^secrets/machines/mirach/.*\.(yaml|json|env|ini)$
@@ -52,4 +58,5 @@ creation_rules:
       - age:
           - *djoolz
           - *djoolz_1
+          - *djoolz_2
           - *mirach
