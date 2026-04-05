@@ -14,7 +14,8 @@ usage() {
   cat <<'EOF'
 Usage: scripts/secrets register-host [options]
 
-Register or refresh a host recipient in .sops.yaml, then rekey the relevant
+Register or refresh a host recipient in flake/secrets-policy.nix, sync
+.sops.yaml, then rekey the relevant
 secrets and verify host decryption.
 
 Options:
@@ -74,13 +75,13 @@ if [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 ]]; then
   exit 1
 fi
 
-if [[ ! -f "${SECRETS_SOPS_CONFIG}" ]]; then
-  secrets_ui_error "Missing sops config: ${SECRETS_SOPS_CONFIG}"
+if [[ ! -f "${SECRETS_POLICY_FILE}" ]]; then
+  secrets_ui_error "Missing secrets policy: ${SECRETS_POLICY_FILE}"
   exit 1
 fi
 
 if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 && "${allow_create}" -ne 1 ]]; then
-  secrets_ui_error "Host alias ${host_name} is not in .sops.yaml. Re-run with --allow-create."
+  secrets_ui_error "Host ${host_name} is not in flake/secrets-policy.nix. Re-run with --allow-create."
   exit 1
 fi
 
@@ -112,7 +113,7 @@ secrets_ui_kv "Host public key" "${SECRETS_HOST_PUBLIC_KEY}"
 if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -eq 1 ]]; then
   secrets_ui_kv "Configured recipient" "${SECRETS_CONFIGURED_HOST_RECIPIENT}"
 else
-  secrets_ui_kv "Configured recipient" "alias missing"
+  secrets_ui_kv "Configured recipient" "host missing from policy"
 fi
 
 printf '\nRelevant secrets:\n'
@@ -123,24 +124,33 @@ else
 fi
 
 if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 ]]; then
-  operator_alias="$(secrets_first_key_alias)"
-  printf '\nPlanned .sops.yaml changes:\n'
-  printf '  - add key alias &%s -> %s\n' "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}"
-  printf '  - add *%s to shared user and shared service rules\n' "${host_name}"
-  printf '  - add a machine rule for secrets/machines/%s\n' "${host_name}"
+  printf '\nPlanned policy changes:\n'
+  printf '  - add host %s -> %s to flake/secrets-policy.nix\n' "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}"
+  printf '  - add %s to user scopes by default\n' "${host_name}"
+  printf '  - regenerate .sops.yaml from policy\n'
 
   if [[ "${dry_run}" -eq 1 ]]; then
     printf '\nDry run only. No files were changed.\n'
     exit 0
   fi
 
-  if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Apply the planned .sops.yaml changes?"; then
+  if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Apply the planned policy changes?"; then
     printf 'Aborted.\n'
     exit 1
   fi
 
-  secrets_add_host_to_config "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" "${operator_alias}"
-  printf '\nUpdated .sops.yaml to add %s.\n' "${host_name}"
+  secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 1
+  secrets_sync_sops_config
+  printf '\nUpdated policy and regenerated .sops.yaml for %s.\n' "${host_name}"
+elif [[ "${SECRETS_HOST_RECIPIENT_MATCHES}" -ne 1 ]]; then
+  if [[ "${dry_run}" -eq 1 ]]; then
+    printf '\nWould update flake/secrets-policy.nix and regenerate .sops.yaml.\n'
+    exit 0
+  fi
+
+  secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 0
+  secrets_sync_sops_config
+  printf '\nUpdated policy recipient and regenerated .sops.yaml for %s.\n' "${host_name}"
 fi
 
 register_args=(--host "${host_name}")
@@ -152,7 +162,8 @@ if [[ "${force_host_rotate}" -eq 1 ]]; then
 fi
 
 printf '\nRunning register-sops-host.sh...\n'
-"${script_dir}/register-sops-host.sh" "${register_args[@]}"
+bash "${script_dir}/register-sops-host.sh" "${register_args[@]}"
 
 printf '\nRunning post-change validation...\n'
-"${workflow_dir}/validate.sh" --actor all --host "${host_name}"
+bash "${workflow_dir}/validate-policy.sh"
+bash "${workflow_dir}/validate.sh" --actor all --host "${host_name}"

@@ -165,6 +165,7 @@ Broader checks:
 
 ```bash
 nix flake check
+sh scripts/validate-fast.sh
 sh validate.sh
 ```
 

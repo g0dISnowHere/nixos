@@ -73,11 +73,14 @@ Current update helpers include:
 
 Current secret helpers include:
 
+- `scripts/secrets` as the operator-facing SOPS orchestrator
+  - `doctor` for guided inspection
+  - `sync-policy` for rendering `.sops.yaml` from `flake/secrets-policy.nix`
+  - `validate-policy` and `validate-access` for split validation
 - `scripts/ssh-pubkey-to-age.sh` for machine `sops-nix` key bootstrap and
   inspection of existing operator and SSH keys
-- `scripts/register-sops-host.sh` for low-friction host registration: update
-  one host recipient in `.sops.yaml`, rekey the relevant secrets, and verify
-  host-side decryption
+- `scripts/register-sops-host.sh` as the lower-level rekey-and-verify helper
+  used by `scripts/secrets register-host`
 - `scripts/set-user-password-secret.sh` for provisioning or rotating the
   encrypted `secrets/users/<name>/password.yaml` secret
 

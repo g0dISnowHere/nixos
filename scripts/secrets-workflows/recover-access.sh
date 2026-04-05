@@ -78,13 +78,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ "${host_explicit}" -ne 1 ]]; then
-  if [[ ! -f "${SECRETS_SOPS_CONFIG}" ]]; then
-    secrets_ui_error "Missing sops config: ${SECRETS_SOPS_CONFIG}"
+  if [[ ! -f "${SECRETS_POLICY_FILE}" ]]; then
+    secrets_ui_error "Missing secrets policy: ${SECRETS_POLICY_FILE}"
     exit 1
   fi
 
   available_hosts=()
-  operator_alias="$(secrets_first_key_alias)"
+  operator_alias="$(secrets_operator_alias)"
   while IFS= read -r alias_name; do
     if [[ -n "${alias_name}" && "${alias_name}" != "${operator_alias}" ]]; then
       available_hosts+=("${alias_name}")
@@ -92,7 +92,7 @@ if [[ "${host_explicit}" -ne 1 ]]; then
   done < <(secrets_list_key_aliases)
 
   if [[ "${#available_hosts[@]}" -eq 0 ]]; then
-    secrets_ui_error "No host aliases were found in ${SECRETS_SOPS_CONFIG}"
+    secrets_ui_error "No host aliases were found in ${SECRETS_POLICY_FILE}"
     exit 1
   fi
 
@@ -111,8 +111,8 @@ fi
 
 secrets_inspect_state "${host_name}"
 
-if [[ ! -f "${SECRETS_SOPS_CONFIG}" ]]; then
-  secrets_ui_error "Missing sops config: ${SECRETS_SOPS_CONFIG}"
+if [[ ! -f "${SECRETS_POLICY_FILE}" ]]; then
+  secrets_ui_error "Missing secrets policy: ${SECRETS_POLICY_FILE}"
   exit 1
 fi
 
@@ -194,7 +194,7 @@ for candidate in "${SECRETS_RELEVANT_SECRETS[@]}"; do
   fi
 done
 
-operator_alias="$(secrets_first_key_alias)"
+operator_alias="$(secrets_operator_alias)"
 
 secrets_ui_section "Recover Access"
 secrets_ui_kv "Target host" "${host_name}"
@@ -206,7 +206,8 @@ printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
 
 if [[ "${dry_run}" -eq 1 ]]; then
   printf '\nDry run plan:\n'
-  printf '  - update .sops.yaml alias &%s -> %s\n' "${operator_alias}" "${target_operator_recipient}"
+  printf '  - update operator recipients in flake/secrets-policy.nix for %s\n' "${operator_alias}"
+  printf '  - regenerate .sops.yaml from policy\n'
   printf '  - rekey the listed secrets using %s\n' "${source_key_file}"
   if [[ -n "${target_operator_key_file}" ]]; then
     printf '  - validate decrypt with %s\n' "${target_operator_key_file}"
@@ -216,13 +217,14 @@ if [[ "${dry_run}" -eq 1 ]]; then
   exit 0
 fi
 
-if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Update .sops.yaml and rekey the listed secrets?"; then
+if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Update policy and rekey the listed secrets?"; then
   printf 'Aborted.\n'
   exit 1
 fi
 
-secrets_update_key_alias_recipient "${operator_alias}" "${target_operator_recipient}"
-printf '\nUpdated .sops.yaml operator recipient.\n'
+secrets_update_policy_operator_recipient "${target_operator_recipient}"
+secrets_sync_sops_config
+printf '\nUpdated policy and regenerated .sops.yaml operator recipients.\n'
 
 for candidate in "${SECRETS_RELEVANT_SECRETS[@]}"; do
   printf 'Rekeying %s\n' "${candidate#${SECRETS_REPO_ROOT}/}"
@@ -238,5 +240,5 @@ if [[ -n "${target_operator_key_file}" ]]; then
 else
   printf '\nRecovered operator access metadata.\n'
   printf 'Validation still needs to run on the destination machine with the target private key:\n'
-  printf '  scripts/secrets validate --actor operator --host %s\n' "${host_name}"
+  printf '  scripts/secrets validate-access --actor operator --host %s\n' "${host_name}"
 fi

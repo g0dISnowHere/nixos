@@ -8,6 +8,10 @@ SECRETS_REPO_ROOT="$(cd "${SECRETS_SCRIPT_DIR}/.." && pwd)"
 SECRETS_SOPS_CONFIG="${SECRETS_REPO_ROOT}/.sops.yaml"
 SECRETS_HOST_KEY_FILE="/var/lib/sops-nix/key.txt"
 SECRETS_OPERATOR_KEY_FILE="${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
+SECRETS_ALLOW_SUDO_PROMPT="${SECRETS_ALLOW_SUDO_PROMPT:-0}"
+
+# shellcheck source=policy.sh
+source "${SECRETS_LIB_DIR}/policy.sh"
 
 secrets_require_command() {
   local cmd="$1"
@@ -17,14 +21,44 @@ secrets_require_command() {
   fi
 }
 
+secrets_sudo_read() {
+  if [[ "${SECRETS_ALLOW_SUDO_PROMPT}" -eq 1 ]]; then
+    sudo "$@"
+  else
+    sudo -n "$@" 2>/dev/null
+  fi
+}
+
+secrets_capture_public_key() {
+  local key_file="$1"
+  local output=""
+
+  SECRETS_LAST_KEY_READ_MODE="none"
+  SECRETS_LAST_PUBLIC_KEY=""
+
+  if [[ -r "${key_file}" ]]; then
+    output="$(grep '^# public key:' "${key_file}" | awk '{print $4}' | head -n 1)"
+    if [[ -n "${output}" ]]; then
+      SECRETS_LAST_KEY_READ_MODE="direct"
+      SECRETS_LAST_PUBLIC_KEY="${output}"
+    fi
+    return 0
+  fi
+
+  if [[ -f "${key_file}" ]]; then
+    output="$(secrets_sudo_read grep '^# public key:' "${key_file}" | awk '{print $4}' | head -n 1 || true)"
+    if [[ -n "${output}" ]]; then
+      SECRETS_LAST_KEY_READ_MODE="elevated"
+      SECRETS_LAST_PUBLIC_KEY="${output}"
+    fi
+  fi
+}
+
 secrets_read_public_key() {
   local key_file="$1"
 
-  if [[ -r "${key_file}" ]]; then
-    grep '^# public key:' "${key_file}" | awk '{print $4}' | head -n 1
-  elif [[ -f "${key_file}" ]]; then
-    sudo -n grep '^# public key:' "${key_file}" 2>/dev/null | awk '{print $4}' | head -n 1
-  fi
+  secrets_capture_public_key "${key_file}"
+  printf '%s\n' "${SECRETS_LAST_PUBLIC_KEY}"
 }
 
 secrets_read_public_keys() {
@@ -35,97 +69,30 @@ secrets_read_public_keys() {
   fi
 }
 
-secrets_config_host_recipient() {
-  local host_name="$1"
-
-  python3 - "${SECRETS_SOPS_CONFIG}" "${host_name}" <<'PY'
-import re
-import sys
-
-path, host = sys.argv[1], sys.argv[2]
-pattern = re.compile(rf"^(\s*-\s*&{re.escape(host)}\s+)(age1[0-9a-z]+)\s*$")
-
-with open(path, "r", encoding="utf-8") as fh:
-    for line in fh:
-        match = pattern.match(line)
-        if match:
-            print(match.group(2))
-            raise SystemExit(0)
-
-raise SystemExit(1)
-PY
+secrets_operator_alias() {
+  secrets_policy_tool get-operator-alias
 }
 
-secrets_first_key_alias() {
-  python3 - "${SECRETS_SOPS_CONFIG}" <<'PY'
-import re
-import sys
+secrets_operator_recipients() {
+  secrets_policy_tool get-operator-recipients
+}
 
-path = sys.argv[1]
-pattern = re.compile(r"^\s*-\s*&([A-Za-z0-9_-]+)\s+age1[0-9a-z]+\s*$")
-
-with open(path, "r", encoding="utf-8") as fh:
-    for line in fh:
-        match = pattern.match(line)
-        if match:
-            print(match.group(1))
-            raise SystemExit(0)
-
-raise SystemExit(1)
-PY
+secrets_config_host_recipient() {
+  local host_name="$1"
+  secrets_policy_tool get-host-recipient --host "${host_name}" 2>/dev/null || true
 }
 
 secrets_list_key_aliases() {
-  python3 - "${SECRETS_SOPS_CONFIG}" <<'PY'
-import re
-import sys
+  local operator_alias
 
-path = sys.argv[1]
-pattern = re.compile(r"^\s*-\s*&([A-Za-z0-9_-]+)\s+age1[0-9a-z]+\s*$")
-
-with open(path, "r", encoding="utf-8") as fh:
-    for line in fh:
-        match = pattern.match(line)
-        if match:
-            print(match.group(1))
-PY
-}
-
-secrets_update_key_alias_recipient() {
-  local alias_name="$1"
-  local recipient="$2"
-
-  python3 - "${SECRETS_SOPS_CONFIG}" "${alias_name}" "${recipient}" <<'PY'
-import re
-import sys
-
-path, alias_name, recipient = sys.argv[1:4]
-pattern = re.compile(rf"^(\s*-\s*&{re.escape(alias_name)}\s+)(age1[0-9a-z]+)\s*$", re.M)
-
-with open(path, "r", encoding="utf-8") as fh:
-    content = fh.read()
-
-updated, count = pattern.subn(rf"\1{recipient}", content, count=1)
-if count != 1:
-    raise SystemExit(f"missing alias: {alias_name}")
-
-with open(path, "w", encoding="utf-8") as fh:
-    fh.write(updated)
-PY
+  operator_alias="$(secrets_operator_alias)"
+  printf '%s\n' "${operator_alias}"
+  secrets_policy_tool list-hosts
 }
 
 secrets_list_relevant_files() {
   local host_name="$1"
-
-  {
-    find "${SECRETS_REPO_ROOT}/secrets/users" -type f -name '*.yaml' 2>/dev/null
-    find "${SECRETS_REPO_ROOT}/secrets/services/shared" -type f \
-      \( -name '*.yaml' -o -name '*.json' -o -name '*.env' -o -name '*.ini' \) \
-      ! -name '*.example' 2>/dev/null
-    find "${SECRETS_REPO_ROOT}/secrets/machines/${host_name}" -type f \
-      \( -name '*.yaml' -o -name '*.json' -o -name '*.env' -o -name '*.ini' \) \
-      2>/dev/null
-  } | sort -u
+  secrets_policy_tool list-relevant-files --repo-root "${SECRETS_REPO_ROOT}" --host "${host_name}"
 }
 
 secrets_list_secret_recipients() {
@@ -158,17 +125,6 @@ secrets_can_decrypt_with_key() {
   SOPS_AGE_KEY_FILE="${key_file}" sops --decrypt "${secret_file}" >/dev/null 2>&1
 }
 
-secrets_ensure_operator_access() {
-  local key_file="$1"
-  local secret_file="$2"
-
-  if ! secrets_can_decrypt_with_key "${key_file}" "${secret_file}"; then
-    printf 'Cannot decrypt %s with operator key %s\n' \
-      "${secret_file#${SECRETS_REPO_ROOT}/}" "${key_file}" >&2
-    return 1
-  fi
-}
-
 secrets_collect_failed_decrypts() {
   local key_file="$1"
   shift
@@ -184,99 +140,37 @@ secrets_collect_failed_decrypts() {
   printf '%s\n' "${failed[@]:-}"
 }
 
-secrets_add_host_to_config() {
+secrets_validate_policy_json() {
+  secrets_policy_tool validate --repo-root "${SECRETS_REPO_ROOT}"
+}
+
+secrets_update_policy_host_recipient() {
   local host_name="$1"
   local recipient="$2"
-  local operator_alias="$3"
+  local create_flag="${3:-0}"
+  local args=(
+    "${SECRETS_POLICY_TOOL}"
+    set-host-recipient
+    --policy-file "${SECRETS_POLICY_FILE}"
+    --host "${host_name}"
+    --recipient "${recipient}"
+  )
 
-  python3 - "${SECRETS_SOPS_CONFIG}" "${host_name}" "${recipient}" "${operator_alias}" <<'PY'
-import sys
+  if [[ "${create_flag}" -eq 1 ]]; then
+    args+=(--create)
+  fi
 
-path, host, recipient, operator_alias = sys.argv[1:5]
+  python3 "${args[@]}"
+  unset SECRETS_POLICY_JSON
+}
 
-with open(path, "r", encoding="utf-8") as fh:
-    lines = fh.readlines()
-
-host_anchor = f"          - *{host}\n"
-operator_anchor = f"          - *{operator_alias}\n"
-host_key_line = f"  - &{host} {recipient}\n"
-machine_rule = f"  - path_regex: ^secrets/machines/{host}/.*\\.(yaml|json|env|ini)$\n"
-
-if any(line.startswith(f"  - &{host} ") for line in lines):
-    raise SystemExit("host alias already exists")
-
-creation_idx = None
-for idx, line in enumerate(lines):
-    if line.startswith("creation_rules:"):
-      creation_idx = idx
-      break
-
-if creation_idx is None:
-    raise SystemExit("missing creation_rules section")
-
-insert_key_at = creation_idx
-while insert_key_at > 0 and lines[insert_key_at - 1].startswith("  - &"):
-    insert_key_at -= 1
-last_key_idx = creation_idx
-for idx in range(insert_key_at, creation_idx):
-    if lines[idx].startswith("  - &"):
-        last_key_idx = idx + 1
-
-lines.insert(last_key_idx, host_key_line)
-
-def find_rule_index(prefix):
-    for idx, line in enumerate(lines):
-        if line.strip() == f"- path_regex: {prefix}":
-            return idx
-    return None
-
-def add_alias_to_rule(path_regex, alias):
-    rule_idx = find_rule_index(path_regex)
-    if rule_idx is None:
-        raise SystemExit(f"missing rule: {path_regex}")
-    next_rule = len(lines)
-    for idx in range(rule_idx + 1, len(lines)):
-        if lines[idx].startswith("  - path_regex:"):
-            next_rule = idx
-            break
-
-    anchor_line = f"          - *{alias}\n"
-    if anchor_line in lines[rule_idx:next_rule]:
-        return
-
-    insert_at = None
-    for idx in range(rule_idx + 1, next_rule):
-        if lines[idx].startswith("          - *"):
-            insert_at = idx + 1
-
-    if insert_at is None:
-        raise SystemExit(f"missing age list for rule: {path_regex}")
-
-    lines.insert(insert_at, anchor_line)
-
-add_alias_to_rule(r"^secrets/users/djoolz/.*\.yaml$", host)
-add_alias_to_rule(r"^secrets/services/shared/.*\.(yaml|json|env|ini)$", host)
-
-machine_idx = find_rule_index(rf"^secrets/machines/{host}/.*\.(yaml|json|env|ini)$")
-if machine_idx is None:
-    shared_idx = find_rule_index(r"^secrets/services/shared/.*\.(yaml|json|env|ini)$")
-    if shared_idx is None:
-        raise SystemExit("missing shared services rule")
-    block = [
-        machine_rule,
-        "    key_groups:\n",
-        "      - age:\n",
-        operator_anchor,
-        host_anchor,
-    ]
-    lines[shared_idx:shared_idx] = block
-else:
-    add_alias_to_rule(rf"^secrets/machines/{host}/.*\.(yaml|json|env|ini)$", operator_alias)
-    add_alias_to_rule(rf"^secrets/machines/{host}/.*\.(yaml|json|env|ini)$", host)
-
-with open(path, "w", encoding="utf-8") as fh:
-    fh.writelines(lines)
-PY
+secrets_update_policy_operator_recipient() {
+  local recipient="$1"
+  python3 "${SECRETS_POLICY_TOOL}" \
+    set-operator-recipient \
+    --policy-file "${SECRETS_POLICY_FILE}" \
+    --recipient "${recipient}"
+  unset SECRETS_POLICY_JSON
 }
 
 secrets_inspect_state() {
@@ -284,12 +178,16 @@ secrets_inspect_state() {
   local operator_failures=()
   local host_failures=()
   local secret_file=""
+  local policy_validation_json=""
 
-  for cmd in awk find grep hostname python3 sops sort sudo; do
+  for cmd in awk find grep hostname nix python3 sops sort sudo; do
     secrets_require_command "${cmd}"
   done
 
+  secrets_load_policy_json
+
   SECRETS_HOST_NAME="${host_name}"
+  SECRETS_OPERATOR_ALIAS="$(secrets_operator_alias)"
   SECRETS_RELEVANT_SECRETS=()
   mapfile -t SECRETS_RELEVANT_SECRETS < <(secrets_list_relevant_files "${host_name}")
   SECRETS_RELEVANT_SECRET_COUNT="${#SECRETS_RELEVANT_SECRETS[@]}"
@@ -298,49 +196,106 @@ secrets_inspect_state() {
     mapfile -t SECRETS_RELEVANT_RECIPIENTS < <(secrets_list_secret_recipients "${SECRETS_RELEVANT_SECRETS[@]}")
   fi
 
+  SECRETS_POLICY_ERRORS=()
+  if policy_validation_json="$(secrets_validate_policy_json 2>/dev/null || true)"; then
+    :
+  fi
+  if [[ -n "${policy_validation_json}" ]]; then
+    mapfile -t SECRETS_POLICY_ERRORS < <(
+      python3 - "${policy_validation_json}" <<'PY'
+import json
+import sys
+
+payload = json.loads(sys.argv[1])
+for error in payload.get("errors", []):
+    print(error)
+PY
+    )
+  fi
+  SECRETS_POLICY_ERROR_COUNT="${#SECRETS_POLICY_ERRORS[@]}"
+
+  SECRETS_POLICY_DRIFT=0
+  if [[ -f "${SECRETS_SOPS_CONFIG}" ]]; then
+    if [[ "$(secrets_render_sops_config)" != "$(cat "${SECRETS_SOPS_CONFIG}")" ]]; then
+      SECRETS_POLICY_DRIFT=1
+    fi
+  else
+    SECRETS_POLICY_DRIFT=1
+  fi
+
   SECRETS_OPERATOR_KEY_EXISTS=0
+  SECRETS_OPERATOR_KEY_PRESENCE_STATUS="missing"
+  SECRETS_OPERATOR_KEY_INSPECTION_STATUS="unavailable"
   SECRETS_OPERATOR_KEY_STATUS="missing"
   SECRETS_OPERATOR_PUBLIC_KEYS=""
   if [[ -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
     SECRETS_OPERATOR_KEY_EXISTS=1
+    SECRETS_OPERATOR_KEY_PRESENCE_STATUS="present"
+    SECRETS_OPERATOR_KEY_INSPECTION_STATUS="readable"
     SECRETS_OPERATOR_KEY_STATUS="readable"
     SECRETS_OPERATOR_PUBLIC_KEYS="$(secrets_read_public_keys "${SECRETS_OPERATOR_KEY_FILE}" | paste -sd ', ' -)"
+  elif [[ -f "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
+    SECRETS_OPERATOR_KEY_EXISTS=1
+    SECRETS_OPERATOR_KEY_PRESENCE_STATUS="present"
+    SECRETS_OPERATOR_KEY_INSPECTION_STATUS="unreadable"
+    SECRETS_OPERATOR_KEY_STATUS="present but unreadable"
   fi
 
   SECRETS_HOST_KEY_EXISTS=0
+  SECRETS_HOST_KEY_PRESENCE_STATUS="missing"
+  SECRETS_HOST_KEY_INSPECTION_STATUS="unavailable"
   SECRETS_HOST_KEY_STATUS="missing"
   SECRETS_HOST_PUBLIC_KEY=""
+  SECRETS_LAST_PUBLIC_KEY=""
   if [[ -f "${SECRETS_HOST_KEY_FILE}" ]]; then
     SECRETS_HOST_KEY_EXISTS=1
+    SECRETS_HOST_KEY_PRESENCE_STATUS="present"
     if [[ -r "${SECRETS_HOST_KEY_FILE}" ]]; then
+      SECRETS_HOST_KEY_INSPECTION_STATUS="direct"
       SECRETS_HOST_KEY_STATUS="readable"
     else
+      SECRETS_HOST_KEY_INSPECTION_STATUS="direct access unavailable"
       SECRETS_HOST_KEY_STATUS="present but unreadable"
     fi
-    SECRETS_HOST_PUBLIC_KEY="$(secrets_read_public_key "${SECRETS_HOST_KEY_FILE}" || true)"
+    secrets_capture_public_key "${SECRETS_HOST_KEY_FILE}"
+    SECRETS_HOST_PUBLIC_KEY="${SECRETS_LAST_PUBLIC_KEY}"
+    case "${SECRETS_LAST_KEY_READ_MODE}" in
+      direct)
+        SECRETS_HOST_KEY_INSPECTION_STATUS="direct"
+        ;;
+      elevated)
+        SECRETS_HOST_KEY_INSPECTION_STATUS="elevated-only"
+        ;;
+      *)
+        ;;
+    esac
   fi
 
   SECRETS_HOST_ALIAS_EXISTS=0
   SECRETS_CONFIGURED_HOST_RECIPIENT=""
-  if [[ -f "${SECRETS_SOPS_CONFIG}" ]]; then
-    if SECRETS_CONFIGURED_HOST_RECIPIENT="$(secrets_config_host_recipient "${host_name}" 2>/dev/null || true)"; then
-      if [[ -n "${SECRETS_CONFIGURED_HOST_RECIPIENT}" ]]; then
-        SECRETS_HOST_ALIAS_EXISTS=1
-      fi
+  if SECRETS_CONFIGURED_HOST_RECIPIENT="$(secrets_config_host_recipient "${host_name}")"; then
+    if [[ -n "${SECRETS_CONFIGURED_HOST_RECIPIENT}" ]]; then
+      SECRETS_HOST_ALIAS_EXISTS=1
     fi
   fi
 
+  SECRETS_HOST_RECIPIENT_MATCH_STATUS="unknown"
   SECRETS_HOST_RECIPIENT_MATCHES=0
   if [[ -n "${SECRETS_HOST_PUBLIC_KEY}" && -n "${SECRETS_CONFIGURED_HOST_RECIPIENT}" \
     && "${SECRETS_HOST_PUBLIC_KEY}" == "${SECRETS_CONFIGURED_HOST_RECIPIENT}" ]]; then
+    SECRETS_HOST_RECIPIENT_MATCH_STATUS="yes"
     SECRETS_HOST_RECIPIENT_MATCHES=1
+  elif [[ -n "${SECRETS_HOST_PUBLIC_KEY}" && -n "${SECRETS_CONFIGURED_HOST_RECIPIENT}" ]]; then
+    SECRETS_HOST_RECIPIENT_MATCH_STATUS="no"
   fi
 
   SECRETS_OPERATOR_CAN_DECRYPT=0
+  SECRETS_OPERATOR_KEY_DECRYPT_STATUS="unavailable"
   SECRETS_OPERATOR_DECRYPT_STATUS="skipped"
   if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -eq 1 ]]; then
     if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
       SECRETS_OPERATOR_CAN_DECRYPT=1
+      SECRETS_OPERATOR_KEY_DECRYPT_STATUS="ok"
       SECRETS_OPERATOR_DECRYPT_STATUS="no relevant secrets"
     else
       for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
@@ -350,21 +305,26 @@ secrets_inspect_state() {
       done
       if [[ "${#operator_failures[@]}" -eq 0 ]]; then
         SECRETS_OPERATOR_CAN_DECRYPT=1
+        SECRETS_OPERATOR_KEY_DECRYPT_STATUS="ok"
         SECRETS_OPERATOR_DECRYPT_STATUS="ok"
       else
+        SECRETS_OPERATOR_KEY_DECRYPT_STATUS="failed"
         SECRETS_OPERATOR_DECRYPT_STATUS="failed (${#operator_failures[@]})"
       fi
     fi
   else
+    SECRETS_OPERATOR_KEY_DECRYPT_STATUS="unavailable"
     SECRETS_OPERATOR_DECRYPT_STATUS="operator key unavailable"
   fi
   SECRETS_OPERATOR_FAILED_SECRETS=("${operator_failures[@]}")
 
   SECRETS_HOST_CAN_DECRYPT=0
+  SECRETS_HOST_KEY_DECRYPT_STATUS="unavailable"
   SECRETS_HOST_DECRYPT_STATUS="skipped"
   if [[ "${SECRETS_HOST_KEY_EXISTS}" -eq 1 ]]; then
     if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
       SECRETS_HOST_CAN_DECRYPT=1
+      SECRETS_HOST_KEY_DECRYPT_STATUS="ok"
       SECRETS_HOST_DECRYPT_STATUS="no relevant secrets"
     else
       for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
@@ -374,12 +334,15 @@ secrets_inspect_state() {
       done
       if [[ "${#host_failures[@]}" -eq 0 ]]; then
         SECRETS_HOST_CAN_DECRYPT=1
+        SECRETS_HOST_KEY_DECRYPT_STATUS="ok"
         SECRETS_HOST_DECRYPT_STATUS="ok"
       else
+        SECRETS_HOST_KEY_DECRYPT_STATUS="failed"
         SECRETS_HOST_DECRYPT_STATUS="failed (${#host_failures[@]})"
       fi
     fi
   else
+    SECRETS_HOST_KEY_DECRYPT_STATUS="unavailable"
     SECRETS_HOST_DECRYPT_STATUS="host key unavailable"
   fi
   SECRETS_HOST_FAILED_SECRETS=("${host_failures[@]}")

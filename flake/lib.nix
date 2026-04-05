@@ -3,8 +3,58 @@ let
   inherit (inputs)
     nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable sops-nix
     nixpkgs-broken;
+  secretsPolicy = import (builtins.path {
+    path = ./secrets-policy.nix;
+    name = "secrets-policy.nix";
+  });
+  sort = builtins.sort builtins.lessThan;
+  hostNames = sort (builtins.attrNames secretsPolicy.hosts);
+  operatorAlias = secretsPolicy.operator.alias;
+  renderAgeList = aliases:
+    builtins.concatStringsSep "\n"
+    (map (alias: "          - *${alias}") aliases);
+  renderKeyLine = alias: recipient: "  - &${alias} ${recipient}";
+  renderRule = pathRegex: aliases: ''
+      - path_regex: ${pathRegex}
+        key_groups:
+          - age:
+    ${renderAgeList aliases}
+  '';
+  renderScopedRules = scopeName: extensionPattern: scopes:
+    let names = sort (builtins.attrNames scopes);
+    in builtins.concatStringsSep "\n" (map (name:
+      let hosts = sort scopes.${name}.hosts;
+      in renderRule "^secrets/${scopeName}/${name}/.*\\.${extensionPattern}$"
+      ([ operatorAlias ] ++ hosts)) names);
+  renderSopsConfig = policy:
+    let
+      policyHostNames = sort (builtins.attrNames policy.hosts);
+      keys = [
+        (renderKeyLine policy.operator.alias
+          (builtins.head policy.operator.recipients))
+      ] ++ map (host: renderKeyLine host policy.hosts.${host}.recipient)
+        policyHostNames;
+      userRules = renderScopedRules "users" "yaml" policy.scopes.users;
+      serviceRules = renderScopedRules "services" "(yaml|json|env|ini)"
+        policy.scopes.services;
+      machineRules = builtins.concatStringsSep "\n" (map (host:
+        renderRule "^secrets/machines/${host}/.*\\.(yaml|json|env|ini)$" [
+          policy.operator.alias
+          host
+        ]) policyHostNames);
+    in builtins.concatStringsSep "\n" [
+      "keys:"
+      (builtins.concatStringsSep "\n" keys)
+      "creation_rules:"
+      userRules
+      serviceRules
+      machineRules
+      ""
+    ];
 in {
   flake.lib = {
+    inherit secretsPolicy renderSopsConfig;
+    renderedSopsConfig = renderSopsConfig secretsPolicy;
     # Helper function to create a NixOS system configuration
     # Provides consistent setup for all machines with role-based defaults
     mkNixosSystem = { system, hostname, role, desktopEnvironment ? null

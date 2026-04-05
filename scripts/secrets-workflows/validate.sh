@@ -12,12 +12,13 @@ source "${script_dir}/secrets-lib/ui.sh"
 
 usage() {
   cat <<'EOF'
-Usage: scripts/secrets validate [options]
+Usage: scripts/secrets validate-access [options]
 
 Validate operator and/or host access to the relevant secrets for a host.
 
 Options:
   --actor NAME    operator, host, or all (default: all)
+  --full-test     Allow privileged inspection checks that may prompt for sudo
   --host NAME     Override the host alias
   -h, --help      Show this help
 EOF
@@ -25,12 +26,17 @@ EOF
 
 actor="all"
 host_name="$(hostname -s)"
+full_test=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --actor)
       actor="${2:?missing value for --actor}"
       shift 2
+      ;;
+    --full-test)
+      full_test=1
+      shift
       ;;
     --host)
       host_name="${2:?missing value for --host}"
@@ -57,9 +63,13 @@ case "${actor}" in
     ;;
 esac
 
+if [[ "${full_test}" -eq 1 ]]; then
+  export SECRETS_ALLOW_SUDO_PROMPT=1
+fi
+
 secrets_inspect_state "${host_name}"
 
-secrets_ui_section "Secrets Validation"
+secrets_ui_section "Secrets Access Validation"
 secrets_ui_kv "Host alias" "${SECRETS_HOST_NAME}"
 secrets_ui_kv "Relevant secrets" "${SECRETS_RELEVANT_SECRET_COUNT}"
 printf '\n'

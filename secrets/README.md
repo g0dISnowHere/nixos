@@ -37,7 +37,7 @@ Examples:
 - `secrets/users/djoolz/...`
 - `secrets/machines/centauri/...`
 - `secrets/machines/mirach/...`
-- `secrets/services/shared/...`
+- `secrets/services/<name>/...`
 
 ## Concepts
 
@@ -68,9 +68,10 @@ Recommended: keep one operator key outside the repo at:
 ~/.config/sops/age/keys.txt
 ```
 
-If this file is missing, `sops --decrypt ...` and `scripts/validate-sops.sh`
-will fail even when the machine's `/var/lib/sops-nix/key.txt` still works for
-activation-time decryption.
+If this file is missing, operator-side decrypt commands and
+`scripts/secrets validate-access --actor operator ...` will fail even when the
+machine's `/var/lib/sops-nix/key.txt` still works for activation-time
+decryption.
 
 ### Machine sops-nix key
 
@@ -157,21 +158,21 @@ Later add more recipients for future hosts like the VPS.
 For the low-friction host registration path, use:
 
 ```bash
-scripts/register-sops-host.sh
+scripts/secrets register-host
 ```
 
-That script:
+That workflow:
 
 - infers the current host alias from `hostname -s` by default
 - reads the machine recipient from `/var/lib/sops-nix/key.txt`
-- updates only that host entry in `.sops.yaml`
-- rekeys shared user secrets, shared service secrets, and machine-local secrets
-  for that host
+- updates the host recipient in `flake/secrets-policy.nix`
+- regenerates `.sops.yaml`
+- rekeys relevant user, service, and machine-local secrets for that host
 - verifies the host can decrypt those secrets with its own `sops-nix` key
 
 Important:
 
-- `scripts/register-sops-host.sh` is not a cold-start recovery path
+- `scripts/secrets register-host` is not a cold-start recovery path
 - it uses `sops updatekeys`, so your local operator key file at
   `~/.config/sops/age/keys.txt` must already decrypt the targeted secrets
 - if your operator key has changed and no longer matches the recipients already
@@ -181,30 +182,17 @@ Important:
 Use `--dry-run` to preview and `--force-host-rotate` only when you are
 intentionally changing a host recipient.
 
-### 2. Update `.sops.yaml`
+### 2. Update policy and render `.sops.yaml`
 
-Replace the placeholders in [.sops.yaml](../.sops.yaml).
+Edit [flake/secrets-policy.nix](../flake/secrets-policy.nix), then render and
+validate the derived config:
 
-Current structure:
-
-```yaml
-keys:
-  - &djoolz age1replace...
-  - &centauri age1replace...
-  - &mirach age1replace...
+```bash
+scripts/secrets sync-policy
+scripts/secrets validate-policy
 ```
 
-Example after replacement:
-
-```yaml
-keys:
-  - &djoolz age1operatorrecipient
-  - &centauri age1centauri-sops-nix-machine-recipient
-  - &mirach age1mirach-sops-nix-machine-recipient
-```
-
-The creation rules in `.sops.yaml` determine which recipients can decrypt which
-files based on path.
+`.sops.yaml` is committed derived state and should match the rendered policy.
 
 ### 3. Create a secret file
 
@@ -213,14 +201,14 @@ Create a plaintext file in the right location first.
 Example:
 
 ```bash
-mkdir -p secrets/services/shared
-cp secrets/services/shared/example.env.example secrets/services/shared/example.env
+mkdir -p secrets/services/fleet-test
+cp secrets/services/fleet-test/example.env.example secrets/services/fleet-test/example.env
 ```
 
 Then edit it before encrypting:
 
 ```bash
-$EDITOR secrets/services/shared/example.env
+$EDITOR secrets/services/fleet-test/example.env
 ```
 
 For the shared `djoolz` login password secret, prefer the helper script instead
@@ -239,7 +227,7 @@ same script later rotates the password secret in place.
 Encrypt in place with `sops`:
 
 ```bash
-sops --encrypt --in-place secrets/services/shared/example.env
+sops --encrypt --in-place secrets/services/fleet-test/example.env
 ```
 
 If `.sops.yaml` is set correctly, `sops` will automatically pick the right
@@ -250,19 +238,19 @@ recipients from the file path.
 Use:
 
 ```bash
-sops secrets/services/shared/example.env
+sops secrets/services/fleet-test/example.env
 ```
 
 Or with an explicit editor:
 
 ```bash
-EDITOR=nano sops secrets/services/shared/example.env
+EDITOR=nano sops secrets/services/fleet-test/example.env
 ```
 
 ### 6. Decrypt temporarily for inspection
 
 ```bash
-sops --decrypt secrets/services/shared/example.env
+sops --decrypt secrets/services/fleet-test/example.env
 ```
 
 Do not commit decrypted secrets back into the repo.
@@ -271,14 +259,14 @@ Do not commit decrypted secrets back into the repo.
 
 Use these rules:
 
-- secret shared by multiple hosts: `secrets/services/shared/...`
+- secret shared by multiple hosts: `secrets/services/<name>/...`
 - secret only for `centauri`: `secrets/machines/centauri/...`
 - secret only for `mirach`: `secrets/machines/mirach/...`
 - secret shared by you and both machines: `secrets/users/djoolz/...`
 
 Examples:
 
-- Docker registry token used on both hosts: `secrets/services/shared/registry.env`
+- Docker registry token used on both hosts: `secrets/services/fleet-test/registry.env`
 - VPS-only app secret later: `secrets/machines/strato-vps/app.env`
 - machine-local backup key for `mirach`: `secrets/machines/mirach/restic.env`
 
@@ -292,7 +280,7 @@ Typical NixOS example:
 ```nix
 {
   sops.secrets."registry_env" = {
-    sopsFile = ../../secrets/services/shared/registry.env;
+    sopsFile = ../../secrets/services/fleet-test/registry.env;
     format = "dotenv";
     owner = "root";
     mode = "0400";
@@ -305,10 +293,16 @@ Then point your service at the rendered secret file path in `/run/secrets/...`.
 For file-shaped secrets like YAML, `.env`, or INI, prefer mounting or pointing
 services at the generated file rather than copying plaintext into Nix strings.
 
-For local operator-side validation, this repo also includes
-`scripts/validate-sops.sh`. It decrypts:
+For local operator-side validation, use:
 
-- `secrets/services/shared/sops-test.yaml`
+```bash
+scripts/secrets validate-policy
+scripts/secrets validate-access --actor operator --host centauri
+```
+
+The example operator validation path decrypts:
+
+- `secrets/services/fleet-test/sops-test.yaml`
 - `secrets/users/djoolz/password.yaml`
 
 and verifies the decrypted YAML contains the expected fields before any secret
@@ -317,18 +311,19 @@ is wired into a NixOS option such as `users.users.<name>.hashedPasswordFile`.
 ## Typical Workflow
 
 1. Generate recipients on each machine.
-2. Update `.sops.yaml`.
-3. Create the plaintext secret file in the correct `secrets/` path.
-4. Encrypt it with `sops --encrypt --in-place`.
-5. Reference it from a NixOS or Home Manager module.
-6. Run a fast eval:
+2. Update `flake/secrets-policy.nix`.
+3. Run `scripts/secrets sync-policy`.
+4. Create the plaintext secret file in the correct `secrets/` path.
+5. Encrypt it with `sops --encrypt --in-place`.
+6. Reference it from a NixOS or Home Manager module.
+7. Run a fast eval:
 
 ```bash
 nix eval 'path:.#nixosConfigurations.centauri.config.system.build.toplevel'
 nix eval 'path:.#nixosConfigurations.mirach.config.system.build.toplevel'
 ```
 
-7. Deploy the target host.
+8. Deploy the target host.
 
 ## Rotating Secrets
 
@@ -341,14 +336,15 @@ To rotate a secret:
 
 To rotate recipients:
 
-1. add the new recipient to `.sops.yaml`
-2. re-encrypt affected files:
+1. update `flake/secrets-policy.nix`
+2. run `scripts/secrets sync-policy`
+3. re-encrypt affected files:
 
 ```bash
-sops updatekeys --yes secrets/services/shared/example.env
+sops updatekeys --yes secrets/services/fleet-test/example.env
 ```
 
-3. remove the old recipient only after every required host or operator key has
+4. remove the old recipient only after every required host or operator key has
    been updated
 
 ## Recovery Notes
@@ -367,8 +363,8 @@ These files matter right now:
 - [scripts/ssh-pubkey-to-age.sh](../scripts/ssh-pubkey-to-age.sh)
 - [modules/nixos/system/secrets.nix](../modules/nixos/system/secrets.nix)
 
-Before real use, you still need to:
+Before broader use, you still need to:
 
-- replace placeholder recipients in `.sops.yaml`
-- create actual encrypted files under `secrets/`
+- add real named service scopes under `secrets/services/`
+- create additional encrypted files under `secrets/`
 - wire each real secret into the owning module
