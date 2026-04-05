@@ -109,6 +109,14 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+# === REGRESSION CHECKS ===
+echo ""
+if bash "$(dirname "$0")/test-system-shell-and-cli-tooling.sh"; then
+    :
+else
+    FAILED=$((FAILED + 1))
+fi
+
 # === SOPS SECRETS ===
 echo ""
 if sh "$(dirname "$0")/validate-sops.sh"; then
