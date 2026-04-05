@@ -1,146 +1,181 @@
 #!/usr/bin/env bash
-# Comprehensive validation script for NixOS flake configuration
-# Tests all machine configurations, home-manager profiles, and flake integrity
+# Comprehensive validation script for NixOS flake configuration.
 #
 # Usage:
 #   sh validate.sh              # Run validation checks
 #   sh validate.sh --dconf2nix  # Also regenerate dconf.nix from system settings
-#
-# Optional: Pass --dconf2nix to regenerate dconf.nix from current system settings
-# (requires dconf2nix: nix-shell -p dconf2nix)
+#   sh validate.sh --full-secrets
+#                             # Allow privileged local host-key inspection
 
-set -e
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# shellcheck source=secrets-lib/inspect.sh
+source "${script_dir}/secrets-lib/inspect.sh"
 
 echo "=== NixOS Flake Configuration Validation ==="
 echo ""
 
-# Check for dconf2nix argument
 REGENERATE_DCONF=0
-if [ "$1" = "--dconf2nix" ]; then
-    REGENERATE_DCONF=1
-    echo "⚠️  --dconf2nix flag detected: Will regenerate dconf.nix"
-    echo ""
-fi
+FULL_SECRETS=0
 
-# Track overall status
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dconf2nix)
+      REGENERATE_DCONF=1
+      echo "⚠️  --dconf2nix flag detected: Will regenerate dconf.nix"
+      echo ""
+      shift
+      ;;
+    --full-secrets)
+      FULL_SECRETS=1
+      shift
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
 FAILED=0
+FAILED_CHECKS=()
 
-# === DCONF2NIX (OPTIONAL) ===
-if [ $REGENERATE_DCONF -eq 1 ]; then
-    echo "Regenerating dconf.nix:"
-    DCONF_FILE="modules/home/dconf/dconf.nix"
+run_check() {
+  local description="$1"
+  shift
 
-    # Check if dconf2nix is available
-    if ! command -v dconf2nix &> /dev/null; then
-        echo "  ✗ dconf2nix not found. Install with: nix-shell -p dconf2nix"
-        FAILED=$((FAILED + 1))
-    else
-        # Save current state for comparison
-        DCONF_TEMP=$(mktemp)
-        if [ -f "$DCONF_FILE" ]; then
-            cp "$DCONF_FILE" "$DCONF_TEMP"
-        fi
+  if "$@"; then
+    return 0
+  fi
 
-        # Regenerate dconf.nix from system settings
-        dconf dump / | dconf2nix > "$DCONF_FILE"
-        echo "  ✓ Regenerated ${DCONF_FILE}"
+  echo "  ✗ ${description}"
+  FAILED=$((FAILED + 1))
+  FAILED_CHECKS+=("${description}")
+  return 0
+}
 
-        # Show diff if file existed before
-        if [ -f "$DCONF_TEMP" ]; then
-            DIFF_COUNT=$(diff "$DCONF_TEMP" "$DCONF_FILE" | wc -l)
-            if [ $DIFF_COUNT -gt 0 ]; then
-                echo "  📝 Changes detected ($DIFF_COUNT lines):"
-                diff -u "$DCONF_TEMP" "$DCONF_FILE" 2>/dev/null | head -30 || true
-                if [ $DIFF_COUNT -gt 30 ]; then
-                    echo "     ... and $(($DIFF_COUNT - 30)) more lines"
-                fi
-            else
-                echo "  ✓ No changes detected"
-            fi
-        fi
-        rm -f "$DCONF_TEMP"
-        echo ""
+if [[ "${REGENERATE_DCONF}" -eq 1 ]]; then
+  echo "Regenerating dconf.nix:"
+  dconf_file="modules/home/dconf/dconf.nix"
+
+  if ! command -v dconf2nix > /dev/null 2>&1; then
+    echo "  ✗ dconf2nix not found. Install with: nix-shell -p dconf2nix"
+    FAILED=$((FAILED + 1))
+  else
+    dconf_temp="$(mktemp)"
+    if [[ -f "${dconf_file}" ]]; then
+      cp "${dconf_file}" "${dconf_temp}"
     fi
+
+    dconf dump / | dconf2nix > "${dconf_file}"
+    echo "  ✓ Regenerated ${dconf_file}"
+
+    if [[ -f "${dconf_temp}" ]]; then
+      diff_count="$(diff "${dconf_temp}" "${dconf_file}" | wc -l || true)"
+      if [[ "${diff_count}" -gt 0 ]]; then
+        echo "  Changes detected (${diff_count} lines):"
+        diff -u "${dconf_temp}" "${dconf_file}" 2>/dev/null | head -30 || true
+        if [[ "${diff_count}" -gt 30 ]]; then
+          echo "     ... and $(("${diff_count}" - 30)) more lines"
+        fi
+      else
+        echo "  ✓ No changes detected"
+      fi
+    fi
+    rm -f "${dconf_temp}"
+    echo ""
+  fi
 fi
 
-# === FLAKE STRUCTURE ===
 echo "Flake Structure:"
 if nix flake show > /dev/null 2>&1; then
-    echo "  ✓ nix flake show succeeds"
+  echo "  ✓ nix flake show succeeds"
 else
-    echo "  ✗ nix flake show failed"
-    FAILED=$((FAILED + 1))
+  echo "  ✗ nix flake show failed"
+  FAILED=$((FAILED + 1))
 fi
 
-# === NIXOS CONFIGURATIONS ===
 echo ""
 echo "NixOS Configurations:"
 
-# Centauri
 echo "  Centauri:"
-# echo "    - hostname: $(nix eval .#nixosConfigurations.centauri.config.networking.hostName 2>/dev/null | tr -d '"')"
 echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.centauri.config.services.desktopManager.gnome.enable 2>/dev/null))"
 echo "    - docker: $(nix eval .#nixosConfigurations.centauri.config.virtualisation.docker.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
 
-# Mirach
 echo "  Mirach:"
 echo "    - hostname: $(nix eval .#nixosConfigurations.mirach.config.networking.hostName 2>/dev/null | tr -d '"')"
-# echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.mirach.config.services.desktopManager.gnome.enable 2>/dev/null))"
 echo "    - libvirtd: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.libvirtd.enable 2>/dev/null)"
 echo "    - docker: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.docker.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
 
-# STRATO VPS
 echo "  Strato VPS:"
 echo "    - hostname: $(nix eval .#nixosConfigurations.albaldah.config.networking.hostName 2>/dev/null | tr -d '"')"
 echo "    - networkmanager: $(nix eval .#nixosConfigurations.albaldah.config.networking.networkmanager.enable 2>/dev/null)"
 echo "    - tailscale: $(nix eval .#nixosConfigurations.albaldah.config.services.tailscale.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
 
-# === HOME-MANAGER CONFIGURATIONS ===
 echo ""
 echo "Home-Manager Configurations:"
-
 if nix eval ".#homeConfigurations.\"djoolz@workstation\".activationPackage" > /dev/null 2>&1; then
-    echo "  ✓ djoolz@workstation evaluates"
+  echo "  ✓ djoolz@workstation evaluates"
 else
-    echo "  ✗ djoolz@workstation failed"
-    FAILED=$((FAILED + 1))
+  echo "  ✗ djoolz@workstation failed"
+  FAILED=$((FAILED + 1))
 fi
 
-# === REGRESSION CHECKS ===
 echo ""
 if bash "$(dirname "$0")/test-system-shell-and-cli-tooling.sh"; then
-    :
+  :
 else
-    FAILED=$((FAILED + 1))
+  FAILED=$((FAILED + 1))
 fi
 
-# === SOPS SECRETS ===
 echo ""
-if sh "$(dirname "$0")/validate-sops.sh"; then
-    :
-else
-    FAILED=$((FAILED + 1))
+echo "Secrets Policy:"
+run_check "scripts/secrets validate-policy failed" \
+  bash "${script_dir}/secrets" validate-policy
+run_check "scripts/secrets sync-policy --check failed" \
+  bash "${script_dir}/secrets" sync-policy --check
+
+echo ""
+echo "Secrets Access:"
+secrets_load_policy_json
+mapfile -t policy_hosts < <(secrets_policy_tool list-hosts)
+validate_access_args=()
+if [[ "${FULL_SECRETS}" -eq 1 ]]; then
+  validate_access_args+=(--full-test)
 fi
 
-# === FLAKE CHECKS ===
-# echo ""
-# echo "Flake Checks:"
-# if nix flake check 2>&1 | grep -q "All checks passed\|warning:"; then
-#     echo "  ✓ nix flake check passes"
-# else
-#     echo "  ✗ nix flake check failed"
-#     FAILED=$((FAILED + 1))
-# fi
-
-# === SUMMARY ===
-echo ""
-if [ $FAILED -eq 0 ]; then
-    echo "=== ✓ All Validation Tests Passed ==="
-    exit 0
+if [[ "${#policy_hosts[@]}" -eq 0 ]]; then
+  echo "  ✗ No hosts defined in flake/secrets-policy.nix"
+  FAILED=$((FAILED + 1))
 else
-    echo "=== ✗ Validation Failed ($FAILED tests) ==="
-    exit 1
+  for host_name in "${policy_hosts[@]}"; do
+    echo "  Operator access for ${host_name}:"
+    run_check "operator access validation failed for ${host_name}" \
+      bash "${script_dir}/secrets" validate-access "${validate_access_args[@]}" --actor operator --host "${host_name}"
+  done
+fi
+
+current_host="$(hostname -s)"
+if printf '%s\n' "${policy_hosts[@]:-}" | grep -Fxq "${current_host}"; then
+  echo "  Local host access for ${current_host}:"
+  run_check "local host access validation failed for ${current_host}" \
+    bash "${script_dir}/secrets" validate-access "${validate_access_args[@]}" --actor host --host "${current_host}"
+else
+  echo "  Local host access: skipped (${current_host} is not in flake/secrets-policy.nix)"
+fi
+
+echo ""
+if [[ "${FAILED}" -eq 0 ]]; then
+  echo "=== ✓ All Validation Tests Passed ==="
+  exit 0
+else
+  echo "Failed checks:"
+  printf '  - %s\n' "${FAILED_CHECKS[@]}"
+  echo "=== ✗ Validation Failed (${FAILED} tests) ==="
+  exit 1
 fi

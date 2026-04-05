@@ -141,6 +141,9 @@
             ],
             "right": [
                 {
+                    "id": "plugin:clipper"
+                },
+                {
                     "defaultSettings": {
                         "arrowType": "caret",
                         "byteThresholdActive": 1024,
@@ -164,16 +167,6 @@
                     "id": "Tray",
                     "pinned": [
                     ]
-                },
-                {
-                    "defaultSettings": {
-                        "enableTodoIntegration": false,
-                        "notecardsEnabled": true,
-                        "pincardsEnabled": true,
-                        "position": "Bottom",
-                        "showCloseButton": false
-                    },
-                    "id": "plugin:clipper"
                 },
                 {
                     "defaultSettings": {
@@ -322,12 +315,6 @@
                 },
                 {
                     "defaultSettings": {
-                        "chargeThreshold": 80
-                    },
-                    "id": "plugin:battery-threshold"
-                },
-                {
-                    "defaultSettings": {
                         "mode": "region"
                     },
                     "id": "plugin:screenshot"
@@ -379,6 +366,10 @@
                     "icon": "noctalia",
                     "id": "ControlCenter",
                     "useDistroLogo": false
+                },
+                {
+                    "iconColor": "error",
+                    "id": "SessionMenu"
                 }
             ]
         }
@@ -475,7 +466,7 @@
         }
     },
     "desktopWidgets": {
-        "enabled": false,
+        "enabled": true,
         "gridSnap": false,
         "monitorWidgets": [
         ]

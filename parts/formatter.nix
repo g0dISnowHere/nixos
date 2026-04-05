@@ -17,6 +17,7 @@
       };
 
       settings.global.excludes = [
+        ".sops.yaml"
         "modules/home/dconf/dconf.nix"
         "machines/*/facts/*"
         "old-machines/*/facts/*"

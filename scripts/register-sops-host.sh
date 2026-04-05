@@ -2,45 +2,25 @@
 
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# shellcheck source=secrets-lib/inspect.sh
+source "${script_dir}/secrets-lib/inspect.sh"
+
 usage() {
   cat <<'EOF'
 Usage: scripts/register-sops-host.sh [options]
 
-Register or refresh the current host's sops-nix machine recipient in .sops.yaml,
-rekey the relevant secrets, and verify the host can decrypt them.
+Rekey the selected host's relevant secrets from policy and verify host access.
 
 Options:
-  --host NAME               Override the host alias in .sops.yaml
+  --host NAME               Override the host alias in flake/secrets-policy.nix
   --dry-run                 Show what would change without writing
   --force-host-rotate       Allow changing an existing host recipient
   -h, --help                Show this help
-
-The script only updates the selected host entry in .sops.yaml. It does not
-modify operator recipients or SSH keys.
 EOF
 }
 
-require_command() {
-  local cmd="$1"
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    printf '%s is required but not on PATH\n' "$cmd" >&2
-    exit 1
-  fi
-}
-
-read_host_public_key() {
-  local key_file="$1"
-
-  if [[ -r "${key_file}" ]]; then
-    grep '^# public key:' "${key_file}" | awk '{print $4}'
-  else
-    sudo grep '^# public key:' "${key_file}" | awk '{print $4}'
-  fi
-}
-
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-sops_config="${repo_root}/.sops.yaml"
-host_key_file="/var/lib/sops-nix/key.txt"
 host_name="$(hostname -s)"
 dry_run=0
 force_host_rotate=0
@@ -71,123 +51,66 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-for cmd in hostname grep find sort sops python3 sudo awk; do
-  require_command "$cmd"
-done
+secrets_inspect_state "${host_name}"
 
-if [[ ! -f "${host_key_file}" ]]; then
-  printf 'Missing host sops-nix key: %s\n' "${host_key_file}" >&2
+if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 ]]; then
+  printf 'Host %s is missing from flake/secrets-policy.nix\n' "${host_name}" >&2
   exit 1
 fi
 
-if [[ ! -f "${sops_config}" ]]; then
-  printf 'Missing sops config: %s\n' "${sops_config}" >&2
+if [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 ]]; then
+  printf 'Missing host sops-nix key: %s\n' "${SECRETS_HOST_KEY_FILE}" >&2
   exit 1
 fi
 
-new_recipient="$(read_host_public_key "${host_key_file}")"
-if [[ -z "${new_recipient}" ]]; then
-  printf 'Could not read host recipient from %s\n' "${host_key_file}" >&2
+if [[ "${SECRETS_HOST_RECIPIENT_MATCHES}" -ne 1 && "${force_host_rotate}" -ne 1 ]]; then
+  printf 'Host recipient mismatch detected.\n' >&2
+  printf 'Refusing to proceed without --force-host-rotate.\n' >&2
   exit 1
 fi
 
-current_recipient="$(python3 - "${sops_config}" "${host_name}" <<'PY'
-import re
-import sys
+if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -gt 0 ]]; then
+  if [[ ! -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
+    printf 'Missing readable operator key file: %s\n' "${SECRETS_OPERATOR_KEY_FILE}" >&2
+    exit 1
+  fi
 
-path, host = sys.argv[1], sys.argv[2]
-pattern = re.compile(rf"^(\s*-\s*&{re.escape(host)}\s+)(age1[0-9a-z]+)\s*$")
-
-with open(path, "r", encoding="utf-8") as fh:
-    for line in fh:
-        match = pattern.match(line)
-        if match:
-            print(match.group(2))
-            raise SystemExit(0)
-
-raise SystemExit(1)
-PY
-)" || {
-  printf 'Host alias not found in .sops.yaml: %s\n' "${host_name}" >&2
-  exit 1
-}
+  if [[ "${SECRETS_OPERATOR_CAN_DECRYPT}" -ne 1 ]]; then
+    printf 'The operator key cannot decrypt the current target secrets.\n' >&2
+    if [[ "${#SECRETS_OPERATOR_FAILED_SECRETS[@]}" -gt 0 ]]; then
+      printf 'Blocked files:\n' >&2
+      printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#${SECRETS_REPO_ROOT}/}" >&2
+    fi
+    exit 1
+  fi
+fi
 
 printf 'Host alias: %s\n' "${host_name}"
-printf 'Current recipient: %s\n' "${current_recipient}"
-printf 'Host key recipient: %s\n' "${new_recipient}"
-
-if [[ "${current_recipient}" != "${new_recipient}" && "${force_host_rotate}" -ne 1 ]]; then
-  printf '\nHost recipient mismatch detected.\n' >&2
-  printf 'Refusing to rewrite .sops.yaml without --force-host-rotate.\n' >&2
-  exit 1
-fi
-
-mapfile -t secret_files < <(
-  {
-    find "${repo_root}/secrets/users" -type f -name '*.yaml' 2>/dev/null
-    find "${repo_root}/secrets/services/shared" -type f \
-      \( -name '*.yaml' -o -name '*.json' -o -name '*.env' -o -name '*.ini' \) \
-      ! -name '*.example' 2>/dev/null
-    find "${repo_root}/secrets/machines/${host_name}" -type f \
-      \( -name '*.yaml' -o -name '*.json' -o -name '*.env' -o -name '*.ini' \) \
-      2>/dev/null
-  } | sort -u
-)
-
+printf 'Configured recipient: %s\n' "${SECRETS_CONFIGURED_HOST_RECIPIENT}"
+printf 'Host key recipient: %s\n' "${SECRETS_HOST_PUBLIC_KEY}"
 printf '\nSecrets to rekey and verify:\n'
-if [[ "${#secret_files[@]}" -eq 0 ]]; then
+if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
   printf '  (none)\n'
 else
-  printf '  %s\n' "${secret_files[@]#${repo_root}/}"
+  printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
 fi
 
 if [[ "${dry_run}" -eq 1 ]]; then
-  if [[ "${current_recipient}" != "${new_recipient}" ]]; then
-    printf '\nWould update .sops.yaml: &%s -> %s\n' "${host_name}" "${new_recipient}"
-  else
-    printf '\n.sops.yaml already matches the host key.\n'
+  if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -gt 0 ]]; then
+    printf '\nWould run sops updatekeys on the listed secrets.\n'
+    printf 'Would verify host decryption with SOPS_AGE_KEY_FILE=%s.\n' "${SECRETS_HOST_KEY_FILE}"
   fi
-
-  if [[ "${#secret_files[@]}" -gt 0 ]]; then
-    printf 'Would run sops updatekeys on the listed secrets.\n'
-    printf 'Would verify host decryption with SOPS_AGE_KEY_FILE=%s.\n' "${host_key_file}"
-  fi
-
   exit 0
 fi
 
-if [[ "${current_recipient}" != "${new_recipient}" ]]; then
-  python3 - "${sops_config}" "${host_name}" "${new_recipient}" <<'PY'
-import re
-import sys
-
-path, host, recipient = sys.argv[1], sys.argv[2], sys.argv[3]
-pattern = re.compile(rf"^(\s*-\s*&{re.escape(host)}\s+)(age1[0-9a-z]+)\s*$")
-
-with open(path, "r", encoding="utf-8") as fh:
-    content = fh.read()
-
-updated, count = pattern.subn(rf"\1{recipient}", content, count=1)
-if count != 1:
-    raise SystemExit(1)
-
-with open(path, "w", encoding="utf-8") as fh:
-    fh.write(updated)
-PY
-
-  printf '\nUpdated .sops.yaml for %s.\n' "${host_name}"
-else
-  printf '\n.sops.yaml already matches the host key.\n'
-fi
-
-for secret_file in "${secret_files[@]}"; do
-  printf 'Rekeying %s\n' "${secret_file#${repo_root}/}"
-  sops updatekeys --yes "${secret_file}"
+for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
+  printf 'Rekeying %s\n' "${secret_file#${SECRETS_REPO_ROOT}/}"
+  SOPS_AGE_KEY_FILE="${SECRETS_OPERATOR_KEY_FILE}" sops updatekeys --yes "${secret_file}"
 done
 
-for secret_file in "${secret_files[@]}"; do
-  printf 'Verifying decrypt %s\n' "${secret_file#${repo_root}/}"
-  SOPS_AGE_KEY_FILE="${host_key_file}" sops --decrypt "${secret_file}" >/dev/null
+for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
+  printf 'Verifying decrypt %s\n' "${secret_file#${SECRETS_REPO_ROOT}/}"
+  SOPS_AGE_KEY_FILE="${SECRETS_HOST_KEY_FILE}" sops --decrypt "${secret_file}" >/dev/null
 done
 
 printf '\nHost secret registration succeeded for %s.\n' "${host_name}"

@@ -25,10 +25,10 @@ echo ""
 
 # Test validation script
 echo "🧪 Testing validation script..."
-if sh validate.sh > /dev/null 2>&1; then
-    echo "   ✓ Validation script works"
+if sh scripts/validate-fast.sh > /dev/null 2>&1; then
+    echo "   ✓ Fast validation script works"
 else
-    echo "   ⚠️  Validation script failed (this may be okay if you haven't set up hardware yet)"
+    echo "   ⚠️  Fast validation script failed (this may be okay if you haven't set up hardware yet)"
 fi
 echo ""
 

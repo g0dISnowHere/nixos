@@ -6,3 +6,4 @@ dotfiles/modules/ui/noctalia/colors.json
 .devenv/
 .codex
 .direnv/
+__pycache__

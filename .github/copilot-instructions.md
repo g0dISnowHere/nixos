@@ -18,3 +18,6 @@ is only a short companion mirror.
 - `AGENTS.md` is the AI source of truth.
 - Quick lookup docs live under `docs/reference/`.
 - Incubator material belongs in `docs/findings/` or `docs/future-ideas/`.
+- Subtree-local AI docs may exist for scoped implementation guidance only; when
+  working under `scripts/`, also review [`scripts/README.md`](../scripts/README.md)
+  and [`scripts/README_FOR_AI.md`](../scripts/README_FOR_AI.md).
