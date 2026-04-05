@@ -1,8 +1,10 @@
 {
   operator = {
     alias = "djoolz";
-    recipients =
-      [ "age10k89krww75k7jp09atly6xay636673nwy66kwv5s3epupf4zl3lser84gy" ];
+    recipients = [
+      "age10k89krww75k7jp09atly6xay636673nwy66kwv5s3epupf4zl3lser84gy"
+      "age1x6l976f6qfq55gfw05qju3vegaa56q43d78mjmmzkv3qgc4z8ahqn9uz39"
+    ];
   };
 
   hosts = {
