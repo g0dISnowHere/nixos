@@ -1,12 +1,31 @@
 { pkgs, ... }: {
   # Shared interactive shell defaults belong at the system layer so headless
   # machines get the same baseline even without Home Manager.
-  environment.systemPackages =
-    with pkgs; [ bat eza fd fzf mosh ripgrep tmux tree which zellij zoxide ];
+  environment.systemPackages = with pkgs; [
+    bat
+    direnv
+    eza
+    fd
+    fzf
+    mosh
+    ripgrep
+    tmux
+    tree
+    which
+    zellij
+    zoxide
+  ];
 
   users.defaultUserShell = pkgs.zsh;
 
   programs = {
+    direnv = {
+      enable = true;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
+      nix-direnv.enable = true;
+    };
+
     fzf = {
       fuzzyCompletion = true;
       keybindings = true;

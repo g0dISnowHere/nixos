@@ -1,0 +1,37 @@
+{ pkgs, ... }: {
+  environment.systemPackages = with pkgs; [
+    neofetch
+    zip
+    unzip
+    p7zip
+    file
+    gnupg
+    mtr
+    iperf3
+    dnsutils
+    ldns
+    aria2
+    socat
+    clinfo
+    elfinfo
+    nmap
+    ipcalc
+    btop
+    iotop
+    iftop
+    strace
+    ltrace
+    lsof
+    lm_sensors
+    pciutils
+    usbutils
+    curl
+    ncdu
+    htop
+    wget
+    traceroute
+    git
+    smartmontools
+    vim
+  ];
+}

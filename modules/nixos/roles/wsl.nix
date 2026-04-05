@@ -1,9 +1,13 @@
 { ... }: {
   imports = [
     ../system/ai-tools.nix
+    ../system/developer-tools.nix
     ../system/locale.nix
+    ../system/nix-tools.nix
     ../system/shell.nix
+    ../system/ssh-client.nix
     ../system/services.nix
+    ../system/system-utils.nix
     ../services/ssh.nix
     ../services/tailscale.nix
   ];
