@@ -69,6 +69,38 @@ secrets_read_public_keys() {
   fi
 }
 
+secrets_key_has_direct_public_key() {
+  local key_file="$1"
+  local public_key=""
+
+  if [[ ! -r "${key_file}" ]]; then
+    return 1
+  fi
+
+  public_key="$(grep '^# public key:' "${key_file}" | awk '{print $4}' | head -n 1)"
+  [[ -n "${public_key}" ]]
+}
+
+secrets_require_readable_age_identity() {
+  local key_file="$1"
+  local label="$2"
+
+  if [[ ! -e "${key_file}" ]]; then
+    printf '%s is missing: %s\n' "${label}" "${key_file}" >&2
+    return 1
+  fi
+
+  if [[ ! -r "${key_file}" ]]; then
+    printf '%s exists but is unreadable: %s\n' "${label}" "${key_file}" >&2
+    return 1
+  fi
+
+  if ! secrets_key_has_direct_public_key "${key_file}"; then
+    printf '%s is malformed or missing a public key comment: %s\n' "${label}" "${key_file}" >&2
+    return 1
+  fi
+}
+
 secrets_operator_alias() {
   secrets_policy_tool get-operator-alias
 }

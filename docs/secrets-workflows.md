@@ -79,6 +79,7 @@ This is the first-class onboarding path for a new host.
 
 Current behavior:
 
+- bootstraps the local operator age key if missing
 - reads the host recipient from `/var/lib/sops-nix/key.txt`
 - adds the host to `flake/secrets-policy.nix`
 - requires explicit user-scope membership selection
@@ -89,6 +90,8 @@ Current behavior:
 Important:
 
 - this refuses to guess user-scope membership
+- onboarding should be run on the target machine so the local operator and
+  host age keys can be generated there when missing
 - use `--user-scope <name>` repeatedly for non-interactive runs
 - use `--no-user-scopes` when the host should not join any current user scope
 

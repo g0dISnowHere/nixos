@@ -89,8 +89,9 @@ if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 && "${allow_create}" -ne 1 ]]; then
   exit 1
 fi
 
-if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -ne 1 && "${SECRETS_RELEVANT_SECRET_COUNT}" -gt 0 ]]; then
-  secrets_ui_error "Missing readable operator key file: ${SECRETS_OPERATOR_KEY_FILE}"
+if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -gt 0 ]] \
+  && ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+  secrets_ui_error "Missing valid readable operator age key: ${SECRETS_OPERATOR_KEY_FILE}"
   exit 1
 fi
 

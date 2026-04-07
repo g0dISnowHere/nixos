@@ -70,8 +70,8 @@ if [[ "${SECRETS_HOST_RECIPIENT_MATCHES}" -ne 1 && "${force_host_rotate}" -ne 1 
 fi
 
 if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -gt 0 ]]; then
-  if [[ ! -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
-    printf 'Missing readable operator key file: %s\n' "${SECRETS_OPERATOR_KEY_FILE}" >&2
+  if ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+    printf 'Missing valid readable operator age key: %s\n' "${SECRETS_OPERATOR_KEY_FILE}" >&2
     exit 1
   fi
 

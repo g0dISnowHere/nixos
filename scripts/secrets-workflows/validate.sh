@@ -75,8 +75,8 @@ secrets_ui_kv "Relevant secrets" "${SECRETS_RELEVANT_SECRET_COUNT}"
 printf '\n'
 
 if [[ "${actor}" == "operator" || "${actor}" == "all" ]]; then
-  if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -ne 1 ]]; then
-    secrets_ui_error "Operator key file is missing or unreadable: ${SECRETS_OPERATOR_KEY_FILE}"
+  if ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+    secrets_ui_error "Operator age key is missing, unreadable, or malformed: ${SECRETS_OPERATOR_KEY_FILE}"
     exit 1
   fi
 

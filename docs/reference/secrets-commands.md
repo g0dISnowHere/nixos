@@ -9,6 +9,7 @@ scripts/secrets
 scripts/secrets doctor
 scripts/secrets doctor --fix
 scripts/secrets doctor --full-test
+scripts/ssh-pubkey-to-age.sh
 scripts/secrets validate-policy
 scripts/secrets validate-access --actor all
 scripts/secrets sync-policy --check
@@ -59,6 +60,8 @@ scripts/secrets retire-host --host <existing-host> --dry-run
 ## Current Lifecycle Notes
 
 - `add-host` is the onboarding path for new hosts.
+- onboarding bootstraps missing local operator and host age keys before host
+  registration.
 - `register-host` is for existing hosts only.
 - `user-scope` manages `users.<name>` membership explicitly.
 - `retire-host` is the supported path for removing shared host access.

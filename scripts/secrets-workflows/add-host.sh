@@ -85,6 +85,12 @@ if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -eq 1 ]]; then
   exit 1
 fi
 
+if [[ "${dry_run}" -ne 1 ]] && [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 || "${SECRETS_OPERATOR_KEY_EXISTS}" -ne 1 ]]; then
+  secrets_ui_note "Bootstrapping missing onboarding age keys before host registration."
+  bash "${script_dir}/ssh-pubkey-to-age.sh"
+  secrets_inspect_state "${host_name}"
+fi
+
 if [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 ]]; then
   secrets_ui_error "Missing host key: ${SECRETS_HOST_KEY_FILE}"
   exit 1
@@ -145,8 +151,8 @@ fi
 if [[ "${#planned_secret_files[@]}" -gt 0 ]]; then
   mapfile -t planned_secret_files < <(printf '%s\n' "${planned_secret_files[@]}" | sort -u)
 
-  if [[ ! -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
-    secrets_ui_error "Missing readable operator key file: ${SECRETS_OPERATOR_KEY_FILE}"
+  if ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+    secrets_ui_error "Missing valid readable operator age key after onboarding bootstrap: ${SECRETS_OPERATOR_KEY_FILE}"
     exit 1
   fi
 

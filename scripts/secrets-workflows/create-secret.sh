@@ -218,6 +218,11 @@ if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Open the plaintext templ
   exit 1
 fi
 
+if ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+  secrets_ui_error "Missing valid readable operator age key: ${SECRETS_OPERATOR_KEY_FILE}"
+  exit 1
+fi
+
 mkdir -p "${target_dir}"
 "${editor_cmd}" "${tmp_plaintext}"
 
