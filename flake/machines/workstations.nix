@@ -8,12 +8,8 @@
       role = "workstation";
       desktopEnvironment = "gnome";
       enableHomeManager = true;
-      modules = [
-        # Virtualization for development
-        ../../modules/nixos/virtualisation/docker_rootless.nix
-      ];
+      modules = [ ../../modules/nixos/virtualisation/docker_rootless.nix ];
     };
 
-    # Add more workstations here as needed
   };
 }

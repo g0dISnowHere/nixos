@@ -8,12 +8,7 @@
       role = "homelab";
       desktopEnvironment = "gnome";
       enableHomeManager = true;
-      modules = [
-        # Docker for services
-        ../../modules/nixos/virtualisation/docker.nix
-
-        # Machine-specific services in machines/mirach/
-      ];
+      modules = [ ../../modules/nixos/virtualisation/docker.nix ];
     };
 
     # STRATO VPS - headless remote server
@@ -26,7 +21,6 @@
         inputs.disko.nixosModules.disko
         ../../modules/nixos/system/disko-install-test-compat.nix
         ../../nixos/machines/albaldah/disko.nix
-        # Docker for services
         ../../modules/nixos/virtualisation/docker.nix
       ];
     };
@@ -35,12 +29,16 @@
       system = "x86_64-linux";
       hostname = "alhena";
       role = "wsl";
-      modules = [
-        # Docker for services
-        ../../modules/nixos/virtualisation/docker.nix
+      modules = [ ];
+    };
 
-        # Machine-specific services in machines/alhena/
-      ];
+    karaka = self.lib.mkNixosSystem {
+      system = "x86_64-linux";
+      hostname = "karaka";
+      role = "homelab";
+      desktopEnvironment = "gnome";
+      enableHomeManager = true;
+      modules = [ ../../modules/nixos/virtualisation/docker.nix ];
     };
 
     # Add more homelabs here as needed

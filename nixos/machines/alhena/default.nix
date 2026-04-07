@@ -1,4 +1,4 @@
-{ hostname, inputs, lib, pkgs, ... }: {
+{ hostname, inputs, pkgs, ... }: {
   imports = [
     inputs.nixos-wsl.nixosModules.default
     ../../../modules/nixos/services/vscode-remote.nix
@@ -24,5 +24,5 @@
   environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
-  system.stateVersion = lib.mkDefault "25.11";
+  system.stateVersion = "25.11";
 }
