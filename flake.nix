@@ -3,14 +3,14 @@
 
   inputs = {
     # Nixpkgs
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
 
     # Nixpkgs unstable TODO use this for vscode.
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-unstable.follows = "nixpkgs";
+    # nixpkgs-unstable.follows = "nixpkgs";
 
     # # Home manager
-    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -28,8 +28,9 @@
     # Available through 'nixos-rebuild --flake .#your-hostname'
     nixosConfigurations = {
       # FIXME replace with your hostname
-      mirach = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
+      karaka = nixpkgs.lib.nixosSystem {
+        # inherit system;
+        specialArgs = {inherit inputs outputs;}; # What is this for again?
         modules = [
           # The main nixos configuration file.
           ./configuration.nix

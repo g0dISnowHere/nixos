@@ -1,0 +1,1 @@
+# https://wiki.nixos.org/wiki/Power_Management

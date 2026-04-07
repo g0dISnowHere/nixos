@@ -14,7 +14,7 @@
   imports = [
     # TODO: Modify other-hardware.nix
     ./nixos/autoupgrade.nix
-    # ./nixos/docker.nix
+    ./nixos/docker.nix
     ./nixos/bootloader.nix
     # TODO: Open the appropriate ports in the firewall. A few are necessary.
     ./nixos/firewall.nix
@@ -34,7 +34,7 @@
     # TODO: Modify users.nix
     ./nixos/tailscale.nix
     ./nixos/users.nix
-    ./virt-manager/virtualisation.nix
+    # ./virt-manager/virtualisation.nix
   ];
 
   nix = let

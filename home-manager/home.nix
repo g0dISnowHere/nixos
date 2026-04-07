@@ -64,33 +64,34 @@
     # nix-software-center
     wget
     smartmontools
-    ansible
-    barrier # needs an open firewall port
+    # ansible
+    # barrier # needs an open firewall port
     bitwarden
     # blender
     clinfo
     direnv
     # dnsmasq
     elfinfo
-    moonlight-qt
+    # moonlight-qt
+    gh # github cli tool
     nextcloud-client
     gimp-with-plugins
     git
     glxinfo
     gparted
-    inkscape
+    # inkscape
     # kicad
-    libreoffice-qt6-still
+    # libreoffice-qt6-still
     nix-tree
     # obs-studio
     # orca-slicer
     pciutils
     # prusa-slicer
-    python312
-    rustdesk
-    spotify
+    # python312
+    # rustdesk
+    # spotify
     # super-slicer-latest
-    synology-drive-client    
+    # synology-drive-client    
     syncthing # needs an open firewall port
     syncthingtray
     traceroute
@@ -98,9 +99,9 @@
     # vscode
     vulkan-tools
     # wayland-info
-    wireshark
+    # wireshark
     webcamoid
-    xsane
+    # xsane
     ];
   };
   
