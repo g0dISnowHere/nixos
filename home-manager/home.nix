@@ -66,7 +66,7 @@
     smartmontools
     # ansible
     # barrier # needs an open firewall port
-    bitwarden
+    bitwarden-desktop
     # blender
     clinfo
     direnv
@@ -75,9 +75,9 @@
     # moonlight-qt
     gh # github cli tool
     nextcloud-client
-    gimp-with-plugins
+    # gimp-with-plugins
     git
-    glxinfo
+    mesa-demos # used to be glxinfo
     gparted
     # inkscape
     # kicad
