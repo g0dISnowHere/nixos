@@ -14,4 +14,12 @@
     enable = true;
     wayland.enable = true;
   };
+
+  # Standardize on GNOME Keyring as the Secret Service backend so Plasma does
+  # not depend on KWallet for Wi-Fi and other desktop secrets.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.login.enableGnomeKeyring = true;
+  security.pam.services.sddm.enableGnomeKeyring = true;
+  security.pam.services.login.kwallet.enable = false;
+  security.pam.services.sddm.kwallet.enable = false;
 }

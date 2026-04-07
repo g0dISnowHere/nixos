@@ -19,5 +19,10 @@
     # shortcuts = { ... };
     # configFile = { ... };
   };
-}
 
+  xdg.configFile."kwalletrc".text = ''
+    [Wallet]
+    Enabled=false
+    First Use=false
+  '';
+}
