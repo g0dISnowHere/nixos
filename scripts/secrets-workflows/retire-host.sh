@@ -84,6 +84,8 @@ if [[ "${#machine_secret_files[@]}" -gt 0 ]]; then
   secrets_ui_error "Refusing to retire ${host_name} while machine-scoped secrets still exist."
   printf 'Machine-scoped secrets to remove or migrate first:\n' >&2
   printf '  %s\n' "${machine_secret_files[@]#${SECRETS_REPO_ROOT}/}" >&2
+  printf 'Next step after cleanup:\n' >&2
+  printf '  scripts/secrets retire-host --host %s\n' "${host_name}" >&2
   exit 1
 fi
 
@@ -95,8 +97,8 @@ for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
 done
 
 if [[ "${#shared_secret_files[@]}" -gt 0 ]]; then
-  if [[ ! -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
-    secrets_ui_error "Missing readable operator key file: ${SECRETS_OPERATOR_KEY_FILE}"
+  if ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+    secrets_ui_error "Missing valid readable operator age key: ${SECRETS_OPERATOR_KEY_FILE}"
     exit 1
   fi
 

@@ -40,6 +40,7 @@ The operator front door is `scripts/secrets`.
 
 Current workflows:
 
+- `scripts/secrets`
 - `scripts/secrets doctor`
 - `scripts/secrets sync-policy`
 - `scripts/secrets validate-policy`
@@ -47,12 +48,17 @@ Current workflows:
 - `scripts/secrets create`
 - `scripts/secrets add-host`
 - `scripts/secrets register-host`
+- `scripts/secrets rotate-host`
 - `scripts/secrets retire-host`
 - `scripts/secrets user-scope`
 - `scripts/secrets recover-access`
 
-`doctor` is the safe default. It stays read-only unless you opt into
-`--fix`.
+`scripts/secrets` without a subcommand is the guided CLI front door. It
+inspects the current host state first, then offers bounded next actions when
+run interactively.
+
+`doctor` remains the inspect-first subcommand. It stays read-only unless you
+opt into `--fix`.
 
 ## Lifecycle Workflows
 
@@ -79,7 +85,10 @@ This is the first-class onboarding path for a new host.
 
 Current behavior:
 
+- bootstraps the local operator age key if missing
 - reads the host recipient from `/var/lib/sops-nix/key.txt`
+- or accepts an explicit `--recipient age1...` for onboarding from another
+  operator machine
 - adds the host to `flake/secrets-policy.nix`
 - requires explicit user-scope membership selection
 - regenerates `.sops.yaml`
@@ -89,6 +98,10 @@ Current behavior:
 Important:
 
 - this refuses to guess user-scope membership
+- onboarding should be run on the target machine so the local operator and
+  host age keys can be generated there when missing
+- if the policy edit is done from another machine, pass the target host
+  recipient explicitly with `--recipient`
 - use `--user-scope <name>` repeatedly for non-interactive runs
 - use `--no-user-scopes` when the host should not join any current user scope
 
@@ -115,6 +128,26 @@ Important:
 
 - this is not a cold-start recovery path
 - the operator key must already decrypt the targeted secrets before rekey
+
+### Rotate A Host Key
+
+Use:
+
+```bash
+scripts/secrets rotate-host --host <name>
+```
+
+This is the first-class flow for intentionally replacing a host recipient with
+the current host `sops-nix` key.
+
+Current behavior:
+
+- runs on the target host
+- verifies the current host key is readable
+- updates the host recipient in `flake/secrets-policy.nix`
+- regenerates `.sops.yaml`
+- rekeys affected secrets
+- validates host decrypt access through the existing registration path
 
 ### Manage User Scope Membership
 
@@ -151,8 +184,7 @@ Current behavior:
 - rekeys shared secrets to drop that host
 - refuses to proceed while machine-scoped secrets still exist for that host
 
-This is considered baseline-capable today, but v1 still wants clearer
-first-class rotation and stronger guided remediation in `doctor --fix`.
+This is considered baseline-capable today.
 
 ### Recover Operator Access
 
@@ -192,10 +224,9 @@ failures.
 
 The workflow is useful now, but a coherent v1 still needs:
 
-1. `rotate-host` as a first-class workflow with clearer intent than
-   `register-host --force-host-rotate`
-2. richer `doctor --fix` guidance for create, rotate, retire, and
+1. richer `doctor --fix` guidance for create, rotate, retire, and
    partial-verification states
+2. broader top-level task routing from the guided front door
 3. end-to-end live testing of the mutation flows on real machines
 
 The current baseline is already good enough in these areas:
@@ -206,6 +237,7 @@ The current baseline is already good enough in these areas:
 - fast versus broad validation split
 - `create` workflow
 - `add-host` workflow
+- `rotate-host` workflow
 - `user-scope` workflow
 - `retire-host` baseline
 - improved `doctor` output

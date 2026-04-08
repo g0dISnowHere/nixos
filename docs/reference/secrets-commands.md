@@ -19,9 +19,11 @@ scripts/secrets sync-policy --check
 ```bash
 scripts/secrets create --scope services.fleet-test --name example.env
 scripts/secrets add-host --host <name> --user-scope djoolz
+scripts/secrets add-host --host <name> --recipient age1... --user-scope djoolz
 scripts/secrets add-host --host <name> --no-user-scopes
 scripts/secrets register-host --host <name>
 scripts/secrets register-host --host <name> --force-host-rotate
+scripts/secrets rotate-host --host <name>
 scripts/secrets user-scope --user djoolz --add-host <name>
 scripts/secrets user-scope --user djoolz --remove-host <name>
 scripts/secrets sync-policy
@@ -60,6 +62,7 @@ scripts/secrets retire-host --host <existing-host> --dry-run
 
 - `add-host` is the onboarding path for new hosts.
 - `register-host` is for existing hosts only.
+- `rotate-host` is the intent-first path for host key rotation.
 - `user-scope` manages `users.<name>` membership explicitly.
 - `retire-host` is the supported path for removing shared host access.
 - `recover-access` is for restoring operator decryptability from a still-working

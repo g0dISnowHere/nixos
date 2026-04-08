@@ -163,6 +163,7 @@ Later add more recipients for future hosts like the VPS.
 For new host onboarding, use:
 
 ```bash
+scripts/secrets
 scripts/secrets add-host --host <name>
 ```
 
@@ -204,6 +205,12 @@ Important:
 
 Use `--dry-run` to preview and `--force-host-rotate` only when you are
 intentionally changing a host recipient.
+
+For explicit host key rotation with clearer intent, use:
+
+```bash
+scripts/secrets rotate-host --host <name>
+```
 
 For explicit user scope membership changes, use:
 

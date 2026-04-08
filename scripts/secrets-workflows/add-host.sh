@@ -19,6 +19,7 @@ sync .sops.yaml, then rekey and verify the resulting secret access.
 
 Options:
   --host NAME            Override the host alias
+  --recipient AGE1...    Use this host recipient instead of the local host key
   --class NAME           Set host metadata class (default: workstation)
   --user-scope NAME      Add the host to this user scope (repeatable)
   --no-user-scopes       Do not add the host to any user scope
@@ -29,6 +30,8 @@ EOF
 }
 
 host_name="$(hostname -s)"
+local_host_name="$(hostname -s)"
+host_recipient=""
 host_class="workstation"
 dry_run=0
 assume_yes=0
@@ -39,6 +42,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --host)
       host_name="${2:?missing value for --host}"
+      shift 2
+      ;;
+    --recipient)
+      host_recipient="${2:?missing value for --recipient}"
       shift 2
       ;;
     --class)
@@ -85,13 +92,33 @@ if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -eq 1 ]]; then
   exit 1
 fi
 
-if [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 ]]; then
-  secrets_ui_error "Missing host key: ${SECRETS_HOST_KEY_FILE}"
+if [[ -n "${host_recipient}" && "${host_recipient}" != age1* ]]; then
+  secrets_ui_error "Host recipient must start with age1."
   exit 1
 fi
 
-if [[ -z "${SECRETS_HOST_PUBLIC_KEY}" ]]; then
-  secrets_ui_error "Could not read the host public key from ${SECRETS_HOST_KEY_FILE}. Run scripts/secrets doctor --full-test if elevated inspection is needed."
+if [[ "${dry_run}" -ne 1 ]] && [[ -z "${host_recipient}" ]] \
+  && [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 || "${SECRETS_OPERATOR_KEY_EXISTS}" -ne 1 ]]; then
+  secrets_ui_note "Bootstrapping missing onboarding age keys before host registration."
+  bash "${script_dir}/ssh-pubkey-to-age.sh"
+  secrets_inspect_state "${host_name}"
+fi
+
+if [[ -z "${host_recipient}" ]]; then
+  if [[ "${SECRETS_HOST_KEY_EXISTS}" -ne 1 ]]; then
+    secrets_ui_error "Missing host key: ${SECRETS_HOST_KEY_FILE}"
+    exit 1
+  fi
+
+  if [[ -z "${SECRETS_HOST_PUBLIC_KEY}" ]]; then
+    secrets_ui_error "Could not read the host public key from ${SECRETS_HOST_KEY_FILE}. Run scripts/secrets doctor --full-test if elevated inspection is needed."
+    exit 1
+  fi
+
+  host_recipient="${SECRETS_HOST_PUBLIC_KEY}"
+elif [[ "${host_name}" == "${local_host_name}" && -n "${SECRETS_HOST_PUBLIC_KEY}" \
+  && "${host_recipient}" != "${SECRETS_HOST_PUBLIC_KEY}" ]]; then
+  secrets_ui_error "Supplied recipient does not match the local host key for ${host_name}."
   exit 1
 fi
 
@@ -145,8 +172,8 @@ fi
 if [[ "${#planned_secret_files[@]}" -gt 0 ]]; then
   mapfile -t planned_secret_files < <(printf '%s\n' "${planned_secret_files[@]}" | sort -u)
 
-  if [[ ! -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
-    secrets_ui_error "Missing readable operator key file: ${SECRETS_OPERATOR_KEY_FILE}"
+  if ! secrets_require_readable_age_identity "${SECRETS_OPERATOR_KEY_FILE}" "Operator age key" >/dev/null; then
+    secrets_ui_error "Missing valid readable operator age key after onboarding bootstrap: ${SECRETS_OPERATOR_KEY_FILE}"
     exit 1
   fi
 
@@ -161,7 +188,7 @@ fi
 secrets_ui_section "Add Host"
 secrets_ui_kv "Host alias" "${host_name}"
 secrets_ui_kv "Host class" "${host_class}"
-secrets_ui_kv "Host public key" "${SECRETS_HOST_PUBLIC_KEY}"
+secrets_ui_kv "Host recipient" "${host_recipient}"
 printf '\nUser scopes to join:\n'
 if [[ "${#selected_user_scopes[@]}" -eq 0 ]]; then
   printf '  (none)\n'
@@ -177,7 +204,7 @@ fi
 
 if [[ "${dry_run}" -eq 1 ]]; then
   printf '\nDry run plan:\n'
-  printf '  - add host %s -> %s to flake/secrets-policy.nix\n' "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}"
+  printf '  - add host %s -> %s to flake/secrets-policy.nix\n' "${host_name}" "${host_recipient}"
   printf '  - set host class to %s\n' "${host_class}"
   if [[ "${#selected_user_scopes[@]}" -gt 0 ]]; then
     printf '  - add %s to user scopes: %s\n' "${host_name}" "$(printf '%s ' "${selected_user_scopes[@]}" | sed 's/ $//')"
@@ -196,7 +223,7 @@ if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Add ${host_name} with th
   exit 1
 fi
 
-secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 1 "${host_class}"
+secrets_update_policy_host_recipient "${host_name}" "${host_recipient}" 1 "${host_class}"
 for scope_name in "${selected_user_scopes[@]}"; do
   mapfile -t scope_hosts < <(secrets_get_user_scope_hosts "${scope_name}")
   scope_hosts+=("${host_name}")
