@@ -155,7 +155,7 @@ def parse_scope_entries(block_text, indent):
 
 def render_scope_entries(entries, indent):
     return "".join(
-        f'{indent}{name} = {{ hosts = [ {render_host_list(hosts)} ]; }};\n'
+        f"{indent}{name} = {{ hosts = [ {render_host_list(hosts)} ]; }};\n"
         for name, hosts in sorted(entries.items())
     )
 

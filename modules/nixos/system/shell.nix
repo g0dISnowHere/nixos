@@ -3,6 +3,7 @@
   # machines get the same baseline even without Home Manager.
   environment.systemPackages = with pkgs; [
     bat
+    direnv
     eza
     fd
     fzf
@@ -18,6 +19,13 @@
   users.defaultUserShell = pkgs.zsh;
 
   programs = {
+    direnv = {
+      enable = true;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
+      nix-direnv.enable = true;
+    };
+
     fzf = {
       fuzzyCompletion = true;
       keybindings = true;

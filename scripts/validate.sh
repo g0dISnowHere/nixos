@@ -127,6 +127,13 @@ else
 fi
 
 echo ""
+if bash "$(dirname "$0")/test-system-shell-and-cli-tooling.sh"; then
+  :
+else
+  FAILED=$((FAILED + 1))
+fi
+
+echo ""
 echo "Secrets Policy:"
 run_check "scripts/secrets validate-policy failed" \
   bash "${script_dir}/secrets" validate-policy

@@ -11,10 +11,15 @@
 
   imports = [
     # System essentials
+    ../system/ai-tools.nix
+    ../system/developer-tools.nix
     ../system/locale.nix
+    ../system/nix-tools.nix
     ../system/shell.nix
     ../system/powermanagement.nix
+    ../system/ssh-client.nix
     ../system/services.nix
+    ../system/system-utils.nix
 
     # Services
     ../services/mosh.nix
