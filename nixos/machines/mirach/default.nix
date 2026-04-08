@@ -6,6 +6,7 @@
   imports = [
     ./hardware-configuration.nix
     ./libvirtd.nix
+    ./power.nix
     ../../../modules/nixos/system/autoupgrade.nix
     ../../../modules/nixos/services/zigbee2mqtt.nix
     # ../../../modules/nixos/services/audio.nix

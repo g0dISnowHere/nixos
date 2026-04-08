@@ -8,6 +8,8 @@ in {
     spiceUSBRedirection.enable = true;
     libvirtd = {
       enable = true;
+      onBoot = "ignore";
+      onShutdown = "shutdown";
       qemu = {
         package = pkgs.qemu_kvm;
         vhostUserPackages = [ pkgs.virtiofsd ];

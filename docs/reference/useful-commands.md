@@ -55,6 +55,58 @@ nix profile diff-closures --profile /nix/var/nix/profiles/system | tail -n 50
 loginctl terminate-user djoolz
 ```
 
+## Common `virsh` Commands
+
+List all system libvirt domains:
+
+```bash
+virsh -c qemu:///system list --all
+```
+
+Show the current state and autostart flag for a domain:
+
+```bash
+virsh -c qemu:///system dominfo homeassistant
+```
+
+Start or stop a domain:
+
+```bash
+virsh -c qemu:///system start homeassistant
+virsh -c qemu:///system shutdown homeassistant
+```
+
+Force a fresh boot and ignore a managed-save image:
+
+```bash
+virsh -c qemu:///system start homeassistant --force-boot
+```
+
+Remove a stale managed-save image:
+
+```bash
+virsh -c qemu:///system managedsave-remove homeassistant
+```
+
+Enable or disable libvirt autostart for a domain:
+
+```bash
+virsh -c qemu:///system autostart homeassistant
+virsh -c qemu:///system autostart --disable homeassistant
+```
+
+Inspect the live domain XML:
+
+```bash
+virsh -c qemu:///system dumpxml homeassistant
+```
+
+Rename an inactive domain:
+
+```bash
+virsh -c qemu:///system domrename old-name new-name
+```
+
 ## Rotate The Declarative `djoolz` Password
 
 ```bash
