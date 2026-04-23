@@ -6,8 +6,8 @@ tooling and developer ergonomics.
 ## Role
 
 This layer is for flake plumbing and development support, not for machine
-policy. It is where formatting, dev shells, checks, and similar per-system
-features belong.
+policy. It is where formatting, dev shells, templates, checks, and similar
+flake features belong.
 
 ## Design Intent
 

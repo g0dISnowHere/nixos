@@ -32,6 +32,8 @@ notes do not blur together.
   - canonical design boundaries and structure decisions
 - `reference/`
   - quick lookup material for common commands and operational snippets
+- `dev-templates.md`
+  - canonical workflow for local flake project templates
 - `vps/`
   - canonical VPS-specific context and runbooks
 - `dotfiles/`
@@ -45,6 +47,7 @@ notes do not blur together.
 
 - Put stable repo documentation in `docs/`.
 - Put the canonical SOPS operator workflow in `docs/secrets-workflows.md`.
+- Put the canonical development template workflow in `docs/dev-templates.md`.
 - Put quick command lists and checklists in `docs/reference/`.
 - Put incomplete plans and backlog ideas in `docs/future-ideas/`.
 - Put dated investigations and point-in-time analysis in `docs/findings/`.

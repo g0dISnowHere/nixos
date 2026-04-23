@@ -1,0 +1,19 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: ruff check --fix
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: ruff format
+        entry: ruff format
+        language: system
+        types_or: [python, pyi]
+      - id: pytest
+        name: pytest
+        entry: bash -c 'if find tests -type f \( -name "test_*.py" -o -name "*_test.py" \) -print -quit 2>/dev/null | grep -q . || find . -maxdepth 1 -type f \( -name "test_*.py" -o -name "*_test.py" \) -print -quit 2>/dev/null | grep -q .; then pytest -q --maxfail=1; else echo "No pytest tests found, skipping."; fi'
+        language: system
+        types: [python]
+        pass_filenames: false

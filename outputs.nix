@@ -17,6 +17,7 @@
     inputs.treefmt-nix.flakeModule
     ./parts/devshells.nix
     ./parts/formatter.nix
+    ./parts/templates.nix
 
     # Library functions and machine definitions
     ./flake/lib.nix
