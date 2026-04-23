@@ -2,7 +2,7 @@
 let
   inherit (inputs)
     nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable sops-nix
-    nixpkgs-broken;
+    nixpkgs-broken nixpkgs-zellij;
   secretsPolicy = import (builtins.path {
     path = ./secrets-policy.nix;
     name = "secrets-policy.nix";
@@ -148,6 +148,10 @@ in {
             config.allowUnfree = true;
           };
           pkgs-tailscale = import nixpkgs-broken {
+            inherit system;
+            config.allowUnfree = true;
+          };
+          pkgs-zellij = import nixpkgs-zellij {
             inherit system;
             config.allowUnfree = true;
           };

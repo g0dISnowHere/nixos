@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, pkgs-zellij, ... }: {
   # Shared interactive shell defaults belong at the system layer so headless
   # machines get the same baseline even without Home Manager.
   environment.systemPackages = with pkgs; [
@@ -12,7 +12,7 @@
     tmux
     tree
     which
-    zellij
+    pkgs-zellij.zellij
     zoxide
   ];
 

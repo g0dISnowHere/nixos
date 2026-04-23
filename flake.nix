@@ -8,6 +8,9 @@
     # Use nixpkgs commit from previous working flake.lock
     nixpkgs-broken.url =
       "github:nixos/nixpkgs/ce01daebf8489ba97bd1609d185ea276efdeb121";
+    # Pin zellij until nixpkgs rustc catches up with zellij 0.44.x.
+    nixpkgs-zellij.url =
+      "github:nixos/nixpkgs/d96b37bbeb9840f1c0ebfe90585ef5067b69bbb3";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
