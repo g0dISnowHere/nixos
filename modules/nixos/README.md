@@ -8,9 +8,11 @@ shared machine behavior that can be composed into multiple hosts.
 - `desktop/`
   - desktop environment and desktop infrastructure modules
 - `roles/`
-  - higher-level shared machine profiles
+  - transitional higher-level shared machine profiles
 - `services/`
-  - reusable service modules
+  - reusable service and service-composition modules
+- `flatpak/`
+  - focused Flatpak application sets; infrastructure stays in `services/flatpak.nix`
 - `system/`
   - core system behavior and platform-level settings
 - `virtualisation/`
@@ -19,6 +21,7 @@ shared machine behavior that can be composed into multiple hosts.
 ## Design Intent
 
 This directory is where shared system policy belongs. Machine-specific behavior
-should stay out unless the module is explicitly tied to a single host. Keep
+should stay out unless the module is explicitly tied to a single host. Prefer
+small capability modules over broad role modules for new shared behavior. Keep
 repo-wide design rationale in `docs/`; this README should stay scoped to
 `modules/nixos/`.

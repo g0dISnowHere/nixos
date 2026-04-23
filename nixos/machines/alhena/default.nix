@@ -1,8 +1,5 @@
 { hostname, inputs, lib, pkgs, ... }: {
-  imports = [
-    inputs.nixos-wsl.nixosModules.default
-    ../../../modules/nixos/services/vscode-remote.nix
-  ];
+  imports = [ inputs.nixos-wsl.nixosModules.default ];
 
   networking.hostName = hostname;
 

@@ -1,35 +1,28 @@
 { ... }: {
   imports = [
-    ../system/ai-tools.nix
-    ../system/developer-tools.nix
-    ../system/locale.nix
-    ../system/nix-tools.nix
-    ../system/shell.nix
-    ../system/ssh-client.nix
-    ../system/services.nix
-    ../system/system-utils.nix
-    ../services/ssh.nix
-    ../services/tailscale.nix
+    ../system/base.nix
+    ../services/ssh-server.nix
+    ../services/tailscale-client.nix
   ];
 
   my.tailscale.enableSSH = true;
-  # NixOS-WSL configuration for frictionless experience
+
+  # NixOS-WSL configuration for server-like use under Windows.
   wsl = {
     enable = true;
-    useWindowsDriver = true; # Enable GPU passthrough (including NVIDIA)
-    docker-desktop.enable =
-      true; # Enable Docker Desktop integration for containers
+    useWindowsDriver = true;
+    docker-desktop.enable = true;
     interop = {
       includePath = true;
-      register = true; # Allow running Windows executables
+      register = true;
     };
-    ssh-agent.enable = true; # SSH agent passthrough
-    startMenuLaunchers = true; # GUI app shortcuts in Windows start menu
+    ssh-agent.enable = true;
+    startMenuLaunchers = true;
     wslConf = {
-      automount.enabled = true; # Mount Windows drives
-      interop.enabled = true; # Enable interop
-      interop.appendWindowsPath = true; # Include Windows PATH
-      boot.systemd = true; # Use systemd as init
+      automount.enabled = true;
+      interop.enabled = true;
+      interop.appendWindowsPath = true;
+      boot.systemd = true;
     };
   };
 }

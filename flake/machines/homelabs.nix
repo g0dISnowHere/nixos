@@ -1,18 +1,18 @@
 { self, inputs, ... }: {
   flake.nixosConfigurations = {
-    # Mirach - Homelab server with the same desktop stack as centauri
+    # Mirach - server-like host with local GNOME management
     # Runs Home Assistant VM, Docker services, media server
     mirach = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "mirach";
-      role = "homelab";
       desktopEnvironment = "gnome";
       enableHomeManager = true;
       modules = [
-        # Docker for services
+        ../../modules/nixos/system/base.nix
+        ../../modules/nixos/services/ssh-server.nix
+        ../../modules/nixos/services/tailscale-router.nix
         ../../modules/nixos/virtualisation/docker.nix
-
-        # Machine-specific services in machines/mirach/
+        { networking.networkmanager.enable = true; }
       ];
     };
 
@@ -21,26 +21,23 @@
     albaldah = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "albaldah";
-      role = "homelab";
       modules = [
+        ../../modules/nixos/system/base.nix
+        ../../modules/nixos/services/ssh-server.nix
+        ../../modules/nixos/services/tailscale-router.nix
+        ../../modules/nixos/virtualisation/docker.nix
         inputs.disko.nixosModules.disko
         ../../modules/nixos/system/disko-install-test-compat.nix
         ../../nixos/machines/albaldah/disko.nix
-        # Docker for services
-        ../../modules/nixos/virtualisation/docker.nix
       ];
     };
 
+    # Alhena - server-like WSL environment, close to albaldah with WSL platform constraints
     alhena = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "alhena";
       role = "wsl";
-      modules = [
-        # Docker for services
-        ../../modules/nixos/virtualisation/docker.nix
-
-        # Machine-specific services in machines/alhena/
-      ];
+      modules = [ ../../modules/nixos/virtualisation/docker.nix ];
     };
 
     # Add more homelabs here as needed

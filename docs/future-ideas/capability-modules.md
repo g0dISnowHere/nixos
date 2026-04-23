@@ -24,7 +24,8 @@ Several machines no longer fit neatly into a single role:
   - headless VPS
   - normal Docker
 - `alhena`
-  - WSL environment
+  - server-like WSL environment
+  - close to `albaldah`, but with WSL platform constraints
 
 `homelab` especially is doing too much at once. It currently implies some mix
 of:
@@ -54,6 +55,28 @@ Examples of capabilities:
 - `scanner`
 - `flatpak`
 
+Flatpak should follow the same pattern:
+
+- one small system capability for Flatpak infrastructure
+- separate focused modules for groups of Flatpak applications
+- optional bundles only when a repeated machine intent becomes clear
+
+Example layout:
+
+- `modules/nixos/services/flatpak.nix`
+  - enable Flatpak support, remotes, and portal/system integration
+- `modules/nixos/flatpak/browsers.nix`
+- `modules/nixos/flatpak/media.nix`
+- `modules/nixos/flatpak/creative.nix`
+- `modules/nixos/flatpak/messaging.nix`
+- `modules/nixos/flatpak/bundles/media-station.nix`
+  - only if this avoids repeating the same imports across multiple machines
+
+Keep Flatpak infrastructure separate from application bundles. A machine should
+be able to enable Flatpak support without automatically inheriting a personal
+desktop app set, and a headless host should not receive Flatpaks just because it
+shares another server capability.
+
 The machine definition should describe what the machine actually does instead of
 forcing it into one overloaded role name.
 
@@ -71,6 +94,32 @@ That would make machine intent easier to read:
 - `mirach` = SSH server + Tailscale router + GNOME + libvirtd + Docker
 - `centauri` = GNOME + scanner + Docker rootless
 
+Flatpaks would compose in the same explicit way:
+
+- `karaka` = Flatpak infrastructure + media Flatpaks
+- `centauri` = Flatpak infrastructure + browser, messaging, and creative Flatpaks
+- `albaldah` = no Flatpak modules
+- `alhena` = no Flatpak modules
+
+Concrete composition should stay boring and readable. Prefer explicit imports
+over a second layer of clever discovery:
+
+```nix
+imports = [
+  ../../modules/nixos/desktop/gnome.nix
+  ../../modules/nixos/services/ssh.nix
+  ../../modules/nixos/services/tailscale-router.nix
+  ../../modules/nixos/services/flatpak.nix
+  ../../modules/nixos/flatpak/media.nix
+  ../../modules/nixos/virtualisation/docker.nix
+];
+```
+
+Some capabilities should also assert invalid combinations. For example,
+`docker` and `docker_rootless` should not silently coexist unless that is
+intentional, and `tailscale-client` versus `tailscale-router` should make routing
+and firewall behavior explicit.
+
 ## Migration Idea
 
 Do this gradually instead of as one large refactor:
@@ -81,6 +130,14 @@ Do this gradually instead of as one large refactor:
    carrying their weight.
 4. Introduce one or two machine-intent modules only where the concept stays
    crisp and useful.
+5. Make `mkNixosSystem` less role-centered once enough behavior has moved out
+   of role modules.
+
+Start with `homelab`, because it currently covers hosts with very different
+needs. `mirach`, `albaldah`, and `alhena` can all be server-like without
+sharing desktop, Docker, Tailscale routing, or Flatpak behavior by implication.
+`alhena` should stay close to `albaldah` in intent, with a WSL platform module
+for the differences that come from running under Windows.
 
 ## Outcome
 

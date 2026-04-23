@@ -12,7 +12,13 @@
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
     # ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
     ../../../modules/nixos/services/scanner.nix # SANE scanner support
-    ../../../modules/nixos/services/flatpak.nix # Flatpak sandboxed apps
+    ../../../modules/nixos/services/flatpak.nix # Flatpak infrastructure
+    ../../../modules/nixos/flatpak/browsers.nix
+    ../../../modules/nixos/flatpak/creative.nix
+    ../../../modules/nixos/flatpak/development.nix
+    ../../../modules/nixos/flatpak/media.nix
+    ../../../modules/nixos/flatpak/messaging.nix
+    ../../../modules/nixos/flatpak/productivity.nix
   ];
 
   # Bootloader.

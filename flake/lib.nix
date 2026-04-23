@@ -55,11 +55,14 @@ in {
   flake.lib = {
     inherit secretsPolicy renderSopsConfig;
     renderedSopsConfig = renderSopsConfig secretsPolicy;
-    # Helper function to create a NixOS system configuration
-    # Provides consistent setup for all machines with role-based defaults
-    mkNixosSystem = { system, hostname, role, desktopEnvironment ? null
+    # Helper function to create a NixOS system configuration.
+    # New machine definitions should prefer explicit capability modules; role is
+    # kept optional for transitional shared defaults.
+    mkNixosSystem = { system, hostname, role ? null, desktopEnvironment ? null
       , enableHomeManager ? false, modules ? [ ], extraSpecialArgs ? { } }:
       let
+        roleModules =
+          if role != null then [ ../modules/nixos/roles/${role}.nix ] else [ ];
         desktopEnvironmentModule = if desktopEnvironment != null then
           ../modules/nixos/desktop/${desktopEnvironment}.nix
         else
@@ -123,9 +126,6 @@ in {
           # Machine-specific hardware and config
           ../nixos/machines/${hostname} # This is where the default.nix for centauri is imported
 
-          # Role-based defaults (workstation, homelab, etc.)
-          ../modules/nixos/roles/${role}.nix
-
           # Desktop environment (if specified)
           desktopEnvironmentModule
 
@@ -139,7 +139,7 @@ in {
           ../modules/nixos/users/djoolz/default.nix
           ../modules/nixos/users/djoolz/ssh.nix
           { nixpkgs.config.allowUnfree = true; }
-        ] ++ homeManagerModule ++ modules;
+        ] ++ roleModules ++ homeManagerModule ++ modules;
 
         specialArgs = {
           inherit inputs hostname desktopEnvironment repoRoot dotfilesRoot;

@@ -1,39 +1,14 @@
-{ config, lib, pkgs, ... }: {
+{ ... }: {
   # Workstation Role Profile
-  # Interactive desktop machine for development and daily use
-  #
-  # Provides:
-  # - Desktop environment (imported by machine)
-  # - Networking with NetworkManager
-  # - Power management for laptops
-  #
-  # Audio, printing, and Bluetooth are provided by the desktop environment module
+  # Interactive desktop machine defaults. Desktop and virtualization stay explicit
+  # in machine composition.
 
   imports = [
-    # System essentials
-    ../system/ai-tools.nix
-    ../system/developer-tools.nix
-    ../system/locale.nix
-    ../system/nix-tools.nix
-    ../system/shell.nix
+    ../system/base.nix
     ../system/powermanagement.nix
-    ../system/ssh-client.nix
-    ../system/services.nix
-    ../system/system-utils.nix
-
-    # Services
     ../services/mosh.nix
-    ../services/tailscale.nix
-
-    # Note: Desktop environment (and its dependencies like audio, printing, bluetooth)
-    # are imported by individual machines based on their needs
+    ../services/tailscale-client.nix
   ];
 
-  # Networking
   networking.networkmanager.enable = true;
-
-  my.tailscale = {
-    enableSSH = false;
-    acceptRoutes = true;
-  };
 }
