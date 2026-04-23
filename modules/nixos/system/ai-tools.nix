@@ -9,4 +9,9 @@
     pkgs-unstable.fabric-ai
     pkgs-unstable.codex
   ];
+
+  # Codex currently probes this FHS path before falling back to its vendored
+  # sandbox helper. Keep the system bubblewrap available there on NixOS hosts.
+  systemd.tmpfiles.rules =
+    [ "L+ /usr/bin/bwrap - - - - ${pkgs.bubblewrap}/bin/bwrap" ];
 }
