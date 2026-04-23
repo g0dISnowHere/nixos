@@ -37,6 +37,30 @@ sudo nixos-rebuild list-generations
 dconf dump / | dconf2nix > modules/home/dconf/dconf.nix
 ```
 
+## List Dev Templates
+
+```bash
+nix flake show path:/home/djoolz/Documents/01_config/mine
+```
+
+## Create Project From Dev Template
+
+```bash
+nix flake new --template path:/home/djoolz/Documents/01_config/mine#rust ./my-rust-project
+```
+
+## Initialize Current Directory From Dev Template
+
+```bash
+nix flake init --template path:/home/djoolz/Documents/01_config/mine#python
+```
+
+## Smoke-Test A Local Dev Template
+
+```bash
+nix flake new --template .#empty /tmp/dev-template-test
+```
+
 ## Check D-Bus Activation Files
 
 ```bash

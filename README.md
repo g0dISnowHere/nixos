@@ -16,6 +16,7 @@ If you are new to this repo, the short version is:
 - NixOS modules describe shared system behavior
 - Home Manager modules describe shared user behavior
 - `dotfiles/` keeps most hand-maintained application config as normal files
+- `dev-templates/` provides reusable flake templates for new projects
 - `docs/` holds the human documentation system
 
 ## What This Repo Optimizes For
@@ -40,6 +41,7 @@ If you are new to this repo, the short version is:
 - reusable NixOS modules under `modules/nixos/`
 - reusable Home Manager modules under `modules/home/`
 - raw config files kept under `dotfiles/`
+- reusable project templates under `dev-templates/`
 - human-facing docs centralized under `docs/`
 
 ## Current Scope
@@ -91,6 +93,7 @@ If you are new to this repo, the short version is:
 │   └── home/                   # reusable Home Manager modules
 ├── nixos/machines/             # host-specific configuration
 ├── dotfiles/                   # raw config content linked into place
+├── dev-templates/              # reusable project flake templates
 └── docs/                       # human-facing documentation
 ```
 
@@ -99,6 +102,8 @@ If you are new to this repo, the short version is:
 - shared machine behavior belongs in reusable modules
 - host-specific behavior belongs in `nixos/machines/<hostname>/`
 - desktop and application config lives primarily in `dotfiles/`
+- project starter environments live under `dev-templates/` and are exported as
+  root flake templates
 - Home Manager is used for packages, activation, services, and link management
 - canonical human docs live in `README.md`, `docs/README.md`, and stable sections under `docs/`
 - quick lookup material lives under `docs/reference/`
@@ -138,6 +143,7 @@ useful commands to start with:
 nix flake show
 nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
 nix eval .#homeConfigurations."djoolz@workstation".activationPackage
+nix flake new --template .#empty /tmp/template-test
 nix develop
 ```
 
@@ -149,6 +155,8 @@ What they do:
   - checks that a machine or Home Manager config evaluates without building it
 - `nix develop`
   - opens the repo development shell with the main tools preloaded
+- `nix flake new --template ...`
+  - creates a new project from one of the local development templates
 
 ## Validation
 
@@ -181,6 +189,8 @@ sudo nixos-rebuild switch --flake .#centauri
   - human documentation index and taxonomy
 - [docs/reference/useful-commands.md](docs/reference/useful-commands.md)
   - quick command lookup
+- [docs/dev-templates.md](docs/dev-templates.md)
+  - local project template workflow
 - [docs/architecture/home-manager-dotfiles-strategy.md](docs/architecture/home-manager-dotfiles-strategy.md)
   - Home Manager and dotfiles split
 - [docs/vps/README.md](docs/vps/README.md)

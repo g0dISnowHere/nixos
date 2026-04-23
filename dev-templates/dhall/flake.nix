@@ -1,0 +1,37 @@
+{
+  description = "A Nix-flake-based Dhall development environment";
+
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
+
+  outputs = { self, ... }@inputs:
+
+    let
+      supportedSystems =
+        [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      forEachSupportedSystem = f:
+        inputs.nixpkgs.lib.genAttrs supportedSystems
+        (system: f { pkgs = import inputs.nixpkgs { inherit system; }; });
+    in {
+      devShells = forEachSupportedSystem ({ pkgs }: {
+        default = let
+          # Helper function for building dhall-* tools
+          mkDhallTools = ls:
+            builtins.map (tool: pkgs.haskellPackages."dhall-${tool}") ls;
+
+          dhallTools = mkDhallTools [
+            "bash"
+            "docs"
+            "json"
+            "lsp-server"
+            "nix"
+            "nixpkgs"
+            "openapi"
+            "toml"
+            "yaml"
+          ];
+        in pkgs.mkShellNoCC {
+          packages = (with pkgs; [ dhall ]) ++ dhallTools;
+        };
+      });
+    };
+}
