@@ -5,12 +5,15 @@
     centauri = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "centauri";
-      role = "workstation";
       desktopEnvironment = "gnome";
       enableHomeManager = true;
       modules = [
-        # Virtualization for development
+        ../../modules/nixos/system/base.nix
+        ../../modules/nixos/system/powermanagement.nix
+        ../../modules/nixos/services/mosh.nix
+        ../../modules/nixos/services/tailscale-client.nix
         ../../modules/nixos/virtualisation/docker_rootless.nix
+        { networking.networkmanager.enable = true; }
       ];
     };
 

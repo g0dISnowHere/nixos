@@ -11,8 +11,8 @@
   networking.hostName = hostname;
   time.timeZone = lib.mkForce "Etc/UTC";
 
-  # The shared homelab role assumes NetworkManager. This VPS should stay on
-  # provider-style networkd + DHCP for remote reliability.
+  # This VPS should stay on provider-style networkd + DHCP for remote
+  # reliability.
   networking.networkmanager.enable = false;
   networking.useDHCP = lib.mkDefault false;
   networking.enableIPv6 = true;

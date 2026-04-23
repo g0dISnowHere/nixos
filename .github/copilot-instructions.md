@@ -4,8 +4,8 @@ Use [`AGENTS.md`](../AGENTS.md) as the canonical repository guidance. This file
 is only a short companion mirror.
 
 ## Core Rules
-- Keep modules self-contained and use explicit imports only.
-- Keep shared config in reusable modules and machine-specific config in `nixos/machines/`.
+- Keep modules self-contained and use explicit imports only; do not reintroduce broad machine-role modules.
+- Keep shared config in explicit capability modules and machine-specific config in `nixos/machines/`.
 - Treat Home Manager as a portable user-environment layer, not a requirement to rewrite all dotfiles in Nix.
 - Prefer linking files from `dotfiles/` before re-expressing them as Home Manager config when file-based config is already the better fit.
 

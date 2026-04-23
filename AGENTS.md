@@ -6,13 +6,13 @@
 - `flake/` defines flake outputs, including machine sets and Home Manager profiles.
 - `secrets/` holds SOPS-managed secret templates, examples, and encrypted files; keep shared secret layout explicit by scope (`users/`, `machines/`, `services/`) instead of scattering secret metadata through machine files.
 - Organize by scope first, feature second.
-- `modules/nixos/` contains reusable NixOS modules grouped by concern: `desktop/`, `roles/`, `services/`, `system/`, `users/`, and `virtualisation/`.
+- `modules/nixos/` contains reusable NixOS modules grouped by concern: `desktop/`, `flatpak/`, `services/`, `system/`, `users/`, and `virtualisation/`.
 - `modules/home/` contains reusable Home Manager modules grouped by concern: `dconf/`, `desktop/`, `packages/`, `plasma/`, `programs/`, and `services/`.
 - When a feature spans both NixOS and Home Manager, model it as two coordinated modules with different scopes: a system-level module for OS configuration and a user-level module for Home Manager state. Prefer names that make scope obvious; only reuse the same feature name across both layers when paths, option namespaces, and documentation already remove ambiguity.
 - Keep AI tooling isolated in `modules/home/packages/ai-tools.nix`; keep package installs and any related notes/settings together there instead of mixing them back into the general package list.
 - `nixos/machines/<hostname>/` stores host-specific configuration and hardware scans.
 - Keep modules self-contained and imported explicitly. Do not add recursive module discovery.
-- Prefer role modules for shared machine behavior and keep machine-specific logic out of shared modules.
+- Prefer explicit capability modules for shared machine behavior and keep machine-specific logic out of shared modules. Do not reintroduce broad machine-role modules for shared policy.
 - Keep shared secret plumbing in focused modules and keep concrete secret declarations close to their owning scope (shared user secrets under `secrets/users/`, host-only secrets under `secrets/machines/`, service secrets under `secrets/services/`).
 
 ## Architecture Rules

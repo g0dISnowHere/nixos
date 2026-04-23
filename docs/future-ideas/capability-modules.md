@@ -116,9 +116,10 @@ imports = [
 ```
 
 Some capabilities should also assert invalid combinations. For example,
-`docker` and `docker_rootless` should not silently coexist unless that is
-intentional, and `tailscale-client` versus `tailscale-router` should make routing
-and firewall behavior explicit.
+`docker` and `docker_rootless` should not silently coexist; the Docker modules
+now carry internal markers that fail evaluation if both are imported.
+`tailscale-client` versus `tailscale-router` should make routing and firewall
+behavior explicit.
 
 ## Migration Idea
 
@@ -126,12 +127,11 @@ Do this gradually instead of as one large refactor:
 
 1. Keep the current machine set files for orchestration.
 2. Move behavior out of broad role modules into focused capability modules.
-3. Reduce role modules to small structural defaults, or remove them if they stop
-   carrying their weight.
+3. Remove role modules when explicit capability imports make them unnecessary.
 4. Introduce one or two machine-intent modules only where the concept stays
    crisp and useful.
-5. Make `mkNixosSystem` less role-centered once enough behavior has moved out
-   of role modules.
+5. Keep `mkNixosSystem` as orchestration only; it should not import broad role
+   policy by name.
 
 Start with `homelab`, because it currently covers hosts with very different
 needs. `mirach`, `albaldah`, and `alhena` can all be server-like without

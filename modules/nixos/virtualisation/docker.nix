@@ -1,5 +1,8 @@
 # https://nixos.wiki/wiki/Docker
 { pkgs, ... }: {
+  imports = [ ./docker-options.nix ];
+
+  my.virtualisation.docker.rootful = true;
 
   virtualisation.docker = {
     enable = true;
@@ -16,11 +19,7 @@
     };
   };
 
-  ## Always needed
   users.users.djoolz.extraGroups = [ "docker" ];
-  ## Another way to give access to the docker socket.
-  # users.extraGroups.docker.members = [ "djoolz" ];
 
   # hardware.nvidia-container-toolkit.enable = true;
-
 }

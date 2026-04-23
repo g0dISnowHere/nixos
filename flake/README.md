@@ -17,7 +17,7 @@ policy or implementation detail.
 ## Main Areas
 
 - `machines/`
-  - groups machine definitions by role
+  - groups concrete machine definitions by fleet area
 - `homes/`
   - standalone Home Manager outputs and user-level profile composition
 - `lib.nix`
@@ -27,5 +27,6 @@ policy or implementation detail.
 
 Keep this layer readable. A person looking at `flake/` should be able to tell
 how the repo is composed without chasing hidden behavior through opaque helper
-logic. Repo-wide architecture guidance belongs in `docs/`; this README should
-stay focused on the role of `flake/` itself.
+logic. Machine behavior should come from explicit capability module imports.
+Repo-wide architecture guidance belongs in `docs/`; this README should stay
+focused on the role of `flake/` itself.

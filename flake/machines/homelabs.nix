@@ -36,10 +36,15 @@
     alhena = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "alhena";
-      role = "wsl";
-      modules = [ ../../modules/nixos/virtualisation/docker.nix ];
+      modules = [
+        ../../modules/nixos/system/base.nix
+        ../../modules/nixos/system/wsl.nix
+        ../../modules/nixos/services/ssh-server.nix
+        ../../modules/nixos/services/tailscale-client.nix
+        ../../modules/nixos/virtualisation/docker.nix
+      ];
     };
 
-    # Add more homelabs here as needed
+    # Add more server-like machines here as needed
   };
 }

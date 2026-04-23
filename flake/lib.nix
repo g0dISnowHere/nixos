@@ -56,13 +56,10 @@ in {
     inherit secretsPolicy renderSopsConfig;
     renderedSopsConfig = renderSopsConfig secretsPolicy;
     # Helper function to create a NixOS system configuration.
-    # New machine definitions should prefer explicit capability modules; role is
-    # kept optional for transitional shared defaults.
-    mkNixosSystem = { system, hostname, role ? null, desktopEnvironment ? null
+    # Machine behavior is assembled from explicit capability modules.
+    mkNixosSystem = { system, hostname, desktopEnvironment ? null
       , enableHomeManager ? false, modules ? [ ], extraSpecialArgs ? { } }:
       let
-        roleModules =
-          if role != null then [ ../modules/nixos/roles/${role}.nix ] else [ ];
         desktopEnvironmentModule = if desktopEnvironment != null then
           ../modules/nixos/desktop/${desktopEnvironment}.nix
         else
@@ -139,7 +136,7 @@ in {
           ../modules/nixos/users/djoolz/default.nix
           ../modules/nixos/users/djoolz/ssh.nix
           { nixpkgs.config.allowUnfree = true; }
-        ] ++ roleModules ++ homeManagerModule ++ modules;
+        ] ++ homeManagerModule ++ modules;
 
         specialArgs = {
           inherit inputs hostname desktopEnvironment repoRoot dotfilesRoot;

@@ -1,13 +1,5 @@
 { ... }: {
-  imports = [
-    ../system/base.nix
-    ../services/ssh-server.nix
-    ../services/tailscale-client.nix
-  ];
-
-  my.tailscale.enableSSH = true;
-
-  # NixOS-WSL configuration for server-like use under Windows.
+  # NixOS-WSL platform configuration for server-like use under Windows.
   wsl = {
     enable = true;
     useWindowsDriver = true;

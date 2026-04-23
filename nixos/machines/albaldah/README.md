@@ -27,7 +27,8 @@ specialized host without turning it into a one-off snowflake.
 ## Place In The Repo
 
 `albaldah` is wired into the flake from `flake/machines/homelabs.nix` as a
-headless VPS machine. This directory is therefore one layer in a larger
+headless VPS machine assembled from explicit capability modules. This directory
+is therefore one layer in a larger
 composition, not a standalone configuration world of its own.
 
 ## Related Docs

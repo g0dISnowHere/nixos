@@ -7,8 +7,6 @@ shared machine behavior that can be composed into multiple hosts.
 
 - `desktop/`
   - desktop environment and desktop infrastructure modules
-- `roles/`
-  - transitional higher-level shared machine profiles
 - `services/`
   - reusable service and service-composition modules
 - `flatpak/`
