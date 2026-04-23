@@ -30,6 +30,7 @@ notes do not blur together.
   - canonical operator guide for the SOPS lifecycle
 - `architecture/`
   - canonical design boundaries and structure decisions
+  - includes capability-module composition and Home Manager/dotfiles boundaries
 - `reference/`
   - quick lookup material for common commands and operational snippets
 - `vps/`

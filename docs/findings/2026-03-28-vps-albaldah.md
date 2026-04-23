@@ -5,7 +5,7 @@ This is a light overview of the `albaldah` host layout in this repo.
 ## What It Is
 
 `albaldah` is the headless STRATO VPS machine definition. The flake wires it in
-from [flake/machines/homelabs.nix](../../flake/machines/homelabs.nix) as a headless VPS host with explicit capability modules and a `disko` install path.
+from [flake/machines/servers.nix](../../flake/machines/servers.nix) as a headless VPS host with explicit capability modules and a `disko` install path.
 
 ## Directory Structure
 

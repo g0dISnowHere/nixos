@@ -112,7 +112,7 @@ If you just want to understand the repo:
 
 1. Read [docs/README.md](docs/README.md).
 2. Look at [flake/machines/workstations.nix](flake/machines/workstations.nix)
-   and [flake/machines/homelabs.nix](flake/machines/homelabs.nix).
+   and [flake/machines/servers.nix](flake/machines/servers.nix).
 3. Check [modules/nixos/](modules/nixos) and [modules/home/](modules/home) for
    reusable building blocks.
 4. Check [dotfiles/](dotfiles) for the raw config files that Home Manager links

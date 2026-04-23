@@ -21,7 +21,7 @@
     # Library functions and machine definitions
     ./flake/lib.nix
     ./flake/machines/workstations.nix
-    ./flake/machines/homelabs.nix
+    ./flake/machines/servers.nix
 
     # Standalone home-manager configurations
     ./flake/homes/djoolz.nix
@@ -42,14 +42,24 @@
 
   flake = {
     # `nixosConfigurations` are defined by importing flake/machines/*.nix
-    # which use self.lib.mkNixosSystem with role-based defaults
+    # which use self.lib.mkNixosSystem plus explicit capability modules.
 
-    # System-agnostic flake attributes
+    # Reusable NixOS capability modules for this or other flakes.
     nixosModules = {
-      # Export reusable modules for other flakes
-      # TODO How to use this?
-      # powermanagement = import ./modules/nixos/system/powermanagement.nix;
-      # autoupgrade = import ./modules/nixos/system/autoupgrade.nix;
+      system-base = ./modules/nixos/system/base.nix;
+      system-wsl = ./modules/nixos/system/wsl.nix;
+      ssh-server = ./modules/nixos/services/ssh-server.nix;
+      tailscale-client = ./modules/nixos/services/tailscale-client.nix;
+      tailscale-router = ./modules/nixos/services/tailscale-router.nix;
+      flatpak = ./modules/nixos/services/flatpak.nix;
+      flatpak-browsers = ./modules/nixos/flatpak/browsers.nix;
+      flatpak-creative = ./modules/nixos/flatpak/creative.nix;
+      flatpak-development = ./modules/nixos/flatpak/development.nix;
+      flatpak-media = ./modules/nixos/flatpak/media.nix;
+      flatpak-messaging = ./modules/nixos/flatpak/messaging.nix;
+      flatpak-productivity = ./modules/nixos/flatpak/productivity.nix;
+      docker = ./modules/nixos/virtualisation/docker.nix;
+      docker-rootless = ./modules/nixos/virtualisation/docker_rootless.nix;
     };
 
     # Home-manager configurations are defined in flake/homes/*.nix

@@ -74,7 +74,7 @@
 
 ## Change Management
 - Move incomplete plans and proposals into `docs/future-ideas/` rather than leaving them mixed with canonical documentation.
-- Preserve explicit structure and avoid reintroducing older mixed-concern layouts described in `docs/future-ideas/flake-refactor-plan.md`.
+- Preserve explicit structure and avoid reintroducing older mixed-concern layouts.
 - If you add new machines or major module families, update this file so it remains the canonical agent guide.
 
 ## Agent-Specific Instructions
