@@ -72,6 +72,19 @@
 - Review `docs/architecture/home-manager-dotfiles-strategy.md` when changing how Home Manager and raw dotfiles are split.
 - Update `docs/README.md` when adding a new documentation area, changing the taxonomy, or promoting incubator material into canonical docs.
 
+## Project Memory
+- The repo knowledge base is the existing `docs/` tree, not a separate `docs/kb/` directory.
+- Before non-trivial changes, read `docs/README.md` and any linked pages relevant to the task.
+- When the task touches a subtree with local AI guidance, also read the subtree-local `README_FOR_AI.md` or equivalent.
+- When you learn something worth keeping, update the relevant existing doc under `docs/`.
+- Keep entries concise and factual.
+- Prefer concrete commands, gotchas, and decisions.
+- Avoid duplicating the same fact across multiple pages.
+- Use `docs/findings/` for dated investigations and recurring issues that are worth recording.
+- Use `docs/reference/` for short lookup material, commands, and checklists.
+- Use `docs/architecture/` for durable design decisions and boundaries.
+- Use `docs/future-ideas/` for incomplete plans and proposals.
+
 ## Change Management
 - Move incomplete plans and proposals into `docs/future-ideas/` rather than leaving them mixed with canonical documentation.
 - Preserve explicit structure and avoid reintroducing older mixed-concern layouts.

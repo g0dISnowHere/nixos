@@ -16,6 +16,8 @@ is only a short companion mirror.
 ## Documentation
 - Human docs start at [`README.md`](../README.md) and [`docs/README.md`](../docs/README.md).
 - `AGENTS.md` is the AI source of truth.
+- Before non-trivial changes, read `docs/README.md` and linked pages relevant to the task.
+- Keep durable knowledge in the existing `docs/` tree; do not introduce a separate KB path.
 - Quick lookup docs live under `docs/reference/`.
 - Incubator material belongs in `docs/findings/` or `docs/future-ideas/`.
 - Subtree-local AI docs may exist for scoped implementation guidance only; when

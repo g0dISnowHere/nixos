@@ -13,6 +13,22 @@ notes do not blur together.
 - `AGENTS.md`
   - canonical AI guidance for coding agents
 
+## Knowledge Base Workflow
+
+The repo knowledge base lives in the existing `docs/` tree.
+
+Before non-trivial changes:
+
+- read `docs/README.md`
+- open any linked pages relevant to the task
+
+When you learn something worth keeping:
+
+- update the relevant existing page under `docs/`
+- keep entries concise and factual
+- prefer concrete commands, gotchas, and decisions
+- avoid duplicating information across pages
+
 ## Document Types
 
 - canonical docs
@@ -50,8 +66,9 @@ notes do not blur together.
 - Put the canonical SOPS operator workflow in `docs/secrets-workflows.md`.
 - Put the canonical development template workflow in `docs/dev-templates.md`.
 - Put quick command lists and checklists in `docs/reference/`.
+- Put recurring issues and point-in-time investigations in `docs/findings/`.
+- Put durable architecture decisions and boundaries in `docs/architecture/`.
 - Put incomplete plans and backlog ideas in `docs/future-ideas/`.
-- Put dated investigations and point-in-time analysis in `docs/findings/`.
 - Keep subtree-specific docs near their owning area when they are not useful as
   repo-wide canonical docs.
 
