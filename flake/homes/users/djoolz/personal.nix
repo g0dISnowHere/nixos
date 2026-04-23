@@ -1,4 +1,4 @@
-{ repoRoot, ... }: {
+{ isNixosIntegrated ? false, lib, repoRoot, ... }: {
   # User-specific settings that should not live in the reusable baseline
   # profiles under flake/homes/profiles/.
   programs.git = {
@@ -9,7 +9,7 @@
     includes = [{ path = "${repoRoot}/dotfiles/git/config.inc"; }];
   };
 
-  programs.ssh.matchBlocks = {
+  programs.ssh.matchBlocks = lib.optionalAttrs (!isNixosIntegrated) {
     centauri = {
       hostname = "centauri";
       user = "djoolz";

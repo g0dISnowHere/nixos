@@ -1,6 +1,6 @@
 { isNixosIntegrated ? false, lib, ... }: {
   programs.ssh = {
-    enable = true;
+    enable = !isNixosIntegrated;
     enableDefaultConfig = false;
     matchBlocks = lib.optionalAttrs (!isNixosIntegrated) {
       "*" = {
