@@ -1,0 +1,2 @@
+# User zsh entrypoint.
+# Interactive shell behavior is managed by NixOS programs.zsh.
