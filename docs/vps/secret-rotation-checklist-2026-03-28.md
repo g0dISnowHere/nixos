@@ -9,6 +9,7 @@ Scope: tracked files and live config for currently preserved services
 - [ ] Rotate `CROWDSEC_BOUNCER_API_KEY` in `public/traefik/config/traefik-crowdsec-bouncer.env`
 - [ ] Rotate CrowdSec local API credentials in `public/traefik/crowdsec/config/local_api_credentials.yaml`
 - [ ] Rotate CrowdSec online API credentials in `public/traefik/crowdsec/config/online_api_credentials.yaml`
+- [ ] Rotate CrowdSec Console enrollment token in `secrets/services/crowdsec/console-enrollment-token.yaml`
 - [ ] Rotate Traefik ACME account material in `public/traefik/traefik/acme_letsencrypt.json`
 - [ ] Rotate Cloudflare ACME account material in `public/traefik/traefik/cloudflare-acme.json`
 - [ ] Rotate TLS account or certificate material in `public/traefik/traefik/tls_letsencrypt.json`
@@ -30,6 +31,7 @@ Scope: tracked files and live config for currently preserved services
 
 - [ ] Remove old credential values from any tracked files
 - [ ] Move rotated secrets out of tracked git files into a managed secret workflow
+- [ ] Verify `secrets/services/crowdsec/` contains current CrowdSec-managed secret imports where needed
 - [ ] Verify Traefik ACME still works after Cloudflare credential rotation
 - [ ] Verify CrowdSec bouncer still authenticates after API key rotation
 - [ ] Verify preserved services start cleanly with the new credentials

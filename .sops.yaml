@@ -18,6 +18,14 @@ creation_rules:
           - *centauri
           - *mirach
 
+  - path_regex: ^secrets/services/crowdsec/.*\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *djoolz_1
+          - *djoolz_2
+          - *albaldah
+
   - path_regex: ^secrets/services/fleet-test/.*\.(yaml|json|env|ini)$
     key_groups:
       - age:

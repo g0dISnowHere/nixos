@@ -15,8 +15,8 @@ Examples:
   Tailscale client behavior, and rootless Docker.
 - `mirach` imports base system behavior, SSH server behavior, Tailscale router
   behavior, GNOME for local management, and rootful Docker.
-- `albaldah` imports base system behavior, SSH server behavior, Tailscale router
-  behavior, rootful Docker, and VPS disk/network specifics.
+- `albaldah` imports base system behavior, SSH server behavior, CrowdSec,
+  Tailscale router behavior, rootful Docker, and VPS disk/network specifics.
 - `alhena` imports base system behavior, WSL platform behavior, SSH server
   behavior, Tailscale client behavior, and Docker.
 

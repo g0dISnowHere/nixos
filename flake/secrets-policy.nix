@@ -37,6 +37,7 @@
     };
 
     services = {
+      crowdsec = { hosts = [ "albaldah" ]; };
       fleet-test = { hosts = [ "albaldah" "alhena" "centauri" "mirach" ]; };
     };
   };

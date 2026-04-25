@@ -44,5 +44,6 @@ as a single machine definition.
 - [nixos-running-services-backup-and-migration-plan-2026-03-28.md](nixos-running-services-backup-and-migration-plan-2026-03-28.md)
 - [nixos-running-services-backup-manifest-2026-03-28.md](nixos-running-services-backup-manifest-2026-03-28.md)
 - [backup-reimport-runbook-2026-03-28.md](backup-reimport-runbook-2026-03-28.md)
+- [crowdsec-on-albaldah.md](crowdsec-on-albaldah.md)
 - [secret-rotation-checklist-2026-03-28.md](secret-rotation-checklist-2026-03-28.md)
 - [strato-vps/README.md](strato-vps/README.md)
