@@ -175,3 +175,45 @@ nix run github:nix-community/nixos-anywhere -- \
   --flake .#albaldah \
   --vm-test
 ```
+
+## Check CrowdSec On `albaldah`
+
+```bash
+ssh albaldah 'sudo systemctl status crowdsec crowdsec-firewall-bouncer; sudo cscli metrics'
+```
+
+## Check CrowdSec Listeners On `albaldah`
+
+```bash
+ssh albaldah "ss -ltnp | rg '8080|7422'"
+```
+
+## Watch CrowdSec Logs On `albaldah`
+
+```bash
+ssh albaldah 'sudo journalctl -u crowdsec -f'
+```
+
+## Show CrowdSec Alerts On `albaldah`
+
+```bash
+ssh albaldah 'sudo cscli alerts list -a -n 20'
+```
+
+## Show CrowdSec Decisions On `albaldah`
+
+```bash
+ssh albaldah 'sudo cscli decisions list -n 20'
+```
+
+## Test CrowdSec Traefik Log Readability On `albaldah`
+
+```bash
+ssh albaldah 'sudo ls -l /var/log/traefik/access.log && sudo -u crowdsec head -n 1 /var/log/traefik/access.log'
+```
+
+## Test CrowdSec AppSec Reachability From Traefik On `albaldah`
+
+```bash
+ssh albaldah "docker exec traefik wget -S -O- http://host.docker.internal:8080/health && docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/"
+```

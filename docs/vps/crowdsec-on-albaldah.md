@@ -13,6 +13,7 @@ It currently covers:
 
 - CrowdSec engine
 - local API (LAPI)
+- AppSec listener for Traefik
 - firewall bouncer
 - CrowdSec Console enrollment
 - CTI API key injection
@@ -52,16 +53,26 @@ The engine currently acquires SSH logs from `journald` only:
 
 - `_SYSTEMD_UNIT=sshd.service`
 
-This keeps the VPS baseline functional, but only the `linux`/SSH part is fully
-active today.
+It also acquires:
+
+- Traefik access logs from `/var/log/traefik/access.log`
+- AppSec requests on `0.0.0.0:7422`
+
+This keeps the VPS baseline functional and makes the Traefik/AppSec path live.
+
+Important:
+
+- keep Traefik access logs in a system path such as `/var/log/traefik/`
+- do not point CrowdSec at log files under `/home`
+- `crowdsec.service` runs with systemd hardening such as `ProtectHome`, so a
+  home-directory log path can silently break Traefik ingestion even when unix
+  permissions look correct from an interactive shell
 
 The following still need dedicated acquisitions or component wiring before they
-become effective on `albaldah`:
+become fully effective on `albaldah`:
 
-- Traefik access logs
 - Nextcloud application logs
 - Authentik logs, likely from Docker or a file log
-- AppSec request inspection in front of Traefik
 
 ## Secret Inputs
 
@@ -159,8 +170,104 @@ Check CrowdSec state:
 ```bash
 sudo cscli console status
 sudo cscli bouncers list
+sudo cscli alerts list
+sudo cscli alerts list -a
 sudo cscli decisions list
 sudo cscli metrics
+```
+
+Interpretation notes:
+
+- `sudo cscli alerts list` shows active alerts only
+- `sudo cscli alerts list -a` shows alert history and is usually the better
+  operator view during troubleshooting
+- `sudo cscli decisions list` shows active local decisions only
+- imported community/list decisions are better observed through
+  `sudo cscli metrics` and the firewall bouncer metrics section
+
+Check listeners:
+
+```bash
+ss -ltnp | rg '8080|7422'
+curl -I http://127.0.0.1:8080
+curl -I http://$(ip -4 addr show docker0 | rg -o 'inet [0-9.]+/' | awk '{print $2}' | cut -d/ -f1):8080
+```
+
+Check from Traefik container after the ingress stack is up:
+
+```bash
+docker exec traefik wget -S -O- http://host.docker.internal:8080/health
+docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/
+```
+
+Expected shape:
+
+- the LAPI call must connect and return HTTP
+- the AppSec call must connect even if the dummy payload returns `400`
+
+Docker reachability model:
+
+- LAPI listens on `0.0.0.0:8080`
+- AppSec listens on `0.0.0.0:7422`
+- NixOS firewall only permits those ports from Docker bridge subnets:
+  - `172.17.0.0/16`
+  - `172.30.0.0/16`
+  - `172.31.0.0/16`
+  - `172.32.0.0/16`
+
+## Maintenance
+
+Rebuild after module or secret changes:
+
+```bash
+sudo nixos-rebuild switch --flake .#albaldah
+```
+
+Restart and inspect the main service:
+
+```bash
+sudo systemctl restart crowdsec
+sudo systemctl status crowdsec
+sudo systemctl cat crowdsec
+```
+
+Check whether the expected log source is readable by the runtime user:
+
+```bash
+sudo ls -l /var/log/traefik/access.log
+sudo -u crowdsec head -n 1 /var/log/traefik/access.log
+```
+
+Watch live CrowdSec logs while generating test traffic:
+
+```bash
+sudo journalctl -u crowdsec -f
+```
+
+Quick local detection test against the Traefik path:
+
+```bash
+for i in {1..10}; do
+  curl -sk -o /dev/null https://djoolz.de/.env
+done
+sudo cscli metrics
+sudo cscli alerts list -a -n 20
+sudo cscli decisions list -n 20
+```
+
+What to expect from that test:
+
+- parser and scenario counters should increase in `sudo cscli metrics`
+- local alerts or decisions may still remain empty if thresholds do not
+  overflow
+- a single `404` on its own is not proof that CrowdSec did or did not work
+- use scenario and parser counters as the first proof of activity
+
+AppSec-specific quick checks:
+
+```bash
+ss -ltnp | rg '7422'
+sudo journalctl -u crowdsec -b | rg -i 'Appsec listening|Appsec Runner|Shutting down Appsec server'
 ```
 
 ## Common Failure Modes
@@ -178,6 +285,19 @@ sudo cscli metrics
 - `crowdsec-firewall-bouncer.service` fails at credential setup
   - usually downstream of failed bouncer registration or missing local API
     bootstrap
+- Traefik ingestion appears dead even though file permissions look fine
+  - do not place Traefik logs under `/home`
+  - `crowdsec.service` is hardened with `ProtectHome`, so interactive shell
+    access can succeed while the service still cannot traverse that path
+- AppSec starts, then `7422` disappears immediately
+  - check whether `journalctl datasource ... stopping` appears during startup
+  - on this host the fix was to disable `PrivateUsers` for `crowdsec.service`
+    so the journald datasource can stay alive
+- `cscli alerts list` is empty, but you still suspect CrowdSec is working
+  - check `sudo cscli alerts list -a`
+  - then inspect parser and scenario counters in `sudo cscli metrics`
+  - imported community/list decisions usually show up there before they show up
+    as obvious local active alerts
 
 ## Free Plan Notes
 

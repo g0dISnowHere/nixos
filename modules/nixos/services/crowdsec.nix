@@ -44,6 +44,49 @@ let
 
   cscliPath =
     "${config.security.wrapperDir}/sudo -u ${config.services.crowdsec.user} /run/current-system/sw/bin/cscli";
+  cscliRegisterPath =
+    "${lib.getExe' config.services.crowdsec.package "cscli"} -c ${
+      config.sops.templates."crowdsec-config.yaml".path
+    }";
+  dockerIngressCidrs =
+    [ "172.17.0.0/16" "172.30.0.0/16" "172.31.0.0/16" "172.32.0.0/16" ];
+  traefikAccessLogPath = "/var/log/traefik/access.log";
+  firewallBouncerApiKeyPath =
+    "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
+  reRegisterFirewallBouncer =
+    pkgs.writeShellScript "crowdsec-firewall-bouncer-register-local" ''
+      set -euo pipefail
+
+      cscli=${lib.escapeShellArg cscliRegisterPath}
+      bouncer_name=crowdsec-firewall-bouncer
+      tmp_key="$(mktemp)"
+      trap 'rm -f "$tmp_key"' EXIT
+
+      if $cscli bouncers list --output json | ${
+        lib.getExe pkgs.jq
+      } -e -- "any(.[]; .name == \"$bouncer_name\")" >/dev/null; then
+        if [ ! -s ${lib.escapeShellArg firewallBouncerApiKeyPath} ]; then
+          $cscli bouncers delete "$bouncer_name" || true
+          rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
+          $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
+          test -s "$tmp_key"
+          install -D -m 0600 -o ${
+            lib.escapeShellArg config.services.crowdsec.user
+          } -g ${
+            lib.escapeShellArg config.services.crowdsec.group
+          } "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
+        fi
+      else
+        rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
+        $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
+        test -s "$tmp_key"
+        install -D -m 0600 -o ${
+          lib.escapeShellArg config.services.crowdsec.user
+        } -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${
+          lib.escapeShellArg firewallBouncerApiKeyPath
+        }
+      fi
+    '';
 in {
   sops.secrets = lib.mkMerge [
     (lib.mkIf hasConsoleToken {
@@ -90,6 +133,8 @@ in {
     enable = true;
     autoUpdateService = true;
 
+    hub.appSecConfigs = [ "crowdsecurity/appsec-default" ];
+
     hub.collections = [
       "crowdsecurity/linux"
       "crowdsecurity/traefik"
@@ -101,17 +146,30 @@ in {
       "firix/authentik"
     ];
 
-    localConfig.acquisitions = [{
-      source = "journalctl";
-      journalctl_filter = [ "_SYSTEMD_UNIT=sshd.service" ];
-      labels.type = "syslog";
-    }];
+    localConfig.acquisitions = [
+      {
+        source = "journalctl";
+        journalctl_filter = [ "_SYSTEMD_UNIT=sshd.service" ];
+        labels.type = "syslog";
+      }
+      {
+        filenames = [ traefikAccessLogPath ];
+        labels.type = "traefik";
+      }
+      {
+        appsec_configs = [ "crowdsecurity/appsec-default" ];
+        labels.type = "appsec";
+        listen_addr = "0.0.0.0:7422";
+        source = "appsec";
+      }
+    ];
 
     settings = {
       lapi.credentialsFile = localApiCredentialsPath;
 
       general.api.server = {
         enable = true;
+        listen_uri = "0.0.0.0:8080";
         console_path = consoleConfigPath;
         online_client.credentials_path = onlineApiCredentialsPath;
       };
@@ -120,6 +178,16 @@ in {
 
   services.crowdsec-firewall-bouncer.enable = true;
 
+  # Keep service-readable ingress logs out of user homes because crowdsec runs
+  # with ProtectHome and should not depend on traversing /home.
+  systemd.tmpfiles.rules = [ "d /var/log/traefik 0755 root root -" ];
+
+  networking.firewall.extraInputRules = ''
+    ip saddr { ${
+      lib.concatStringsSep ", " dockerIngressCidrs
+    } } tcp dport { 8080, 7422 } accept comment "allow Docker stacks to reach CrowdSec LAPI and AppSec"
+  '';
+
   systemd.services = {
     crowdsec.serviceConfig.ExecStart = lib.mkIf hasCtiApiKey (lib.mkForce [
       " "
@@ -127,7 +195,16 @@ in {
         config.sops.templates."crowdsec-config.yaml".path
       } -info"
     ]);
-    crowdsec.serviceConfig.StateDirectory = "crowdsec";
+    crowdsec.serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      # CrowdSec's journalctl datasource exits immediately inside the service's
+      # user namespace even when the runtime user is in systemd-journal.
+      # Keep journal access working so SSH ingestion does not tear down AppSec
+      # and file datasources on startup.
+      PrivateUsers = lib.mkForce false;
+      StateDirectory = "crowdsec";
+      SupplementaryGroups = [ "systemd-journal" ];
+    };
     crowdsec.after = [ "crowdsec-console-config-init.service" ];
     crowdsec.requires = [ "crowdsec-console-config-init.service" ];
 
@@ -171,7 +248,6 @@ in {
         Type = "oneshot";
         User = "root";
         Group = "root";
-        StateDirectory = "crowdsec";
         ExecStart = pkgs.writeShellScript "crowdsec-capi-register" ''
           set -euo pipefail
 
@@ -195,7 +271,6 @@ in {
         Type = "oneshot";
         User = "root";
         Group = "root";
-        StateDirectory = "crowdsec";
         ExecStart = pkgs.writeShellScript "crowdsec-console-enroll" ''
           set -euo pipefail
 
@@ -219,5 +294,7 @@ in {
     crowdsec-firewall-bouncer-register.requires =
       lib.mkIf (!hasImportedOnlineApiCredentials)
       [ "crowdsec-capi-register.service" ];
+    crowdsec-firewall-bouncer-register.script =
+      lib.mkForce (builtins.readFile reRegisterFirewallBouncer);
   };
 }
