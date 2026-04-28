@@ -5,6 +5,7 @@
 
   imports = [
     ./hardware-configuration.nix
+    ./docker-compose-secrets.nix
     ../../../modules/nixos/system/autoupgrade.nix
   ];
 

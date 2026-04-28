@@ -4,8 +4,12 @@ let
 
   traefikCloudflareSecretFile =
     ../../../secrets/services/traefik/cloudflare-dns-token.yaml;
+  traefikCrowdsecLapiKeySecretFile =
+    ../../../secrets/services/traefik/crowdsec-lapi-key.yaml;
 
   hasTraefikCloudflareSecret = builtins.pathExists traefikCloudflareSecretFile;
+  hasTraefikCrowdsecLapiKeySecret =
+    builtins.pathExists traefikCrowdsecLapiKeySecretFile;
 in {
   sops.secrets = lib.mkMerge [
     (lib.mkIf hasTraefikCloudflareSecret {
@@ -13,6 +17,15 @@ in {
         sopsFile = traefikCloudflareSecretFile;
         format = "yaml";
         key = "secret";
+        owner = dockerUser;
+        mode = "0400";
+      };
+    })
+    (lib.mkIf hasTraefikCrowdsecLapiKeySecret {
+      "traefik-crowdsec-lapi-key" = {
+        sopsFile = traefikCrowdsecLapiKeySecretFile;
+        format = "yaml";
+        key = "key";
         owner = dockerUser;
         mode = "0400";
       };
@@ -37,7 +50,13 @@ in {
       path = "/run/secrets/traefik/crowdsec.env";
       owner = dockerUser;
       mode = "0400";
-      content = "";
+      content = lib.concatStrings [
+        (lib.optionalString hasTraefikCrowdsecLapiKeySecret ''
+          CROWDSEC_LAPI_KEY=${
+            config.sops.placeholder."traefik-crowdsec-lapi-key"
+          }
+        '')
+      ];
     };
 
     "docker-nextcloud-aio-env" = {

@@ -39,6 +39,8 @@
     services = {
       crowdsec = { hosts = [ "albaldah" ]; };
       fleet-test = { hosts = [ "albaldah" "alhena" "centauri" "mirach" ]; };
+      nextcloud-aio = { hosts = [ "albaldah" ]; };
+      traefik = { hosts = [ "albaldah" ]; };
     };
   };
 }

@@ -50,6 +50,7 @@ let
     }";
   dockerIngressCidrs =
     [ "172.17.0.0/16" "172.30.0.0/16" "172.31.0.0/16" "172.32.0.0/16" ];
+  dockerIngressInterfaces = [ "docker0" "br-*" ];
   traefikAccessLogPath = "/var/log/traefik/access.log";
   firewallBouncerApiKeyPath =
     "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
@@ -186,6 +187,23 @@ in {
     ip saddr { ${
       lib.concatStringsSep ", " dockerIngressCidrs
     } } tcp dport { 8080, 7422 } accept comment "allow Docker stacks to reach CrowdSec LAPI and AppSec"
+    iifname { ${
+      lib.concatStringsSep ", "
+      (map (iface: ''"${iface}"'') dockerIngressInterfaces)
+    } } tcp dport { 8080, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec LAPI and AppSec"
+  '';
+
+  networking.firewall.extraCommands = ''
+    ${lib.concatMapStringsSep "\n" (cidr: ''
+      iptables -C nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null \
+        || iptables -I nixos-fw 3 -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept
+    '') dockerIngressCidrs}
+  '';
+
+  networking.firewall.extraStopCommands = ''
+    ${lib.concatMapStringsSep "\n" (cidr: ''
+      iptables -D nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null || true
+    '') dockerIngressCidrs}
   '';
 
   systemd.services = {
