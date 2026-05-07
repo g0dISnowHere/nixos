@@ -189,6 +189,8 @@ sudo nixos-rebuild switch --flake .#centauri
   - human documentation index and taxonomy
 - [docs/reference/useful-commands.md](docs/reference/useful-commands.md)
   - quick command lookup
+- [docs/reference/fingerprint-maintenance.md](docs/reference/fingerprint-maintenance.md)
+  - update and validation checklist for `centauri` fingerprint support
 - [docs/dev-templates.md](docs/dev-templates.md)
   - local project template workflow
 - [docs/architecture/home-manager-dotfiles-strategy.md](docs/architecture/home-manager-dotfiles-strategy.md)

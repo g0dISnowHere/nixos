@@ -38,6 +38,18 @@ echo ""
 echo "Key Evaluations:"
 run_check "nixosConfigurations.centauri failed to evaluate" \
   nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
+run_check "centauri fingerprint PAM wiring missing" \
+  nix eval --impure --expr '
+    let
+      flake = builtins.getFlake (toString ./.);
+      cfg = flake.nixosConfigurations.centauri.config;
+    in
+      assert cfg.security.pam.services.sudo.fprintAuth;
+      assert cfg.security.pam.services.swaylock.fprintAuth;
+      assert cfg.security.pam.services."polkit-1".fprintAuth;
+      assert cfg.security.pam.services ? "gdm-fingerprint";
+      true
+  '
 run_check "nixosConfigurations.mirach failed to evaluate" \
   nix eval .#nixosConfigurations.mirach.config.system.build.toplevel
 run_check "nixosConfigurations.albaldah failed to evaluate" \

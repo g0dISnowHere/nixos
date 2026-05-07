@@ -59,32 +59,6 @@
     libinput # For configuring input devices
   ];
 
-  ########################### Fingerprint Reader ############################
-  # Enable the fprintd fingerprint reader daemon.
-  # Start the driver at boot
-  # systemd.services.fprintd = {
-  #   wantedBy = [ "multi-user.target" ];
-  #   serviceConfig.Type = "simple";
-  # };
-
-  ## Doesn't work, there are no drivers for my version of a fingerprint reader,
-  # https://wiki.nixos.org/wiki/Fingerprint_scanner
-  # services.fprintd = {
-  #   enable = true;
-  #   # If simply enabling fprintd doesn't work, try enabling the driver
-  #   tod = {
-  #     enable = true;
-  #     driver = pkgs.libfprint-2-tod1-goodix; # Goodix driver module
-  #     # driver = pkgs.libfprint-2-tod1-elan; # Elan(04f3:0c4b) driver
-  #     # driver = pkgs.libfprint-2-tod1-vfs0090; # (Marked as broken as of 2025/04/23!) driver for 2016 ThinkPads
-  #     # driver = pkgs.libfprint-2-tod1-goodix-550a; # Goodix 550a driver (from Lenovo)
-
-  #     # however for focaltech 2808:a658, use fprintd with overidden package (without tod)
-  #     # services.fprintd.package = pkgs.fprintd.override {
-  #     #   libfprint = pkgs.libfprint-focaltech-2808-a658;
-  #     # };
-  #   };
-  # };
   ############################ Trackpoint ############################
   hardware.trackpoint = {
     enable = true;

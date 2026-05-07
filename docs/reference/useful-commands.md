@@ -151,6 +151,48 @@ sudo nixos-rebuild switch --flake .#centauri
 systemctl --user restart noctalia-shell
 ```
 
+## Fingerprint: Check Driver Service
+
+```bash
+sudo systemctl status python3-validity
+```
+
+## Fingerprint: Enroll
+
+```bash
+fprintd-enroll
+```
+
+## Fingerprint: Verify
+
+```bash
+fprintd-verify
+```
+
+## Fingerprint: Download Sensor Firmware
+
+```bash
+sudo validity-sensors-firmware
+```
+
+## Fingerprint: Check Recent Logs
+
+```bash
+sudo journalctl -u python3-validity -b --no-pager
+```
+
+## Fingerprint: Check If `06cb:009a` Is Upstream-Supported
+
+```bash
+curl -fsSL https://fprint.freedesktop.org/supported-devices.html | rg '06cb:009a'
+```
+
+## Fingerprint: Check Flake Input Version
+
+```bash
+rg -n 'nixos-06cb-009a-fingerprint-sensor|url = ' flake.nix flake.lock
+```
+
 ## Build `albaldah` Locally
 
 ```bash

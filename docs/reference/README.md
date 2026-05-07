@@ -6,3 +6,8 @@ and similar docs that help during operation or development.
 These files are not the place for architecture explanation or long-form
 background. If a document starts explaining why the repo is structured a certain
 way, that content belongs in canonical docs under `docs/` instead.
+
+Current entries:
+- `useful-commands.md`
+- `secrets-commands.md`
+- `fingerprint-maintenance.md`
