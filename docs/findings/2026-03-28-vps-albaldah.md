@@ -42,6 +42,8 @@ Tailscale routing, Docker, and a `disko` install path.
 - BIOS/GRUB boot path
 - `systemd-networkd` on `ens6` with DHCP and IPv6
 - Tailscale SSH plus provider-console administration
+- no public SSH allowlist on `tcp/22`; public SSH attempts should hit the
+  firewall drop path rather than an active refusal
 
 For implementation details, read the machine files directly. This note is only
 meant to explain the structure and where to look next.

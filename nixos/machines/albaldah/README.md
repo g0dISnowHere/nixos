@@ -33,6 +33,13 @@ go through Tailscale SSH plus the provider console, not public OpenSSH. This
 directory is therefore one layer
 in a larger composition, not a standalone configuration world of its own.
 
+Public SSH behavior in the repo-managed config:
+
+- `tcp/22` is not opened in the NixOS firewall for `albaldah`
+- remote admin is intended through Tailscale SSH, not a public SSH port
+- from a public network path, SSH connection attempts should be dropped at the
+  firewall rather than actively refused by a listening `sshd`
+
 ## Related Docs
 
 - [docs/findings/2026-03-28-vps-albaldah.md](../../../docs/findings/2026-03-28-vps-albaldah.md)
