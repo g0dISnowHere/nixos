@@ -36,6 +36,11 @@
   boot.loader.grub = {
     enable = true;
     efiSupport = false;
+    extraConfig = ''
+      serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1
+      terminal_input console serial
+      terminal_output console serial
+    '';
   };
 
   swapDevices = [{
@@ -43,8 +48,11 @@
     size = 8 * 1024;
   }];
 
-  # Keep serial console access aligned with the audited host.
-  boot.kernelParams = [ "console=tty1" "console=ttyS0" ];
+  # Keep provider recovery consoles usable through both boot and login.
+  boot.kernelParams = [ "console=tty1" "console=ttyS0" "systemd.ssh_auto=no" ];
+
+  systemd.services."getty@tty1".enable = true;
+  systemd.services."serial-getty@ttyS0".enable = true;
 
   services.openssh.settings = {
     PermitRootLogin = lib.mkForce "prohibit-password";
