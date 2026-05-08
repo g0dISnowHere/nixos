@@ -48,6 +48,9 @@
     binfmt = true;
   };
 
+  # This laptop travels, so let NixOS track the current local timezone.
+  services.automatic-timezoned.enable = true;
+
   # Machine-specific packages
   environment.systemPackages = with pkgs;
     [

@@ -1,6 +1,7 @@
-{
+{ lib, ... }: {
   # Set your time zone.
-  time.timeZone = "Europe/Berlin";
+  # Germany is the fleet default, but traveling machines can override this.
+  time.timeZone = lib.mkDefault "Europe/Berlin";
 
   # Select internationalisation properties.
   i18n = {

@@ -10,7 +10,6 @@
   ];
 
   networking.hostName = hostname;
-  time.timeZone = lib.mkForce "Etc/UTC";
   networking.firewall.enable = true;
 
   # This VPS should stay on provider-style networkd + DHCP for remote
