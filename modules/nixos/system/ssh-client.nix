@@ -13,12 +13,12 @@
       IdentitiesOnly yes
 
     Host albaldah
-      HostName 85.215.175.36
+      HostName albaldah
       User djoolz
       IdentitiesOnly yes
 
     Host albaldah-root
-      HostName 85.215.175.36
+      HostName albaldah
       User root
       IdentitiesOnly yes
 

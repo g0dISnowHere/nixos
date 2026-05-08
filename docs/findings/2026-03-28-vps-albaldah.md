@@ -6,14 +6,14 @@ This is a light overview of the `albaldah` host layout in this repo.
 
 `albaldah` is the headless STRATO VPS machine definition. The flake wires it in
 from [flake/machines/servers.nix](../../flake/machines/servers.nix) as a
-headless VPS host with explicit capability modules, including SSH, CrowdSec,
+headless VPS host with explicit capability modules, including CrowdSec,
 Tailscale routing, Docker, and a `disko` install path.
 
 ## Directory Structure
 
 - [default.nix](../../nixos/machines/albaldah/default.nix)
-  - host-specific behavior such as networking, bootloader, SSH access, timezone,
-    and the attached Home Manager user
+  - host-specific behavior such as networking, bootloader, Tailscale-only admin
+    access, timezone, and the attached Home Manager user
 - [hardware-configuration.nix](../../nixos/machines/albaldah/hardware-configuration.nix)
   - hardware detection only
   - does not own `/` or `/boot`
@@ -41,7 +41,7 @@ Tailscale routing, Docker, and a `disko` install path.
 - declarative `8 GiB` swapfile on the root filesystem
 - BIOS/GRUB boot path
 - `systemd-networkd` on `ens6` with DHCP and IPv6
-- SSH-first remote administration
+- Tailscale SSH plus provider-console administration
 
 For implementation details, read the machine files directly. This note is only
 meant to explain the structure and where to look next.

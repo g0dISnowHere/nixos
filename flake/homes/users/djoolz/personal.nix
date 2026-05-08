@@ -16,12 +16,12 @@
       identitiesOnly = true;
     };
     albaldah = {
-      hostname = "85.215.175.36";
+      hostname = "albaldah";
       user = "djoolz";
       identitiesOnly = true;
     };
     albaldah-root = {
-      hostname = "85.215.175.36";
+      hostname = "albaldah";
       user = "root";
       identitiesOnly = true;
     };

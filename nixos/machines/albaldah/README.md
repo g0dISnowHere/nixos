@@ -27,8 +27,10 @@ specialized host without turning it into a one-off snowflake.
 ## Place In The Repo
 
 `albaldah` is wired into the flake from `flake/machines/servers.nix` as a
-headless VPS machine assembled from explicit capability modules such as SSH,
-CrowdSec, Tailscale routing, and Docker. This directory is therefore one layer
+headless VPS machine assembled from explicit capability modules such as
+CrowdSec, Tailscale routing, and Docker. Remote administration is intended to
+go through Tailscale SSH plus the provider console, not public OpenSSH. This
+directory is therefore one layer
 in a larger composition, not a standalone configuration world of its own.
 
 ## Related Docs

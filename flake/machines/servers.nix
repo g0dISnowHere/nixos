@@ -23,7 +23,6 @@
       hostname = "albaldah";
       modules = [
         ../../modules/nixos/system/base.nix
-        ../../modules/nixos/services/ssh-server.nix
         ../../modules/nixos/services/crowdsec.nix
         ../../modules/nixos/services/tailscale-router.nix
         ../../modules/nixos/virtualisation/docker.nix

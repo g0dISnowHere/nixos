@@ -11,6 +11,7 @@
 
   networking.hostName = hostname;
   time.timeZone = lib.mkForce "Etc/UTC";
+  networking.firewall.enable = true;
 
   # This VPS should stay on provider-style networkd + DHCP for remote
   # reliability.
@@ -54,22 +55,7 @@
   systemd.services."getty@tty1".enable = true;
   systemd.services."serial-getty@ttyS0".enable = true;
 
-  services.openssh.settings = {
-    PermitRootLogin = lib.mkForce "prohibit-password";
-    PasswordAuthentication = lib.mkForce false;
-    KbdInteractiveAuthentication = false;
-  };
-
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIItFDRkSHQOn8MlPIjHx/kSPDYSpElw+SozdUIjMMDGe djoolz@mirach"
-  ];
-
-  users.users.djoolz = {
-    extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIItFDRkSHQOn8MlPIjHx/kSPDYSpElw+SozdUIjMMDGe djoolz@mirach"
-    ];
-  };
+  users.users.djoolz = { extraGroups = [ "wheel" ]; };
 
   environment.systemPackages = with pkgs; [ curl git htop tmux vim ];
 
