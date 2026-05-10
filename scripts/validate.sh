@@ -41,6 +41,11 @@ done
 
 FAILED=0
 FAILED_CHECKS=()
+REMOTE_VSCODE_HOSTS=(
+  "mirach"
+  "albaldah"
+  "alhena"
+)
 
 run_check() {
   local description="$1"
@@ -54,6 +59,25 @@ run_check() {
   FAILED=$((FAILED + 1))
   FAILED_CHECKS+=("${description}")
   return 0
+}
+
+validate_remote_vscode_support() {
+  local host_name="$1"
+  local nix_ld_enabled
+
+  if ! nix_ld_enabled="$(
+    nix eval ".#nixosConfigurations.${host_name}.config.programs.nix-ld.enable" 2>/dev/null
+  )"; then
+    echo "  ✗ ${host_name}: failed to evaluate programs.nix-ld.enable"
+    return 1
+  fi
+
+  if [[ "${nix_ld_enabled}" != "true" ]]; then
+    echo "  ✗ ${host_name}: programs.nix-ld.enable = ${nix_ld_enabled}"
+    return 1
+  fi
+
+  echo "  ✓ ${host_name}: VS Code Remote support enabled"
 }
 
 if [[ "${REGENERATE_DCONF}" -eq 1 ]]; then
@@ -116,6 +140,13 @@ echo "    - hostname: $(nix eval .#nixosConfigurations.albaldah.config.networkin
 echo "    - networkmanager: $(nix eval .#nixosConfigurations.albaldah.config.networking.networkmanager.enable 2>/dev/null)"
 echo "    - tailscale: $(nix eval .#nixosConfigurations.albaldah.config.services.tailscale.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
+
+echo ""
+echo "Remote VS Code Support:"
+for host_name in "${REMOTE_VSCODE_HOSTS[@]}"; do
+  run_check "remote VS Code support missing for ${host_name}" \
+    validate_remote_vscode_support "${host_name}"
+done
 
 echo ""
 echo "Home-Manager Configurations:"
