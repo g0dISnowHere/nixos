@@ -140,10 +140,10 @@ If this is your first time looking at a Nix flake repo, these are the most
 useful commands to start with:
 
 ```bash
-nix flake show
-nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
-nix eval .#homeConfigurations."djoolz@workstation".activationPackage
-nix flake new --template .#empty /tmp/template-test
+nix flake show | tail -n 20
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
+nix eval .#homeConfigurations."djoolz@workstation".activationPackage | tail -n 20
+nix flake new --template .#empty /tmp/template-test | tail -n 20
 nix develop
 ```
 
@@ -163,18 +163,18 @@ What they do:
 Use fast evals during iteration:
 
 ```bash
-nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
-nix eval .#nixosConfigurations.mirach.config.system.build.toplevel
-nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel
-nix eval .#homeConfigurations."djoolz@workstation".activationPackage
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
+nix eval .#nixosConfigurations.mirach.config.system.build.toplevel | tail -n 20
+nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 20
+nix eval .#homeConfigurations."djoolz@workstation".activationPackage | tail -n 20
 ```
 
 Broader checks:
 
 ```bash
-nix flake check
-sh scripts/validate-fast.sh
-sh validate.sh
+nix flake check | tail -n 20
+sh scripts/validate-fast.sh | tail -n 20
+sh validate.sh | tail -n 20
 ```
 
 When you are ready to apply a machine config locally, the basic NixOS command is:

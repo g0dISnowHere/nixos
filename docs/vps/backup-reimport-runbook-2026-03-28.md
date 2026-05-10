@@ -4,6 +4,8 @@ This file covers the restore side of the VPS migration work. It is the document
 to use after the backup set already exists and the target system is ready to
 receive it.
 
+The backup archive referenced by this runbook is `vps-running-services-backup-2026-03-28.tar`.
+
 ## Focus
 
 - restore order

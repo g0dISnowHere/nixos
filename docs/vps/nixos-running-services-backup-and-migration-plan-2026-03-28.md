@@ -4,6 +4,8 @@ This file covers the preservation plan for the services kept during the VPS
 migration. It narrows the audit down to the service set and data classes that
 actually need to survive the move.
 
+The backup archive for this document set is `vps-running-services-backup-2026-03-28.tar`.
+
 ## Focus
 
 - which services are in scope

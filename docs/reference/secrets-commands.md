@@ -5,35 +5,35 @@ Quick lookup for the repo's SOPS operator commands.
 ## Core Checks
 
 ```bash
-scripts/secrets
-scripts/secrets doctor
-scripts/secrets doctor --fix
-scripts/secrets doctor --full-test
-scripts/secrets validate-policy
-scripts/secrets validate-access --actor all
-scripts/secrets sync-policy --check
+scripts/secrets | tail -n 20
+scripts/secrets doctor | tail -n 20
+scripts/secrets doctor --fix | tail -n 20
+scripts/secrets doctor --full-test | tail -n 20
+scripts/secrets validate-policy | tail -n 20
+scripts/secrets validate-access --actor all | tail -n 20
+scripts/secrets sync-policy --check | tail -n 20
 ```
 
 ## Create And Update
 
 ```bash
-scripts/secrets create --scope services.fleet-test --name example.env
-scripts/secrets add-host --host <name> --user-scope djoolz
-scripts/secrets add-host --host <name> --no-user-scopes
-scripts/secrets register-host --host <name>
-scripts/secrets register-host --host <name> --force-host-rotate
-scripts/secrets user-scope --user djoolz --add-host <name>
-scripts/secrets user-scope --user djoolz --remove-host <name>
-scripts/secrets sync-policy
+scripts/secrets create --scope services.fleet-test --name example.env | tail -n 20
+scripts/secrets add-host --host <name> --user-scope djoolz | tail -n 20
+scripts/secrets add-host --host <name> --no-user-scopes | tail -n 20
+scripts/secrets register-host --host <name> | tail -n 20
+scripts/secrets register-host --host <name> --force-host-rotate | tail -n 20
+scripts/secrets user-scope --user djoolz --add-host <name> | tail -n 20
+scripts/secrets user-scope --user djoolz --remove-host <name> | tail -n 20
+scripts/secrets sync-policy | tail -n 20
 ```
 
 ## Retirement And Recovery
 
 ```bash
-scripts/secrets retire-host --host <name> --dry-run
-scripts/secrets retire-host --host <name>
-scripts/secrets recover-access --host <name>
-scripts/secrets recover-access --host <name> --target-operator-recipient age1...
+scripts/secrets retire-host --host <name> --dry-run | tail -n 20
+scripts/secrets retire-host --host <name> | tail -n 20
+scripts/secrets recover-access --host <name> | tail -n 20
+scripts/secrets recover-access --host <name> --target-operator-recipient age1... | tail -n 20
 ```
 
 ## Pre-Merge Checks
@@ -41,19 +41,19 @@ scripts/secrets recover-access --host <name> --target-operator-recipient age1...
 Run these before merging changes to secrets policy tooling:
 
 ```bash
-scripts/tests/secrets-policy-roundtrip.sh
-python3 -m py_compile scripts/secrets-lib/policy.py
-bash scripts/secrets-workflows/validate-policy.sh
-nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
-nix eval .#homeConfigurations."djoolz@workstation".activationPackage
+scripts/tests/secrets-policy-roundtrip.sh | tail -n 20
+python3 -m py_compile scripts/secrets-lib/policy.py | tail -n 20
+bash scripts/secrets-workflows/validate-policy.sh | tail -n 20
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
+nix eval .#homeConfigurations."djoolz@workstation".activationPackage | tail -n 20
 ```
 
 For policy-mutation changes, also run dry-run smoke tests against the affected workflows:
 
 ```bash
-scripts/secrets user-scope --user <existing-scope> --add-host <existing-host> --dry-run
-scripts/secrets user-scope --user <new-scope> --add-host <existing-host> --create --dry-run
-scripts/secrets retire-host --host <existing-host> --dry-run
+scripts/secrets user-scope --user <existing-scope> --add-host <existing-host> --dry-run | tail -n 20
+scripts/secrets user-scope --user <new-scope> --add-host <existing-host> --create --dry-run | tail -n 20
+scripts/secrets retire-host --host <existing-host> --dry-run | tail -n 20
 ```
 
 ## Current Lifecycle Notes

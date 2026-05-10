@@ -1,42 +1,32 @@
 # VPS Docs
 
-This section covers the VPS-specific slice of the repo. It connects the
-integrated `albaldah` machine with the migration history and the surrounding
-service-preservation work.
+This section covers VPS slice of repo. It ties `albaldah`, migration history,
+service-preservation work together.
 
-This is canonical documentation for the VPS area. Dated investigations and
-historical migration notes remain separate from this section's role as the VPS
-entrypoint.
+This page = canonical VPS entrypoint. Dated findings and migration notes stay
+separate.
 
 ## Why This Section Exists
 
-The VPS story is structurally different from the local workstation and homelab
-machines:
+VPS story differs from workstation and homelab:
 
-- it has remote-install concerns
-- it has migration and preservation concerns
-- it has a clearer boundary between historical source state and the new
-  repo-managed target state
+- remote install matters
+- migration and preservation matter
+- old source state vs new repo-managed state has hard boundary
 
-That makes it worth documenting as its own area rather than scattering the
-context across host files and findings.
+So VPS gets own doc area, not scattered crumbs.
 
 ## Main Themes
 
-- migration context
-  - where the VPS setup came from and what was observed on the source side
-- backup and restore planning
-  - how the preserved service set is framed
-- secret handling
-  - credential review and follow-up cleanup
-- reference material
-  - older standalone artifacts that explain the historical path
+- migration context: where VPS came from, what source side looked like
+- backup and restore planning: how preserved services framed
+- secret handling: credential review, cleanup follow-up
+- reference material: older artifacts showing historical path
 
 ## How To Read It
 
-Use this section as a bridge between the host-local `albaldah` files and the
-detailed findings. The files here describe the VPS as an area of work, not just
-as a single machine definition.
+Use this section as bridge between host-local `albaldah` files and detailed
+findings. Files here describe VPS as work area, not only one host definition.
 
 ## Files
 

@@ -1,13 +1,13 @@
 # Capability Modules
 
-Machine behavior is assembled from explicit capability modules rather than broad
-machine role modules.
+Machine behavior built from explicit capability modules, not broad role
+modules.
 
 ## Core Rule
 
-A machine definition should show what the host actually does. Prefer a readable
-list of imports over an abstract label that hides SSH, Tailscale, Docker,
-desktop, or Flatpak policy.
+Machine definition should show what host actually does. Prefer readable import
+list over abstract label hiding SSH, Tailscale, Docker, desktop, Flatpak
+policy.
 
 Examples:
 
@@ -15,54 +15,49 @@ Examples:
   Tailscale client behavior, and rootless Docker.
 - `mirach` imports base system behavior, SSH server behavior, Tailscale router
   behavior, GNOME for local management, and rootful Docker.
-- `albaldah` imports base system behavior, CrowdSec, Tailscale router
-  behavior, rootful Docker, and VPS disk/network specifics. Remote
-  administration is intended to use Tailscale SSH rather than a public
-  OpenSSH listener.
+- `albaldah` imports base system behavior, VS Code remote-session support,
+  CrowdSec, Tailscale router behavior, rootful Docker, and VPS disk/network
+  specifics. Remote administration is intended to use Tailscale SSH rather
+  than a public OpenSSH listener.
 - `alhena` imports base system behavior, WSL platform behavior, SSH server
   behavior, Tailscale client behavior, and Docker.
 
 ## Module Boundaries
 
-- `modules/nixos/system/`
-  - platform and baseline system behavior such as `base.nix`, WSL support, Nix
-    settings, shell integration, and secrets plumbing
-- `modules/nixos/services/`
-  - reusable service capabilities such as SSH server, Tailscale client/router,
-    Flatpak infrastructure, scanner, firewall, and service-specific modules
-- `modules/nixos/virtualisation/`
-  - container and virtualization capabilities such as Docker, rootless Docker,
-    podman, and quickemu
-- `modules/nixos/desktop/`
-  - desktop environment and desktop infrastructure modules
-- `modules/nixos/flatpak/`
-  - focused Flatpak application sets; Flatpak infrastructure stays in
-    `modules/nixos/services/flatpak.nix`
+- `modules/nixos/system/`: platform and baseline system behavior like
+  `base.nix`, WSL support, Nix settings, shell integration, secrets plumbing
+- `modules/nixos/services/`: reusable service capabilities like SSH server,
+  Tailscale client/router, Flatpak infra, scanner, firewall, service modules
+- `modules/nixos/virtualisation/`: container and virtualization capabilities
+  like Docker, rootless Docker, podman, quickemu
+- `modules/nixos/desktop/`: desktop environment and desktop infra modules
+- `modules/nixos/flatpak/`: focused Flatpak app sets; infra stays in
+  `modules/nixos/services/flatpak.nix`
 
 ## Composition
 
-`flake/lib.nix` provides `mkNixosSystem` as an orchestration helper. It wires
+`flake/lib.nix` provides `mkNixosSystem` as orchestration helper. It wires
 shared flake inputs, Home Manager integration, desktop selection, SOPS support,
-Nix daemon settings, and the default user plumbing. It does not import machine
-roles by name.
+Nix daemon settings, default user plumbing. It does not import machine roles by
+name.
 
 Machine sets under `flake/machines/` choose concrete capabilities explicitly:
 
-- `workstations.nix` contains local workstation-style hosts.
-- `servers.nix` contains server-like hosts, including VPS and WSL hosts.
+- `workstations.nix` contains local workstation-style hosts
+- `servers.nix` contains server-like hosts, including VPS and WSL hosts
 
 ## Guardrails
 
-Capabilities should fail early for invalid combinations. Docker uses internal
+Capabilities should fail early on bad combinations. Docker uses internal
 markers so importing both `docker.nix` and `docker_rootless.nix` fails during
-evaluation.
+eval.
 
-Flatpak infrastructure and Flatpak application sets stay separate. A host can
-enable Flatpak without inheriting a personal desktop application bundle, and
-headless hosts should not receive Flatpaks through unrelated server behavior.
+Flatpak infra and Flatpak app sets stay separate. Host can enable Flatpak
+without inheriting personal desktop bundle. Headless hosts should not get
+Flatpaks through unrelated server behavior.
 
 ## Home Manager Boundary
 
-Home Manager remains the user-environment layer. NixOS capability modules choose
-system behavior; Home Manager profiles and modules choose user packages,
-services, settings, and dotfile links.
+Home Manager stays user-environment layer. NixOS capability modules choose
+system behavior. Home Manager profiles and modules choose user packages,
+services, settings, dotfile links.

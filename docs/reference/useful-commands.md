@@ -6,17 +6,17 @@ lookup rather than explanation.
 ## Rebuild Error Output
 
 ```bash
-sudo nixos-rebuild switch &>nixos-switch.log || (cat nixos-switch.log | grep --color error && exit 1)
+sudo nixos-rebuild switch &>nixos-switch.log || (tail -n 20 nixos-switch.log | grep --color error && exit 1)
 ```
 
 ```bash
-sudo nixos-rebuild switch &>nixos-switch.log || (echo "NixOS rebuild failed with the following error:" && cat nixos-switch.log | grep --color error && exit 1)
+sudo nixos-rebuild switch &>nixos-switch.log || (echo "NixOS rebuild failed with the following error:" && tail -n 20 nixos-switch.log | grep --color error && exit 1)
 ```
 
 ## Keep Upgrade Logs
 
 ```bash
-sudo nixos-rebuild switch --flake .# 2>&1 | tee nixos-switch.log || { grep --color error nixos-switch.log && exit 1; }
+sudo nixos-rebuild switch --flake .# 2>&1 | tee nixos-switch.log || { tail -n 20 nixos-switch.log | grep --color error && exit 1; }
 ```
 
 ## Roll Back
@@ -40,31 +40,31 @@ dconf dump / | dconf2nix > modules/home/dconf/dconf.nix
 ## List Dev Templates
 
 ```bash
-nix flake show path:/home/djoolz/Documents/01_config/mine
+nix flake show path:/home/djoolz/Documents/01_config/mine | tail -n 20
 ```
 
 ## Create Project From Dev Template
 
 ```bash
-nix flake new --template path:/home/djoolz/Documents/01_config/mine#rust ./my-rust-project
+nix flake new --template path:/home/djoolz/Documents/01_config/mine#rust ./my-rust-project | tail -n 20
 ```
 
 ## Initialize Current Directory From Dev Template
 
 ```bash
-nix flake init --template path:/home/djoolz/Documents/01_config/mine#python
+nix flake init --template path:/home/djoolz/Documents/01_config/mine#python | tail -n 20
 ```
 
 ## Smoke-Test A Local Dev Template
 
 ```bash
-nix flake new --template .#empty /tmp/dev-template-test
+nix flake new --template .#empty /tmp/dev-template-test | tail -n 20
 ```
 
 ## Check D-Bus Activation Files
 
 ```bash
-find /nix/store -path "*/share/dbus-1/services/*kdeconnect*" 2>/dev/null
+find /nix/store -path "*/share/dbus-1/services/*kdeconnect*" 2>/dev/null | tail -n 20
 ```
 
 ## See Recent System Updates
@@ -84,13 +84,13 @@ loginctl terminate-user djoolz
 List all system libvirt domains:
 
 ```bash
-virsh -c qemu:///system list --all
+virsh -c qemu:///system list --all | tail -n 20
 ```
 
 Show the current state and autostart flag for a domain:
 
 ```bash
-virsh -c qemu:///system dominfo homeassistant
+virsh -c qemu:///system dominfo homeassistant | tail -n 20
 ```
 
 Start or stop a domain:
@@ -122,7 +122,7 @@ virsh -c qemu:///system autostart --disable homeassistant
 Inspect the live domain XML:
 
 ```bash
-virsh -c qemu:///system dumpxml homeassistant
+virsh -c qemu:///system dumpxml homeassistant | tail -n 20
 ```
 
 Rename an inactive domain:
@@ -154,7 +154,7 @@ systemctl --user restart noctalia-shell
 ## Fingerprint: Check Driver Service
 
 ```bash
-sudo systemctl status python3-validity
+sudo systemctl status python3-validity | tail -n 20
 ```
 
 ## Fingerprint: Enroll
@@ -178,25 +178,25 @@ sudo validity-sensors-firmware
 ## Fingerprint: Check Recent Logs
 
 ```bash
-sudo journalctl -u python3-validity -b --no-pager
+sudo journalctl -u python3-validity -b --no-pager | tail -n 20
 ```
 
 ## Fingerprint: Check If `06cb:009a` Is Upstream-Supported
 
 ```bash
-curl -fsSL https://fprint.freedesktop.org/supported-devices.html | rg '06cb:009a'
+curl -fsSL https://fprint.freedesktop.org/supported-devices.html | rg '06cb:009a' | tail -n 20
 ```
 
 ## Fingerprint: Check Flake Input Version
 
 ```bash
-rg -n 'nixos-06cb-009a-fingerprint-sensor|url = ' flake.nix flake.lock
+rg -n 'nixos-06cb-009a-fingerprint-sensor|url = ' flake.nix flake.lock | tail -n 20
 ```
 
 ## Build `albaldah` Locally
 
 ```bash
-nix build .#nixosConfigurations.albaldah.config.system.build.toplevel
+nix build .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 20
 ```
 
 ## Install `albaldah` With `nixos-anywhere`
@@ -206,7 +206,7 @@ nix build .#nixosConfigurations.albaldah.config.system.build.toplevel && \
 nix run github:nix-community/nixos-anywhere -- \
   --build-on local \
   --flake .#albaldah \
-  --target-host root@YOUR_SERVER_IP
+  --target-host root@YOUR_SERVER_IP | tail -n 20
 ```
 
 ## Test `albaldah` Install With `nixos-anywhere`
@@ -215,47 +215,47 @@ nix run github:nix-community/nixos-anywhere -- \
 nix build .#nixosConfigurations.albaldah.config.system.build.toplevel && \
 nix run github:nix-community/nixos-anywhere -- \
   --flake .#albaldah \
-  --vm-test
+  --vm-test | tail -n 20
 ```
 
 ## Check CrowdSec On `albaldah`
 
 ```bash
-ssh albaldah 'sudo systemctl status crowdsec crowdsec-firewall-bouncer; sudo cscli metrics'
+ssh albaldah 'sudo systemctl status crowdsec crowdsec-firewall-bouncer; sudo cscli metrics | tail -n 20'
 ```
 
 ## Check CrowdSec Listeners On `albaldah`
 
 ```bash
-ssh albaldah "ss -ltnp | rg '8080|7422'"
+ssh albaldah "ss -ltnp | rg '8080|7422' | tail -n 20"
 ```
 
 ## Watch CrowdSec Logs On `albaldah`
 
 ```bash
-ssh albaldah 'sudo journalctl -u crowdsec -f'
+ssh albaldah 'sudo journalctl -u crowdsec -f | tail -n 20'
 ```
 
 ## Show CrowdSec Alerts On `albaldah`
 
 ```bash
-ssh albaldah 'sudo cscli alerts list -a -n 20'
+ssh albaldah 'sudo cscli alerts list -a -n 20 | tail -n 20'
 ```
 
 ## Show CrowdSec Decisions On `albaldah`
 
 ```bash
-ssh albaldah 'sudo cscli decisions list -n 20'
+ssh albaldah 'sudo cscli decisions list -n 20 | tail -n 20'
 ```
 
 ## Test CrowdSec Traefik Log Readability On `albaldah`
 
 ```bash
-ssh albaldah 'sudo ls -l /var/log/traefik/access.log && sudo -u crowdsec head -n 1 /var/log/traefik/access.log'
+ssh albaldah 'sudo ls -l /var/log/traefik/access.log | tail -n 20 && sudo -u crowdsec head -n 1 /var/log/traefik/access.log | tail -n 20'
 ```
 
 ## Test CrowdSec AppSec Reachability From Traefik On `albaldah`
 
 ```bash
-ssh albaldah "docker exec traefik wget -S -O- http://host.docker.internal:8080/health && docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/"
+ssh albaldah "docker exec traefik wget -S -O- http://host.docker.internal:8080/health | tail -n 20 && docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/ | tail -n 20"
 ```

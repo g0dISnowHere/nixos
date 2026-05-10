@@ -21,7 +21,7 @@ Quick checklist for the `centauri` fingerprint sensor (`06cb:009a`).
 If `06cb:009a` appears here, re-evaluate whether the custom stack is still needed:
 
 ```bash
-curl -fsSL https://fprint.freedesktop.org/supported-devices.html | rg '06cb:009a'
+curl -fsSL https://fprint.freedesktop.org/supported-devices.html | rg '06cb:009a' | tail -n 20
 ```
 
 Official list:
@@ -32,7 +32,7 @@ Official list:
 See whether the external flake has a branch matching the repo's target NixOS release:
 
 ```bash
-rg -n 'nixos-06cb-009a-fingerprint-sensor|url = ' flake.nix flake.lock
+rg -n 'nixos-06cb-009a-fingerprint-sensor|url = ' flake.nix flake.lock | tail -n 20
 ```
 
 Project:
@@ -61,7 +61,7 @@ sha256 = lib.fakeSha256;
 4. Run:
 
 ```bash
-nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
 ```
 
 5. Replace `sha256` with the hash Nix prints.
@@ -70,10 +70,10 @@ nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
 ## Validate After Any Change
 
 ```bash
-nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
+nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
 sudo nixos-rebuild switch --flake .#centauri
-sudo systemctl status python3-validity
-fprintd-verify
+sudo systemctl status python3-validity | tail -n 20
+fprintd-verify | tail -n 20
 sudo -v
 ```
 

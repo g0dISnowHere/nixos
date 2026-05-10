@@ -1,11 +1,10 @@
 # Future Ideas
 
-`docs/future-ideas/` is incubator documentation for proposals, backlog items,
-draft plans, and not-yet-canonical designs.
+`docs/future-ideas/` = incubator cave for proposals, backlog, draft plans,
+not-canon designs.
 
-Use this directory for ideas worth preserving without implying they are current
-policy. When an idea becomes real and stable, move the enduring parts into the
-appropriate canonical docs under `docs/`.
+Use when idea worth keeping but not current policy. When idea becomes real,
+move durable parts into right canonical doc under `docs/`.
 
-Remove incubator docs when their proposal has been fully implemented, or keep
-only concrete follow-up backlog that has not landed yet.
+When proposal fully lands, delete incubator doc or keep only real leftover
+backlog.

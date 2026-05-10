@@ -1,21 +1,21 @@
 # Reasons For `stateVersion`
 
-This repo pins both `system.stateVersion` and `home.stateVersion` to `25.11`.
+Repo pins both `system.stateVersion` and `home.stateVersion` to `25.11`.
 
-Do not change these values casually.
+Do not change casually.
 
 Why:
 
-- They are compatibility markers, not upgrade toggles.
-- They influence module defaults during evaluation, which can change the generated system or home profile.
-- They may keep older data-format or filesystem-layout defaults for stateful modules and programs.
-- Upgrading `nixpkgs`, `home-manager`, or the flake lock is separate from changing `*.stateVersion`.
+- compatibility markers, not upgrade toggles
+- they affect module defaults during eval, which can change generated system or home profile
+- they may preserve older data-format or filesystem-layout defaults for stateful modules and programs
+- upgrading `nixpkgs`, `home-manager`, or flake lock is separate from changing `*.stateVersion`
 
 Short version:
 
-- `system.stateVersion` exists to preserve compatibility with stateful NixOS services and on-disk data.
-- `home.stateVersion` exists to preserve compatibility with Home Manager defaults and user-state layout.
-- Rolling back a generation does not necessarily undo application-level migrations that already happened on disk.
+- `system.stateVersion` preserves compatibility for stateful NixOS services and on-disk data
+- `home.stateVersion` preserves compatibility for Home Manager defaults and user-state layout
+- rolling back generation does not necessarily undo app-level migrations already written on disk
 
 References:
 
@@ -31,5 +31,5 @@ References:
 
 Repo-specific note:
 
-- We checked the local config and found no custom modules in this repo that branch on either state version directly.
-- That means the practical gating risk here comes from upstream NixOS and Home Manager modules, not from repo-local conditional logic.
+- local config has no custom modules branching directly on either state version
+- practical gating risk comes from upstream NixOS and Home Manager modules, not repo-local conditionals

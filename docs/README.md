@@ -1,80 +1,61 @@
 # Documentation
 
-`docs/` is the human documentation system for this repo. It is organized by
-document role so stable explanations, quick lookup material, and incubator
-notes do not blur together.
+`docs/` = human doc cave. Split by job so stable truth, quick lookup, rough
+ideas not mix.
 
 ## Entry Points
 
-- `README.md`
-  - repo landing page and first-stop overview
-- `docs/README.md`
-  - documentation taxonomy and navigation
-- `AGENTS.md`
-  - canonical AI guidance for coding agents
+- `README.md`: repo front door
+- `docs/README.md`: doc map
+- `AGENTS.md`: AI worker law
 
-## Knowledge Base Workflow
+## Knowledge Base Flow
 
-The repo knowledge base lives in the existing `docs/` tree.
+Repo knowledge live here.
 
-Before non-trivial changes:
+Before non-trivial change:
 
 - read `docs/README.md`
-- open any linked pages relevant to the task
+- open linked pages for task
 
-When you learn something worth keeping:
+When new thing worth keeping:
 
-- update the relevant existing page under `docs/`
-- keep entries concise and factual
-- prefer concrete commands, gotchas, and decisions
-- avoid duplicating information across pages
+- update right page under `docs/`
+- keep short, factual
+- prefer commands, gotchas, decisions
+- no duplicate fact spread everywhere
 
-## Document Types
+## Doc Types
 
-- canonical docs
-  - stable repo structure, architecture, and operator workflows
-- reference docs
-  - short lookup material such as commands and checklists
-- incubator docs
-  - findings, proposals, and future work that are not canonical yet
-- local-area docs
-  - docs that belong to one subtree and stay near that code
+- canonical docs: stable structure, architecture, operator flow
+- reference docs: quick commands, checklists, snippets
+- incubator docs: findings, proposals, future work, not canon yet
+- local-area docs: subtree-local notes near code
 
 ## Sections
 
-- `secrets-workflows.md`
-  - canonical operator guide for the SOPS lifecycle
-- `architecture/`
-  - canonical design boundaries and structure decisions
-  - includes capability-module composition and Home Manager/dotfiles boundaries
-- `reference/`
-  - quick lookup material for common commands and operational snippets
-- `dev-templates.md`
-  - canonical workflow for local flake project templates
-- `vps/`
-  - canonical VPS-specific context and runbooks
-- `dotfiles/`
-  - canonical explanation of the role of `dotfiles/` in the repo design
-- `findings/`
-  - incubator investigations and dated analysis
-- `future-ideas/`
-  - incubator proposals, drafts, and backlog material
+- `secrets-workflows.md`: SOPS operator guide
+- `architecture/`: design boundaries, structure decisions
+- `reference/`: quick lookup material
+- `dev-templates.md`: local flake template workflow
+- `vps/`: VPS context, runbooks
+- `dotfiles/`: why `dotfiles/` exist, how fit repo
+- `findings/`: dated investigations
+- `future-ideas/`: drafts, proposals, backlog
 
 ## Placement Rules
 
-- Put stable repo documentation in `docs/`.
-- Put the canonical SOPS operator workflow in `docs/secrets-workflows.md`.
-- Put the canonical development template workflow in `docs/dev-templates.md`.
-- Put quick command lists and checklists in `docs/reference/`.
-- Put recurring issues and point-in-time investigations in `docs/findings/`.
-- Put durable architecture decisions and boundaries in `docs/architecture/`.
-- Put incomplete plans and backlog ideas in `docs/future-ideas/`.
-- Keep subtree-specific docs near their owning area when they are not useful as
-  repo-wide canonical docs.
+- stable repo docs go in `docs/`
+- SOPS workflow truth goes in `docs/secrets-workflows.md`
+- dev template workflow truth goes in `docs/dev-templates.md`
+- command lists, checklists go in `docs/reference/`
+- recurring issues, point-in-time analysis go in `docs/findings/`
+- durable architecture decisions go in `docs/architecture/`
+- incomplete plans, backlog ideas go in `docs/future-ideas/`
+- subtree-specific docs stay near owner when not useful repo-wide
 
-## Documentation Philosophy
+## Philosophy
 
-- explain ownership, intent, and boundaries
-- prefer stable concepts over volatile implementation detail
-- promote incubator material into canonical docs only after the design is
-  current and intentional
+- explain ownership, intent, boundaries
+- prefer stable concepts over volatile detail
+- promote incubator docs only when design current, intentional

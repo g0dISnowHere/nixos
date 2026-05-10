@@ -1,58 +1,56 @@
 # Development Templates
 
-This repo exposes reusable project templates from the root flake under
-`templates`.
+Repo exports reusable project templates from root flake under `templates`.
 
-Template bodies live under `dev-templates/<name>/`. The root export lives in
+Template body lives in `dev-templates/<name>/`. Root export lives in
 `parts/templates.nix`.
 
 ## Use
 
-Create a new project from a template:
+Create new project from template:
 
 ```bash
-nix flake new --template path:/home/djoolz/Documents/01_config/mine#rust ./my-rust-project
+nix flake new --template path:/home/djoolz/Documents/01_config/mine#rust ./my-rust-project | tail -n 20
 ```
 
-Initialize the current directory:
+Init current directory:
 
 ```bash
-nix flake init --template path:/home/djoolz/Documents/01_config/mine#python
+nix flake init --template path:/home/djoolz/Documents/01_config/mine#python | tail -n 20
 ```
 
-From the repo root, the shorter local form works:
+From repo root, shorter local form works:
 
 ```bash
-nix flake new --template .#empty /tmp/template-test
+nix flake new --template .#empty /tmp/template-test | tail -n 20
 ```
 
 ## List Templates
 
 ```bash
-nix flake show path:/home/djoolz/Documents/01_config/mine
+nix flake show path:/home/djoolz/Documents/01_config/mine | tail -n 20
 ```
 
-Look under the `templates` output.
+Look under `templates` output.
 
 ## Maintenance
 
-- Add template files under `dev-templates/<name>/`.
-- Add the matching explicit export in `parts/templates.nix`.
-- Keep template names stable once used by projects.
-- Prefer explicit exports over recursive directory discovery.
-- Keep templates self-contained so generated projects do not depend on this
-  repo after creation.
+- add template files under `dev-templates/<name>/`
+- add matching explicit export in `parts/templates.nix`
+- keep template names stable once projects use them
+- prefer explicit exports over recursive discovery
+- keep templates self-contained so generated project not depend on this repo
 
 ## Validation
 
-Check that a template export evaluates:
+Check template export evaluates:
 
 ```bash
-nix eval .#templates.rust.description
+nix eval .#templates.rust.description | tail -n 20
 ```
 
 Smoke-test template creation:
 
 ```bash
-nix flake new --template .#empty /tmp/dev-template-test
+nix flake new --template .#empty /tmp/dev-template-test | tail -n 20
 ```

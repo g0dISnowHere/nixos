@@ -1,42 +1,44 @@
 # Secrets Workflows
 
-This is the canonical operator guide for the repo's SOPS workflow.
+This page = canonical operator guide for repo SOPS workflow.
 
-The intent is to keep secret policy deterministic, keep `.sops.yaml` rendered
-from one source of truth, and make lifecycle mutations explicit instead of
-hiding them behind ad hoc manual edits.
+Goal:
+
+- keep secret policy deterministic
+- render `.sops.yaml` from one source of truth
+- make lifecycle mutations explicit, not ad hoc hand edits
 
 ## Design Boundaries
 
-The secrets workflow is split into two layers:
+Secrets workflow split into two layers:
 
 - `flake/secrets-policy.nix` defines intended public policy
-- `scripts/secrets` provides operator UX for inspection, mutation, and recovery
+- `scripts/secrets` provides operator UX for inspection, mutation, recovery
 
-Keep those responsibilities separate:
+Keep split hard:
 
 - Nix owns declared access intent
 - scripts own guided mutation and validation
 
 ## Current Policy Model
 
-The repo currently treats these as the public inventory:
+Repo treats these as public inventory:
 
 - one operator alias with one or more public recipients
-- known hosts and their public recipients
+- known hosts with their public recipients
 - explicit `users.<name>` host membership
 - explicit `services.<name>` host membership
 
 Rules:
 
 - access is explicit, not inferred from host class or role
-- every managed secret file must map to exactly one scope
-- machine secrets are always operator plus the owning host
-- service and user scope membership is a host list, not a dynamic rule
+- every managed secret file maps to exactly one scope
+- machine secrets are always operator plus owning host
+- service and user scope membership is host list, not dynamic rule
 
 ## Current Command Surface
 
-The operator front door is `scripts/secrets`.
+Operator front door = `scripts/secrets`.
 
 Current workflows:
 
@@ -51,8 +53,7 @@ Current workflows:
 - `scripts/secrets user-scope`
 - `scripts/secrets recover-access`
 
-`doctor` is the safe default. It stays read-only unless you opt into
-`--fix`.
+`doctor` = safe default. Stays read-only unless `--fix`.
 
 ## Lifecycle Workflows
 
@@ -64,8 +65,8 @@ Use:
 scripts/secrets create --scope services.fleet-test --name example.env
 ```
 
-This is the preferred path for new managed secrets because it keeps file
-placement aligned with policy ownership.
+Preferred path for new managed secrets. Keeps file placement aligned with
+policy ownership.
 
 ### Add A Host
 
@@ -75,7 +76,7 @@ Use:
 scripts/secrets add-host --host <name>
 ```
 
-This is the first-class onboarding path for a new host.
+First-class onboarding path for new host.
 
 Current behavior:
 
@@ -88,9 +89,9 @@ Current behavior:
 
 Important:
 
-- this refuses to guess user-scope membership
+- refuses to guess user-scope membership
 - use `--user-scope <name>` repeatedly for non-interactive runs
-- use `--no-user-scopes` when the host should not join any current user scope
+- use `--no-user-scopes` when host should not join any current user scope
 
 ### Register An Existing Host
 
@@ -100,8 +101,8 @@ Use:
 scripts/secrets register-host --host <name>
 ```
 
-This workflow is for a host that already exists in policy and needs its current
-host recipient refreshed or re-verified.
+Use when host already exists in policy and current host recipient needs refresh
+or re-verification.
 
 Current behavior:
 
@@ -113,8 +114,8 @@ Current behavior:
 
 Important:
 
-- this is not a cold-start recovery path
-- the operator key must already decrypt the targeted secrets before rekey
+- not cold-start recovery path
+- operator key must already decrypt targeted secrets before rekey
 
 ### Manage User Scope Membership
 
@@ -151,8 +152,8 @@ Current behavior:
 - rekeys shared secrets to drop that host
 - refuses to proceed while machine-scoped secrets still exist for that host
 
-This is considered baseline-capable today, but v1 still wants clearer
-first-class rotation and stronger guided remediation in `doctor --fix`.
+Baseline-capable today. v1 still wants clearer first-class rotation and
+stronger guided remediation in `doctor --fix`.
 
 ### Recover Operator Access
 
@@ -162,8 +163,8 @@ Use:
 scripts/secrets recover-access --host <name>
 ```
 
-Use this from a machine that still has a working private key matching embedded
-recipients in the affected secrets.
+Run this from machine that still has working private key matching embedded
+recipients in affected secrets.
 
 Current behavior:
 
@@ -174,23 +175,17 @@ Current behavior:
 
 ## Validation Model
 
-Validation is intentionally split:
+Validation split on purpose:
 
-- `validate-policy`
-  - policy correctness
-  - path ownership
-  - unknown host references
-  - rendered `.sops.yaml` drift
-- `validate-access`
-  - operator decryptability
-  - host decryptability for relevant secrets
+- `validate-policy`: policy correctness, path ownership, unknown host refs, rendered `.sops.yaml` drift
+- `validate-access`: operator decryptability, host decryptability for relevant secrets
 
 This keeps deterministic policy failures separate from runtime key-access
 failures.
 
 ## Remaining V1 Work
 
-The workflow is useful now, but a coherent v1 still needs:
+Workflow useful now. Coherent v1 still needs:
 
 1. `rotate-host` as a first-class workflow with clearer intent than
    `register-host --force-host-rotate`
@@ -198,7 +193,7 @@ The workflow is useful now, but a coherent v1 still needs:
    partial-verification states
 3. end-to-end live testing of the mutation flows on real machines
 
-The current baseline is already good enough in these areas:
+Current baseline already good enough here:
 
 - deterministic policy model
 - rendered `.sops.yaml`
@@ -212,7 +207,7 @@ The current baseline is already good enough in these areas:
 
 ## Verification Targets
 
-The current design is healthy when all of these are true:
+Design healthy when all true:
 
 - `scripts/secrets validate-policy` passes
 - `scripts/secrets sync-policy --check` passes

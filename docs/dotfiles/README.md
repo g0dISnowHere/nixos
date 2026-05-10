@@ -1,40 +1,33 @@
 # Dotfiles
 
-The `dotfiles/` tree is the repo’s plain-file layer. It exists so application
-and desktop config can stay close to the formats those programs already use,
-while still being versioned and wired into the declarative environment.
+`dotfiles/` = plain-file layer. App and desktop config stay in native format,
+still versioned, still wired into declarative setup.
 
-This is canonical documentation for how `dotfiles/` fits into the repo design.
+This page = canonical note for how `dotfiles/` fit repo.
 
-## Role In The Architecture
+## Role In Architecture
 
-This tree is not a second module system and not a dumping ground. Its role is
-to hold the config that is easier to maintain as normal files than as Nix
-expressions.
+This tree not second module system. Not junk pile. It holds config easier to
+maintain as normal files than Nix.
 
-In practice, that usually means:
+Common examples:
 
 - desktop and compositor config
-- launcher, notification, and shell-adjacent config
-- UI assets and small supporting scripts
-- state or workflow references that are useful to keep alongside the config
+- launcher, notification, shell-adjacent config
+- UI assets and small helper scripts
+- state or workflow refs useful near config
 
 ## Main Areas
 
-- `modules/`
-  - raw application and desktop config
-- `scripts/`
-  - helper scripts tied to the dotfiles layer
-- `state/`
-  - workflow and reference state files
-- `docs/`
-  - dotfile-specific supporting notes
+- `modules/`: raw app and desktop config
+- `scripts/`: helper scripts for dotfiles layer
+- `state/`: workflow and reference state files
+- `docs/`: dotfile-specific notes
 
 ## Design Intent
 
-The point of `dotfiles/` is to keep the repo frictionless where direct editing
-is the better experience. Home Manager then gives those files a clean place in
-the larger user environment instead of replacing them outright.
+Point of `dotfiles/`: keep editing smooth where direct file edit best. Home
+Manager links files into wider user env, not replace them all.
 
 ## Related Docs
 

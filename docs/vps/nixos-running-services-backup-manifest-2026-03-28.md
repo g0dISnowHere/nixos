@@ -4,6 +4,8 @@ This file is the inventory side of the VPS migration work. It is the detailed
 record of what belongs in the backup set and what should be tracked through
 restore.
 
+The backup archive for this manifest is `vps-running-services-backup-2026-03-28.tar`.
+
 ## Focus
 
 - services being preserved

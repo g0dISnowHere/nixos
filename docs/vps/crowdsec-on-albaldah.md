@@ -148,32 +148,32 @@ systemctl status \
   crowdsec-firewall-bouncer-register \
   crowdsec-capi-register \
   crowdsec-console-config-init \
-  crowdsec-console-enroll
+  crowdsec-console-enroll | tail -n 20
 ```
 
 Inspect logs:
 
 ```bash
-journalctl -u crowdsec -u crowdsec-firewall-bouncer -u crowdsec-firewall-bouncer-register -u crowdsec-capi-register -u crowdsec-console-config-init -u crowdsec-console-enroll -b
+journalctl -u crowdsec -u crowdsec-firewall-bouncer -u crowdsec-firewall-bouncer-register -u crowdsec-capi-register -u crowdsec-console-config-init -u crowdsec-console-enroll -b | tail -n 20
 ```
 
 Check generated files:
 
 ```bash
-ls -l /var/lib/crowdsec/local_api_credentials.yaml
-ls -l /var/lib/crowdsec/online_api_credentials.yaml
-ls -l /var/lib/crowdsec/console.yaml
+ls -l /var/lib/crowdsec/local_api_credentials.yaml | tail -n 20
+ls -l /var/lib/crowdsec/online_api_credentials.yaml | tail -n 20
+ls -l /var/lib/crowdsec/console.yaml | tail -n 20
 ```
 
 Check CrowdSec state:
 
 ```bash
-sudo cscli console status
-sudo cscli bouncers list
-sudo cscli alerts list
-sudo cscli alerts list -a
-sudo cscli decisions list
-sudo cscli metrics
+sudo cscli console status | tail -n 20
+sudo cscli bouncers list | tail -n 20
+sudo cscli alerts list | tail -n 20
+sudo cscli alerts list -a | tail -n 20
+sudo cscli decisions list | tail -n 20
+sudo cscli metrics | tail -n 20
 ```
 
 Interpretation notes:
@@ -188,16 +188,16 @@ Interpretation notes:
 Check listeners:
 
 ```bash
-ss -ltnp | rg '8080|7422'
-curl -I http://127.0.0.1:8080
-curl -I http://$(ip -4 addr show docker0 | rg -o 'inet [0-9.]+/' | awk '{print $2}' | cut -d/ -f1):8080
+ss -ltnp | rg '8080|7422' | tail -n 20
+curl -I http://127.0.0.1:8080 | tail -n 20
+curl -I http://$(ip -4 addr show docker0 | rg -o 'inet [0-9.]+/' | awk '{print $2}' | cut -d/ -f1):8080 | tail -n 20
 ```
 
 Check from Traefik container after the ingress stack is up:
 
 ```bash
-docker exec traefik wget -S -O- http://host.docker.internal:8080/health
-docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/
+docker exec traefik wget -S -O- http://host.docker.internal:8080/health | tail -n 20
+docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/ | tail -n 20
 ```
 
 Expected shape:
@@ -279,6 +279,11 @@ sudo journalctl -u crowdsec -b | rg -i 'Appsec listening|Appsec Runner|Shutting 
     `/var/lib/crowdsec/online_api_credentials.yaml`
 - `crowdsec-console-enroll.service` fails with secret read errors
   - the enrollment token secret ownership is wrong for the `crowdsec` user
+- `crowdsec-console-enroll.service` logs `API error: Forbidden`
+  - the Console enrollment token is usually stale, revoked, or already used
+  - the current module treats this as non-fatal so deploys can continue
+  - rotate `secrets/services/crowdsec/console-enrollment-token.yaml` if you
+    need to enroll again
 - `crowdsec-firewall-bouncer-register.service` fails because online credentials
   are missing
   - this is usually downstream of a failed `crowdsec-capi-register.service`
