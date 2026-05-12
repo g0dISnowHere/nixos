@@ -23,7 +23,7 @@ in {
 
   boot.extraModprobeConfig = lib.mkAfter ''
     options kvm_intel nested=1
-    options e1000e EEE=0 SmartPowerDownEnable=0
+    options e1000e SmartPowerDownEnable=0
   '';
   boot.kernelModules = [ "bridge" "br_netfilter" ];
   boot.kernel.sysctl = {
@@ -38,6 +38,9 @@ in {
   services.spice-vdagentd.enable = true;
 
   networking = {
+    # Keep NetworkManager available for Wi-Fi, but leave the bridged Ethernet path
+    # to the static host config so VM networking does not get re-managed.
+    useDHCP = lib.mkForce false;
     networkmanager.unmanaged = [ physicalInterface bridgeInterface ];
     bridges = { "${bridgeInterface}".interfaces = [ physicalInterface ]; };
     interfaces = {
@@ -47,6 +50,25 @@ in {
     # Keep the bridge MAC stable so carrier does not flap when guests start or stop.
     localCommands = ''
       ${pkgs.iproute2}/bin/ip link set ${bridgeInterface} address ${bridgeMacAddress}
+    '';
+  };
+
+  systemd.services.enp0s25-link-tuning = {
+    description = "Tune Intel Ethernet link power settings";
+    after = [ "sys-subsystem-net-devices-${physicalInterface}.device" ];
+    bindsTo = [ "sys-subsystem-net-devices-${physicalInterface}.device" ];
+    before =
+      [ "network-addresses-${bridgeInterface}.service" "dhcpcd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    path = with pkgs; [ ethtool ];
+    script = ''
+      # Apply runtime NIC tuning that e1000e module parameters do not fully cover.
+      ethtool --set-eee ${physicalInterface} eee off || true
+      ethtool --change ${physicalInterface} wol d || true
     '';
   };
 

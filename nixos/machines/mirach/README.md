@@ -8,6 +8,12 @@
 Reason: this machine is a homelab host first. The GNOME login screen should not
 suspend the host just because nobody logged in locally.
 
+The same file also overrides `systemd-logind` lid handling to ignore lid-close
+events on battery, external power, and when docked.
+
+Reason: this host should keep VMs and background services running even if the
+laptop lid is closed.
+
 ## Home Assistant VM Privileges
 
 `mirach` runs the Home Assistant libvirt guest as `homeassistant`.
