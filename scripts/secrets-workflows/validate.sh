@@ -85,7 +85,7 @@ if [[ "${actor}" == "operator" || "${actor}" == "all" ]]; then
   else
     printf 'operator: failed\n'
     if [[ "${#SECRETS_OPERATOR_FAILED_SECRETS[@]}" -gt 0 ]]; then
-      printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
+      printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}"
     fi
     exit 1
   fi
@@ -102,7 +102,7 @@ if [[ "${actor}" == "host" || "${actor}" == "all" ]]; then
   else
     printf 'host: failed\n'
     if [[ "${#SECRETS_HOST_FAILED_SECRETS[@]}" -gt 0 ]]; then
-      printf '  %s\n' "${SECRETS_HOST_FAILED_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
+      printf '  %s\n' "${SECRETS_HOST_FAILED_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}"
     fi
     exit 1
   fi

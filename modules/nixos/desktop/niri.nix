@@ -1,4 +1,4 @@
-{ config, inputs, lib, pkgs, ... }:
+{ inputs, lib, pkgs, ... }:
 let
   niriLockScript = "%h/.config/niri/swaylock-noctalia.sh";
   fallbackLockCommand = "${pkgs.swaylock}/bin/swaylock -f";
@@ -18,83 +18,101 @@ in {
 
   programs.niri.enable = true;
 
-  services.udisks2.enable = true;
-  services.gvfs.enable = true;
+  services = {
+    udisks2.enable = true;
+    gvfs.enable = true;
 
-  services.noctalia-shell = {
-    enable = true;
-    target = "niri.service";
+    noctalia-shell = {
+      enable = true;
+      target = "niri.service";
+    };
+
+    nirinit.enable = true;
+
+    gnome.gnome-keyring.enable = true; # Secret Service
+    displayManager.gdm = {
+      enable = true;
+      wayland = true;
+    };
+
+    power-profiles-daemon.enable = true;
+    upower.enable = true;
   };
 
-  services.nirinit.enable = true;
-
-  systemd.user.services.nirinit = {
-    description = lib.mkForce "Nirinit";
-    partOf = lib.mkForce [ "niri.service" ];
-    after = lib.mkForce [ "niri.service" ];
-    wantedBy = lib.mkForce [ "niri.service" ];
-    serviceConfig = {
-      Environment = [
-        "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
-      ];
-      ExecStart = lib.mkForce [
-        ""
-        "${
-          inputs.nirinit.packages.${pkgs.stdenv.hostPlatform.system}.default
-        }/bin/nirinit --save-interval 30 --config %h/.config/nirinit/config.toml"
-      ];
-      Restart = "always";
+  security = {
+    pam = {
+      services = {
+        swaylock = { };
+        login.enableGnomeKeyring = true;
+        gdm-password.enableGnomeKeyring = true;
+      };
     };
   };
 
-  systemd.user.services.udiskie = {
-    description = "Udiskie automount";
-    wantedBy = [ "niri.service" ];
-    after = [ "niri.service" "graphical-session.target" "dbus.service" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.udiskie}/bin/udiskie --no-tray";
-      Restart = "on-failure";
+  systemd.user.services = {
+    nirinit = {
+      description = lib.mkForce "Nirinit";
+      partOf = lib.mkForce [ "niri.service" ];
+      after = lib.mkForce [ "niri.service" ];
+      wantedBy = lib.mkForce [ "niri.service" ];
+      serviceConfig = {
+        Environment = [
+          "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
+        ];
+        ExecStart = lib.mkForce [
+          ""
+          "${
+            inputs.nirinit.packages.${pkgs.stdenv.hostPlatform.system}.default
+          }/bin/nirinit --save-interval 30 --config %h/.config/nirinit/config.toml"
+        ];
+        Restart = "always";
+      };
     };
-  };
 
-  systemd.user.services.swayidle = {
-    description = "Swayidle";
-    partOf = [ "niri.service" ];
-    wantedBy = [ "niri.service" ];
-    after = [ "niri.service" ];
-    serviceConfig = {
-      Environment = [
-        "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
-      ];
-      ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
-        + "timeout 300 '${lockCommand}' "
-        + "timeout 330 '${pkgs.wlopm}/bin/wlopm --off' "
-        + "resume '${pkgs.wlopm}/bin/wlopm --on' "
-        + "timeout 1800 '${pkgs.systemd}/bin/systemctl suspend' "
-        + "before-sleep '${lockCommand}' " + "lock '${lockCommand}'";
-      Restart = "on-failure";
+    udiskie = {
+      description = "Udiskie automount";
+      wantedBy = [ "niri.service" ];
+      after = [ "niri.service" "graphical-session.target" "dbus.service" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.udiskie}/bin/udiskie --no-tray";
+        Restart = "on-failure";
+      };
     };
-  };
 
-  # Authentication / secrets
-  services.gnome.gnome-keyring.enable = true; # Secret Service
-  security.pam.services.swaylock = { };
-  security.pam.services.login.enableGnomeKeyring = true;
-  security.pam.services.gdm-password.enableGnomeKeyring = true;
+    swayidle = {
+      description = "Swayidle";
+      partOf = [ "niri.service" ];
+      wantedBy = [ "niri.service" ];
+      after = [ "niri.service" ];
+      serviceConfig = {
+        Environment = [
+          "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
+        ];
+        ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
+          + "timeout 300 '${lockCommand}' "
+          + "timeout 330 '${pkgs.wlopm}/bin/wlopm --off' "
+          + "resume '${pkgs.wlopm}/bin/wlopm --on' "
+          + "timeout 1800 '${pkgs.systemd}/bin/systemctl suspend' "
+          + "before-sleep '${lockCommand}' " + "lock '${lockCommand}'";
+        Restart = "on-failure";
+      };
+    };
 
-  # Greeter
-  services.displayManager.gdm = {
-    enable = true;
-    wayland = true;
+    mako = {
+      description = "Mako notification daemon";
+      partOf = [ "niri.service" ];
+      after = [ "niri.service" ];
+      wantedBy = [ "niri.service" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.mako}/bin/mako -c %h/.config/mako/config";
+        Restart = "on-failure";
+      };
+    };
   };
 
   # Portals for file pickers/screen sharing on Wayland
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-
-  # Power profiles + battery info for control center widgets
-  services.power-profiles-daemon.enable = true;
-  services.upower.enable = true;
 
   # Wayland utilities
   programs.waybar.enable = false; # Top bar
@@ -108,17 +126,6 @@ in {
   #     Restart = "on-failure";
   #   };
   # };
-
-  systemd.user.services.mako = {
-    description = "Mako notification daemon";
-    partOf = [ "niri.service" ];
-    after = [ "niri.service" ];
-    wantedBy = [ "niri.service" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.mako}/bin/mako -c %h/.config/mako/config";
-      Restart = "on-failure";
-    };
-  };
 
   # Battery threshold control (Noctalia plugin)
   users.groups.battery_ctl = { };

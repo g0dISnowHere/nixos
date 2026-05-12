@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: {
+{ pkgs, ... }: {
   # If you want to use modules from other flakes (such as nixos-hardware):
   # inputs.hardware.nixosModules.common-cpu-amd
   # inputs.hardware.nixosModules.common-ssd
@@ -33,64 +33,64 @@
 
   ########################### Graphics and Video ###########################
   # Graphics drivers https://nixos.wiki/wiki/Accelerated_Video_Playback
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs;
-      [
-        intel-media-driver # LIBVA_DRIVER_NAME=iHD
-        # intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-        # libvdpau-va-gl
-      ];
+  hardware = {
+    graphics = {
+      enable = true;
+      extraPackages = with pkgs;
+        [
+          intel-media-driver # LIBVA_DRIVER_NAME=iHD
+          # intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+          # libvdpau-va-gl
+        ];
+    };
+    trackpoint = {
+      enable = true;
+      device =
+        "TPPS/2 IBM TrackPoint"; # Options: TPPS/2 IBM TrackPoint|ETPS/2 Elantech TrackPoint|Elantech PS/2 TrackPoint|DualPoint Stick|Synaptics Inc. Composite TouchPad / TrackPoint|ThinkPad USB Keyboard with TrackPoint|USB Trackpoint pointing device|Composite TouchPad / TrackPoint|${cfg.device}
+    };
+    logitech.wireless = {
+      enable = true;
+      enableGraphical = true;
+    };
   };
-  environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "iHD";
-  }; # Force intel-media-driver
+  environment = {
+    sessionVariables = {
+      LIBVA_DRIVER_NAME = "iHD";
+    }; # Force intel-media-driver
+    systemPackages = with pkgs; [
+      piper # For configuring Logitech devices
+      libratbag # daemon for configuring gaming mice
+
+      libinput # For configuring input devices
+    ];
+  };
 
   # nixpkgs.config.cudaSupport = true; # Enable CUDA support globally. 
 
   ########################### Printing ############################
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services = {
+    printing.enable = true;
 
-  environment.systemPackages = with pkgs; [
-    piper # For configuring Logitech devices
-    libratbag # daemon for configuring gaming mice
-
-    libinput # For configuring input devices
-  ];
-
-  ############################ Trackpoint ############################
-  hardware.trackpoint = {
-    enable = true;
-    device =
-      "TPPS/2 IBM TrackPoint"; # Options: "ETPS/2 Elantech TrackPoint|Elantech PS/2 TrackPoint|TPPS/2 IBM TrackPoint|DualPoint Stick|Synaptics Inc. Composite TouchPad / TrackPoint|ThinkPad USB Keyboard with TrackPoint|USB Trackpoint pointing device|Composite TouchPad / TrackPoint|${cfg.device}"
-
-  };
-
-  ########################### Touchpad ############################
-  # Enable touchpad support (enabled default in most desktopManager).
-  # https://nixos.org/manual/nixos/stable/options
-  services.libinput = {
-    enable = true;
-    # disabling mouse acceleration
-    mouse = { accelProfile = "flat"; };
-    # disabling touchpad acceleration
-    touchpad = {
-      accelProfile = "flat";
-      tapping = true; # tap-to-click
-      tappingButtonMap = "lrm"; # 2-finger tap = right click
-      tappingDragLock = true; # double-tap + hold to drag
-      clickMethod = "clickfinger"; # 2-finger physical click = right click
-      scrollMethod = "twofinger"; # touch gestures for scrolling
-      horizontalScrolling = true;
-      disableWhileTyping = true;
+    ########################### Touchpad ############################
+    # Enable touchpad support (enabled default in most desktopManager).
+    # https://nixos.org/manual/nixos/stable/options
+    libinput = {
+      enable = true;
+      # disabling mouse acceleration
+      mouse = { accelProfile = "flat"; };
+      # disabling touchpad acceleration
+      touchpad = {
+        accelProfile = "flat";
+        tapping = true; # tap-to-click
+        tappingButtonMap = "lrm"; # 2-finger tap = right click
+        tappingDragLock = true; # double-tap + hold to drag
+        clickMethod = "clickfinger"; # 2-finger physical click = right click
+        scrollMethod = "twofinger"; # touch gestures for scrolling
+        horizontalScrolling = true;
+        disableWhileTyping = true;
+      };
     };
-  };
-
-  # https://nixos.wiki/wiki/Logitech_Unifying_Receiver
-  hardware.logitech.wireless = {
-    enable = true;
-    enableGraphical = true;
   };
   services.ratbagd.enable = true;
 }

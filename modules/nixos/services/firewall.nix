@@ -1,4 +1,4 @@
-{ config, ... }: {
+_: {
   # Firewall Configuration with Port Rules
   # Enables firewall with nftables backend and specific port allowlists for services
   # Reference: https://nixos.wiki/wiki/Firewall

@@ -43,7 +43,7 @@ in {
     services.tailscale = {
       enable = true;
       package = pkgs.tailscale;
-      extraUpFlags = extraUpFlags;
+      inherit extraUpFlags;
     };
 
     # networking.nftables.enable = true; ## https://nixos.wiki/wiki/Tailscale

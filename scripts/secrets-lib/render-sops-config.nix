@@ -2,7 +2,7 @@ let
   policy = import ../../flake/secrets-policy.nix;
   sort = builtins.sort builtins.lessThan;
   operatorRecipientAliases = let
-    recipients = policy.operator.recipients;
+    inherit (policy.operator) recipients;
     count = builtins.length recipients;
     mkAlias = index:
       if index == 0 then

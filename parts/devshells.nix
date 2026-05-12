@@ -1,9 +1,16 @@
-{ ... }: {
+_: {
   perSystem = { pkgs, system, ... }:
     let nixLdLibraryPath = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc ];
     in {
       devShells.default = pkgs.mkShell {
-        packages = with pkgs; [ python3 nixpkgs-fmt statix deadnix ];
+        packages = with pkgs; [
+          python3
+          nixpkgs-fmt
+          statix
+          deadnix
+          markdownlint-cli
+          shellcheck
+        ];
 
         NIX_LD_LIBRARY_PATH = nixLdLibraryPath;
         NIX_LD =

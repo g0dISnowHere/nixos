@@ -1,4 +1,4 @@
-{ inputs, config, lib, pkgs, ... }: {
+{ inputs, ... }: {
   # Plasma Desktop — Home-Manager Settings
   # Parallel to modules/home/dconf/dconf.nix for GNOME
   # Uses plasma-manager for declarative KDE configuration
@@ -20,4 +20,3 @@
     # configFile = { ... };
   };
 }
-

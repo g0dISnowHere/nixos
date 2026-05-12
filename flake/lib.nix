@@ -1,14 +1,16 @@
 { inputs, ... }:
 let
   inherit (inputs)
-    nixpkgs home-manager nix-flatpak plasma-manager nixpkgs-unstable sops-nix
-    nixpkgs-broken nixpkgs-zellij;
+    nixpkgs home-manager nix-flatpak nixpkgs-unstable sops-nix nixpkgs-broken
+    nixpkgs-zellij;
+  repoRootEnv = builtins.getEnv "REPO_ROOT";
+  repoRootDefault =
+    if repoRootEnv != "" then repoRootEnv else builtins.toString ../.;
   secretsPolicy = import (builtins.path {
     path = ./secrets-policy.nix;
     name = "secrets-policy.nix";
   });
   sort = builtins.sort builtins.lessThan;
-  hostNames = sort (builtins.attrNames secretsPolicy.hosts);
   operatorAlias = secretsPolicy.operator.alias;
   renderAgeList = aliases:
     builtins.concatStringsSep "\n"
@@ -113,9 +115,9 @@ in {
           }
         ] else
           [ ];
-        # Use the live checkout path so Home Manager out-of-store symlinks point
-        # into the working tree instead of the immutable flake snapshot.
-        repoRoot = "/home/djoolz/Documents/01_config/mine";
+        # Prefer an explicit live checkout path when provided. Fall back to the
+        # flake source path so evaluation still works in pure contexts.
+        repoRoot = repoRootDefault;
         dotfilesRoot = "${repoRoot}/dotfiles";
       in nixpkgs.lib.nixosSystem {
         inherit system;

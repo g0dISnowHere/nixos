@@ -1,4 +1,4 @@
-{ config, inputs, pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
   fpSrc = inputs.nixos-06cb-009a-fingerprint-sensor.outPath;
   pythonValidity =
@@ -17,16 +17,37 @@ in {
 
   environment.systemPackages = [ pkgs.fprintd pythonValidity ];
 
-  systemd.packages = [ pkgs.open-fprintd pythonValidity ];
+  systemd = {
+    packages = [ pkgs.open-fprintd pythonValidity ];
+
+    services = {
+      python3-validity = {
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "5s";
+        };
+      };
+      open-fprintd-resume.wantedBy = [
+        "suspend.target"
+        "hibernate.target"
+        "hybrid-sleep.target"
+        "suspend-then-hibernate.target"
+      ];
+      open-fprintd-suspend.wantedBy = [
+        "suspend.target"
+        "hibernate.target"
+        "hybrid-sleep.target"
+        "suspend-then-hibernate.target"
+      ];
+    };
+  };
 
   # Register D-Bus service files from both packages.
   services.dbus.packages = [ pkgs.open-fprintd pythonValidity ];
 
   # open-fprintd replaces upstream fprintd daemon, but keep fprintd CLI tools.
   services.fprintd.enable = false;
-
-  # Upstream package ships service file but does not auto-start by itself.
-  systemd.services.python3-validity.wantedBy = [ "multi-user.target" ];
 
   security.pam.services = {
     login.fprintAuth = true;

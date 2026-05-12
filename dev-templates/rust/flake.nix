@@ -9,7 +9,7 @@
     };
   };
 
-  outputs = { self, ... }@inputs:
+  outputs = inputs:
 
     let
       supportedSystems =
@@ -23,7 +23,7 @@
             };
           });
     in {
-      overlays.default = final: prev: {
+      overlays.default = _: prev: {
         rustToolchain =
           with inputs.fenix.packages.${prev.stdenv.hostPlatform.system};
           combine (with stable; [ clippy rustc cargo rustfmt rust-src ]);

@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+_: {
   # Something about powermanagement. FIXME source
   powerManagement.powertop.enable = true;
   systemd.services.powertop = {

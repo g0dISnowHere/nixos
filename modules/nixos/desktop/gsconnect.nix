@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ pkgs, ... }: {
   # GSConnect Module - Self-Contained
   # Provides installation of GNOME GSConnect extension and KDE Connect backend,
   # along with necessary firewall rules for communication.

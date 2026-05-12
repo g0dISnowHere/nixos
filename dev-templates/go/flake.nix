@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = { self, ... }@inputs:
+  outputs = inputs:
 
     let
       goVersion = 24; # Change this to update the whole stack
@@ -19,9 +19,7 @@
             };
           });
     in {
-      overlays.default = final: prev: {
-        go = final."go_1_${toString goVersion}";
-      };
+      overlays.default = final: _: { go = final."go_1_${toString goVersion}"; };
 
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShellNoCC {

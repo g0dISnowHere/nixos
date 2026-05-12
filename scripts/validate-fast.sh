@@ -65,6 +65,21 @@ run_check "scripts/secrets sync-policy --check failed" \
   bash "${script_dir}/secrets" sync-policy --check
 
 echo ""
+echo "Shell:"
+run_check "shell lint failed" \
+  bash "${script_dir}/lint-shell.sh"
+
+echo ""
+echo "Nix:"
+run_check "Nix lint failed" \
+  bash "${script_dir}/lint-nix.sh"
+
+echo ""
+echo "Documentation:"
+run_check "markdown lint failed" \
+  bash "${script_dir}/lint-markdown.sh"
+
+echo ""
 if [[ "${failed}" -eq 0 ]]; then
   echo "=== ✓ Fast Validation Passed ==="
   exit 0

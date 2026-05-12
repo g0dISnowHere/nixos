@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
   # Flatpak infrastructure only. Application sets live under modules/nixos/flatpak/.
   # Reference: https://github.com/gmodena/nix-flatpak
 

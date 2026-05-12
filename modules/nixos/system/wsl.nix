@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
   # NixOS-WSL platform configuration for server-like use under Windows.
   wsl = {
     enable = true;

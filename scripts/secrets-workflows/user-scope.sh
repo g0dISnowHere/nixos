@@ -124,7 +124,7 @@ if [[ "${retire_scope}" -eq 1 ]]; then
   if [[ "${#affected_secret_files[@]}" -gt 0 ]]; then
     secrets_ui_error "Refusing to retire users.${user_name} while user-scoped secrets still exist."
     printf 'User-scoped secrets to remove or migrate first:\n' >&2
-    printf '  %s\n' "${affected_secret_files[@]#${SECRETS_REPO_ROOT}/}" >&2
+    printf '  %s\n' "${affected_secret_files[@]#"${SECRETS_REPO_ROOT}"/}" >&2
     exit 1
   fi
 
@@ -191,7 +191,7 @@ if [[ "${#affected_secret_files[@]}" -gt 0 ]]; then
 
   for secret_file in "${affected_secret_files[@]}"; do
     if ! secrets_can_decrypt_with_key "${SECRETS_OPERATOR_KEY_FILE}" "${secret_file}"; then
-      secrets_ui_error "Operator key cannot decrypt ${secret_file#${SECRETS_REPO_ROOT}/}"
+      secrets_ui_error "Operator key cannot decrypt ${secret_file#"${SECRETS_REPO_ROOT}"/}"
       exit 1
     fi
   done
@@ -210,7 +210,7 @@ printf '\nAffected secrets:\n'
 if [[ "${#affected_secret_files[@]}" -eq 0 ]]; then
   printf '  (none)\n'
 else
-  printf '  %s\n' "${affected_secret_files[@]#${SECRETS_REPO_ROOT}/}"
+  printf '  %s\n' "${affected_secret_files[@]#"${SECRETS_REPO_ROOT}"/}"
 fi
 
 if [[ "${dry_run}" -eq 1 ]]; then
@@ -241,7 +241,7 @@ secrets_set_user_scope_hosts "${user_name}" "${create_flag}" "${target_hosts[@]}
 secrets_sync_sops_config
 
 for secret_file in "${affected_secret_files[@]}"; do
-  printf 'Rekeying %s\n' "${secret_file#${SECRETS_REPO_ROOT}/}"
+  printf 'Rekeying %s\n' "${secret_file#"${SECRETS_REPO_ROOT}"/}"
   SOPS_AGE_KEY_FILE="${SECRETS_OPERATOR_KEY_FILE}" sops updatekeys --yes "${secret_file}"
 done
 

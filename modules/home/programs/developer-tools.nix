@@ -1,56 +1,58 @@
 { pkgs, pkgs-unstable, desktopEnvironment ? null, ... }: {
-  home.packages = with pkgs;
-    [
-      # Python
-      python3
-      python3Packages.pip
-      python3Packages.setuptools
-      python3Packages.wheel
-      python3Packages.virtualenv
-      python3Packages.pipx
-      uv
+  home = {
+    packages = with pkgs;
+      [
+        # Python
+        python3
+        python3Packages.pip
+        python3Packages.setuptools
+        python3Packages.wheel
+        python3Packages.virtualenv
+        python3Packages.pipx
+        uv
 
-      # Go
-      go
-      gopls
-      go-tools
+        # Go
+        go
+        gopls
+        go-tools
 
-      # JavaScript / Node.js
-      nodejs
-      npm-check-updates
-      yarn
-      pnpm
+        # JavaScript / Node.js
+        nodejs
+        npm-check-updates
+        yarn
+        pnpm
 
-      # Rust
-      rustc
-      cargo
-      rust-analyzer
-      clippy
-      rustfmt
+        # Rust
+        rustc
+        cargo
+        rust-analyzer
+        clippy
+        rustfmt
 
-      # Native build tooling
-      pkgconf
-      gcc
-      gnumake
-      cmake
+        # Native build tooling
+        pkgconf
+        gcc
+        gnumake
+        cmake
 
-      # Developer-focused newer packages
-      pkgs-unstable.devenv
-      pkgs-unstable.gh
-    ]
-    ++ pkgs.lib.optionals (desktopEnvironment != null) [ pkgs-unstable.vscode ];
+        # Developer-focused newer packages
+        pkgs-unstable.devenv
+        pkgs-unstable.gh
+      ] ++ pkgs.lib.optionals (desktopEnvironment != null)
+      [ pkgs-unstable.vscode ];
 
-  home.sessionVariables = {
-    GOPATH = "$HOME/go";
-    GOBIN = "$HOME/go/bin";
-    NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-    CARGO_HOME = "$HOME/.cargo";
+    sessionVariables = {
+      GOPATH = "$HOME/go";
+      GOBIN = "$HOME/go/bin";
+      NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+      CARGO_HOME = "$HOME/.cargo";
+    };
+
+    sessionPath = [
+      "$HOME/go/bin"
+      "$HOME/.npm-global/bin"
+      "$HOME/.cargo/bin"
+      "$HOME/.local/bin"
+    ];
   };
-
-  home.sessionPath = [
-    "$HOME/go/bin"
-    "$HOME/.npm-global/bin"
-    "$HOME/.cargo/bin"
-    "$HOME/.local/bin"
-  ];
 }

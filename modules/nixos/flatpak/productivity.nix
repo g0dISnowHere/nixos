@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
   services.flatpak.packages = [
     "io.github.flattool.Warehouse"
     "io.github.giantpinkrobots.flatsweep"

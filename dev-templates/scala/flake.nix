@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = { self, ... }@inputs:
+  outputs = inputs:
 
     let
       javaVersion = 25; # Change this value to update the whole stack
@@ -19,7 +19,7 @@
             };
           });
     in {
-      overlays.default = final: prev:
+      overlays.default = _: prev:
         let jdk = prev."jdk${toString javaVersion}";
         in {
           sbt = prev.sbt.override { jre = jdk; };

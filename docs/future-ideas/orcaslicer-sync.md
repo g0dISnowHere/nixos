@@ -50,10 +50,8 @@
 
 2.  **Create Symbolic Links on Windows:**
     *   You will need to use the `mklink` command (run in an **administrator command prompt**) to create symbolic links (junctions for directories, hard links for files) from Orca Slicer's expected Windows config location (`%APPDATA%\OrcaSlicer`) to the files/directories within your cloned `config_sync/orcaslicer` directory.
-    *   *Example command (for `OrcaSlicer.conf`):* `mklink /H "%APPDATA%\OrcaSlicer\OrcaSlicer.conf" "C:\path	o\your
-epo\config_sync\orcaslicer\OrcaSlicer.conf"`
-    *   *Example command (for `printers` directory):* `mklink /J "%APPDATA%\OrcaSlicer\printers" "C:\path	o\your
-epo\config_sync\orcaslicer\printers"`
+    *   *Example command (for `OrcaSlicer.conf`):* `mklink /H "%APPDATA%\OrcaSlicer\OrcaSlicer.conf" "C:\path\to\your\repo\config_sync\orcaslicer\OrcaSlicer.conf"`
+    *   *Example command (for `printers` directory):* `mklink /J "%APPDATA%\OrcaSlicer\printers" "C:\path\to\your\repo\config_sync\orcaslicer\printers"`
     *   You will need to perform this for `OrcaSlicer.conf`, `printers/`, `system/`, and `user/`.
 
 ### Part 3: Synchronization Workflow

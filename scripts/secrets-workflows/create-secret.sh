@@ -84,21 +84,18 @@ fi
 
 case "${scope_name}" in
   users.*)
-    scope_kind="users"
     scope_id="${scope_name#users.}"
     target_dir="${SECRETS_REPO_ROOT}/secrets/users/${scope_id}"
     default_name="secret.yaml"
     default_template="yaml"
     ;;
   services.*)
-    scope_kind="services"
     scope_id="${scope_name#services.}"
     target_dir="${SECRETS_REPO_ROOT}/secrets/services/${scope_id}"
     default_name="secret.env"
     default_template="env"
     ;;
   machines.*)
-    scope_kind="machines"
     scope_id="${scope_name#machines.}"
     target_dir="${SECRETS_REPO_ROOT}/secrets/machines/${scope_id}"
     default_name="secret.env"
@@ -164,7 +161,7 @@ case "${template_type}" in
 esac
 
 target_path="${target_dir}/${target_name}"
-relative_target="${target_path#${SECRETS_REPO_ROOT}/}"
+relative_target="${target_path#"${SECRETS_REPO_ROOT}"/}"
 
 if [[ -e "${target_path}" ]]; then
   secrets_ui_error "Target already exists: ${relative_target}"

@@ -1,10 +1,6 @@
-{ self, home-manager, nixpkgs, nixpkgs-unstable, nixpkgs-broken, nixpkgs-zellij
-, flake-parts, nix-flatpak, plasma-manager, treefmt-nix, systems,
-# nixos-conf-editor,
-# nix-software-center,
-... }@inputs:
+inputs:
 
-(flake-parts.lib.mkFlake { inherit inputs; } {
+(inputs."flake-parts".lib.mkFlake { inherit inputs; } {
 
   imports = [
     # To import a flake module
@@ -17,6 +13,7 @@
     inputs.treefmt-nix.flakeModule
     ./parts/devshells.nix
     ./parts/formatter.nix
+    ./parts/checks.nix
     ./parts/templates.nix
 
     # Library functions and machine definitions
@@ -35,7 +32,7 @@
     # "x86_64-darwin"
   ];
 
-  perSystem = { ... }:
+  perSystem = _:
     {
       # System-specific packages could go here
       # packages.some-tool = pkgs.callPackage ./some-tool.nix {};

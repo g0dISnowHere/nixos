@@ -1,4 +1,4 @@
-{ config, pkgs, hostname, ... }: {
+{ pkgs, hostname, ... }: {
   # Centauri - Primary laptop/workstation
   # Hardware: [describe hardware]
   # Role: Workstation (development, daily use)

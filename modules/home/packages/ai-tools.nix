@@ -3,19 +3,7 @@
 {
   # AI assistant tooling lives here so installs and tool-specific notes stay together.
   home.packages = with pkgs;
-    let
-      # Optional pinned Codex build kept here with the rest of the AI tooling.
-      # Enable `codex-latest` below if the unstable package lags behind a needed release.
-      codex-latest = pkgs-unstable.codex.overrideAttrs (_old: {
-        version = "0.104.0";
-        src = pkgs-unstable.fetchFromGitHub {
-          owner = "openai";
-          repo = "codex";
-          rev = "rust-v0.104.0";
-          hash = "sha256-spWb/msjl9am7E4UkZfEoH0diFbvAfydJKJQM1N1aoI=";
-        };
-      });
-    in [
+    [
       #################################################################################
       ## AI
       #################################################################################

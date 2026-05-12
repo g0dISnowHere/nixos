@@ -79,7 +79,7 @@ if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -gt 0 ]]; then
     printf 'The operator key cannot decrypt the current target secrets.\n' >&2
     if [[ "${#SECRETS_OPERATOR_FAILED_SECRETS[@]}" -gt 0 ]]; then
       printf 'Blocked files:\n' >&2
-      printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#${SECRETS_REPO_ROOT}/}" >&2
+      printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}" >&2
     fi
     exit 1
   fi
@@ -92,7 +92,7 @@ printf '\nSecrets to rekey and verify:\n'
 if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
   printf '  (none)\n'
 else
-  printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
+  printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}"
 fi
 
 if [[ "${dry_run}" -eq 1 ]]; then
@@ -104,12 +104,12 @@ if [[ "${dry_run}" -eq 1 ]]; then
 fi
 
 for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
-  printf 'Rekeying %s\n' "${secret_file#${SECRETS_REPO_ROOT}/}"
+  printf 'Rekeying %s\n' "${secret_file#"${SECRETS_REPO_ROOT}"/}"
   SOPS_AGE_KEY_FILE="${SECRETS_OPERATOR_KEY_FILE}" sops updatekeys --yes "${secret_file}"
 done
 
 for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
-  printf 'Verifying decrypt %s\n' "${secret_file#${SECRETS_REPO_ROOT}/}"
+  printf 'Verifying decrypt %s\n' "${secret_file#"${SECRETS_REPO_ROOT}"/}"
   SOPS_AGE_KEY_FILE="${SECRETS_HOST_KEY_FILE}" sops --decrypt "${secret_file}" >/dev/null
 done
 

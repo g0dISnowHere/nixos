@@ -98,7 +98,7 @@ if [[ "${SECRETS_OPERATOR_CAN_DECRYPT}" -ne 1 && "${SECRETS_RELEVANT_SECRET_COUN
   secrets_ui_error "The operator key cannot decrypt the current target secrets."
   if [[ "${#SECRETS_OPERATOR_FAILED_SECRETS[@]}" -gt 0 ]]; then
     printf 'Blocked files:\n' >&2
-    printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#${SECRETS_REPO_ROOT}/}" >&2
+    printf '  %s\n' "${SECRETS_OPERATOR_FAILED_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}" >&2
   fi
   exit 1
 fi
@@ -124,7 +124,7 @@ printf '\nRelevant secrets:\n'
 if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
   printf '  (none)\n'
 else
-  printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
+  printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}"
 fi
 
 if [[ "${SECRETS_HOST_ALIAS_EXISTS}" -ne 1 ]]; then
@@ -138,6 +138,11 @@ elif [[ "${SECRETS_HOST_RECIPIENT_MATCHES}" -ne 1 ]]; then
   if [[ "${dry_run}" -eq 1 ]]; then
     printf '\nWould update flake/secrets-policy.nix and regenerate .sops.yaml.\n'
     exit 0
+  fi
+
+  if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Update policy, rekey the host secrets, and run validation for ${host_name}?"; then
+    printf 'Aborted.\n'
+    exit 1
   fi
 
   secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 0

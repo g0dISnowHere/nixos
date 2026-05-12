@@ -207,7 +207,7 @@ fi
 
 for candidate in "${SECRETS_RELEVANT_SECRETS[@]}"; do
   if ! secrets_can_decrypt_with_key "${source_key_file}" "${candidate}"; then
-    secrets_ui_error "Source key ${source_key_file} cannot decrypt ${candidate#${SECRETS_REPO_ROOT}/}"
+    secrets_ui_error "Source key ${source_key_file} cannot decrypt ${candidate#"${SECRETS_REPO_ROOT}"/}"
     exit 1
   fi
 done
@@ -221,7 +221,7 @@ secrets_ui_kv "Target operator alias" "${operator_alias}"
 secrets_ui_kv "Target recipient" "${target_operator_recipient}"
 secrets_ui_kv "Final operator recipients" "$(printf '%s ' "${target_operator_recipients[@]}" | sed 's/ $//')"
 printf '\nAffected secrets:\n'
-printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#${SECRETS_REPO_ROOT}/}"
+printf '  %s\n' "${SECRETS_RELEVANT_SECRETS[@]#"${SECRETS_REPO_ROOT}"/}"
 
 if [[ "${dry_run}" -eq 1 ]]; then
   printf '\nDry run plan:\n'
@@ -246,13 +246,13 @@ secrets_sync_sops_config
 printf '\nUpdated policy and regenerated .sops.yaml operator recipients.\n'
 
 for candidate in "${SECRETS_RELEVANT_SECRETS[@]}"; do
-  printf 'Rekeying %s\n' "${candidate#${SECRETS_REPO_ROOT}/}"
+  printf 'Rekeying %s\n' "${candidate#"${SECRETS_REPO_ROOT}"/}"
   SOPS_AGE_KEY_FILE="${source_key_file}" sops updatekeys --yes "${candidate}"
 done
 
 if [[ -n "${target_operator_key_file}" ]]; then
   for candidate in "${SECRETS_RELEVANT_SECRETS[@]}"; do
-    printf 'Validating target operator key against %s\n' "${candidate#${SECRETS_REPO_ROOT}/}"
+    printf 'Validating target operator key against %s\n' "${candidate#"${SECRETS_REPO_ROOT}"/}"
     SOPS_AGE_KEY_FILE="${target_operator_key_file}" sops --decrypt "${candidate}" >/dev/null
   done
   printf '\nRecovered operator access and validated the target key.\n'

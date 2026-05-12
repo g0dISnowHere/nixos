@@ -83,7 +83,7 @@ fi
 if [[ "${#machine_secret_files[@]}" -gt 0 ]]; then
   secrets_ui_error "Refusing to retire ${host_name} while machine-scoped secrets still exist."
   printf 'Machine-scoped secrets to remove or migrate first:\n' >&2
-  printf '  %s\n' "${machine_secret_files[@]#${SECRETS_REPO_ROOT}/}" >&2
+  printf '  %s\n' "${machine_secret_files[@]#"${SECRETS_REPO_ROOT}"/}" >&2
   exit 1
 fi
 
@@ -102,7 +102,7 @@ if [[ "${#shared_secret_files[@]}" -gt 0 ]]; then
 
   for secret_file in "${shared_secret_files[@]}"; do
     if ! secrets_can_decrypt_with_key "${SECRETS_OPERATOR_KEY_FILE}" "${secret_file}"; then
-      secrets_ui_error "Operator key cannot decrypt ${secret_file#${SECRETS_REPO_ROOT}/}"
+      secrets_ui_error "Operator key cannot decrypt ${secret_file#"${SECRETS_REPO_ROOT}"/}"
       exit 1
     fi
   done
@@ -115,7 +115,7 @@ printf '\nShared secrets to rekey:\n'
 if [[ "${#shared_secret_files[@]}" -eq 0 ]]; then
   printf '  (none)\n'
 else
-  printf '  %s\n' "${shared_secret_files[@]#${SECRETS_REPO_ROOT}/}"
+  printf '  %s\n' "${shared_secret_files[@]#"${SECRETS_REPO_ROOT}"/}"
 fi
 
 if [[ "${dry_run}" -eq 1 ]]; then
@@ -141,7 +141,7 @@ unset SECRETS_POLICY_JSON
 secrets_sync_sops_config
 
 for secret_file in "${shared_secret_files[@]}"; do
-  printf 'Rekeying %s\n' "${secret_file#${SECRETS_REPO_ROOT}/}"
+  printf 'Rekeying %s\n' "${secret_file#"${SECRETS_REPO_ROOT}"/}"
   SOPS_AGE_KEY_FILE="${SECRETS_OPERATOR_KEY_FILE}" sops updatekeys --yes "${secret_file}"
 done
 

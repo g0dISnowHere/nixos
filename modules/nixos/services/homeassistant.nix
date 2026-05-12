@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+_: {
   # Home Assistant Integration
   # Provides Home Assistant service with configuration directory and firewall rules
   # Reference: https://wiki.nixos.org/wiki/Home_Assistant

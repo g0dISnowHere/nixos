@@ -4,7 +4,7 @@
 
 set -e
 
-SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd -P)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 DOTFILES_LINKER="${REPO_ROOT}/dotfiles/scripts/link.sh"
 

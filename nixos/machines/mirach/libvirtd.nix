@@ -21,16 +21,18 @@ in {
 
   users.users.djoolz.extraGroups = [ "libvirtd" ];
 
-  boot.extraModprobeConfig = lib.mkAfter ''
-    options kvm_intel nested=1
-    options e1000e SmartPowerDownEnable=0
-  '';
-  boot.kernelModules = [ "bridge" "br_netfilter" ];
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-    "net.bridge.bridge-nf-call-iptables" = 0;
-    "net.bridge.bridge-nf-call-ip6tables" = 0;
-    "net.bridge.bridge-nf-call-arptables" = 0;
+  boot = {
+    extraModprobeConfig = lib.mkAfter ''
+      options kvm_intel nested=1
+      options e1000e SmartPowerDownEnable=0
+    '';
+    kernelModules = [ "bridge" "br_netfilter" ];
+    kernel.sysctl = {
+      "net.ipv4.ip_forward" = 1;
+      "net.bridge.bridge-nf-call-iptables" = 0;
+      "net.bridge.bridge-nf-call-ip6tables" = 0;
+      "net.bridge.bridge-nf-call-arptables" = 0;
+    };
   };
 
   environment.systemPackages = with pkgs; [ virt-manager virt-viewer OVMF ];

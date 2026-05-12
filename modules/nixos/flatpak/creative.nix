@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
   services.flatpak.packages = [
     "org.blender.Blender"
     "org.freecad.FreeCAD"

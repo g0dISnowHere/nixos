@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ pkgs, ... }: {
 
   home.packages = [
     #(pkgs.quickemu.override { qemu_full = pkgs.qemu_kvm; })

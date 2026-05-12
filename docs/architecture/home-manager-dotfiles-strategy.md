@@ -51,6 +51,23 @@ Repo picks middle path:
 - [dotfiles/](../../dotfiles): raw config content linked into place
 - [nixos/machines/](../../nixos/machines): host attachment points when machine-local user wiring needed
 
+## Live Checkout Path
+
+Some Home Manager modules use `mkOutOfStoreSymlink` so linked files point at a
+live checkout instead of a copied flake snapshot.
+
+For that reason, the flake passes a `repoRoot` special argument into the Home
+Manager layer and derives `dotfilesRoot` from it.
+
+Resolution order:
+
+- if `REPO_ROOT` is set in the evaluation environment, use that as the live
+  checkout path
+- otherwise fall back to the flake source path so pure evaluation still works
+
+This avoids hardcoding one machine-local absolute path into the shared flake
+while still allowing working-tree-backed links during local use.
+
 ## Design Rule
 
 When deciding where thing lives, choose representation that keeps behavior
