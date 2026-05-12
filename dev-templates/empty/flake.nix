@@ -6,7 +6,7 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
   # Flake outputs
-  outputs = { self, ... }@inputs:
+  outputs = inputs:
 
     let
       # The systems supported for this flake

@@ -1,7 +1,7 @@
 # https://nixos.wiki/wiki/Android
 
 # Below is unused AI slop.
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   programs.android = {

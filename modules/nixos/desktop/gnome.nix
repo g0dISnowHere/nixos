@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ pkgs, ... }: {
   # GNOME Desktop Environment — Self-Contained
   # Imports shared desktop infrastructure from common.nix
   # Provides: GNOME DE + GDM, plus all dependencies from common.nix
@@ -9,12 +9,20 @@
   ];
 
   # Enable GNOME Desktop Environment
-  services.desktopManager.gnome.enable = true;
+  services = {
+    desktopManager.gnome.enable = true;
 
-  # Enable GDM display manager (login screen)
-  services.displayManager.gdm = {
-    enable = true;
-    wayland = true;
+    # Enable GDM display manager (login screen)
+    displayManager.gdm = {
+      enable = true;
+      wayland = true;
+    };
+
+    # GNOME-specific Flatpak applications
+    flatpak.packages = [
+      "org.gnome.Extensions" # GNOME Extensions Manager
+      "org.gnome.PowerStats" # Power consumption monitor
+    ];
   };
 
   # Enable dconf (GNOME settings backend)
@@ -28,9 +36,4 @@
     gtop # for system-monitor-ng extension
   ];
 
-  # GNOME-specific Flatpak applications
-  services.flatpak.packages = [
-    "org.gnome.Extensions" # GNOME Extensions Manager
-    "org.gnome.PowerStats" # Power consumption monitor
-  ];
 }

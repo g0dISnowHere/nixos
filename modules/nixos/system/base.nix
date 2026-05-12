@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
   imports = [
     ./ai-tools.nix
     ./developer-tools.nix

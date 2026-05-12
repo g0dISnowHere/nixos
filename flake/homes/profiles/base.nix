@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgs-unstable, isNixosIntegrated ? false, ... }: {
+{ lib, isNixosIntegrated ? false, ... }: {
   # Base home-manager configuration.
   # Shared across all profiles and provides CLI essentials.
   # This is the minimal profile for headless systems.

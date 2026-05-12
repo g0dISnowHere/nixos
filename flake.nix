@@ -82,5 +82,5 @@
     # lan-mouse.url = "github:feschber/lan-mouse";
   };
 
-  outputs = { self, ... }@args: import ./outputs.nix args;
+  outputs = args: import ./outputs.nix args;
 }

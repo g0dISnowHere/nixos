@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = { self, ... }@inputs:
+  outputs = inputs:
 
     let
       supportedSystems =
@@ -17,9 +17,9 @@
             };
           });
     in {
-      overlays.default = final: prev: rec {
-        nodejs = prev.nodejs;
-        yarn = (prev.yarn.override { inherit nodejs; });
+      overlays.default = _: prev: rec {
+        inherit (prev) nodejs;
+        yarn = prev.yarn.override { inherit nodejs; };
       };
 
       devShells = forEachSupportedSystem ({ pkgs }: {

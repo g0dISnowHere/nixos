@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: {
+{ pkgs, ... }: {
   # Scanner Support with SANE Backend
   # Enables hardware.sane for scanner support with workaround for Canon LiDE 25
   # Automatically adds users to required groups
@@ -31,4 +31,3 @@
   # Note: Add 'scanner' and 'lp' to user's extraGroups in machine config:
   # users.users.djoolz.extraGroups = [ ... "scanner" "lp" ];
 }
-

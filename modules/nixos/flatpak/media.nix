@@ -1,1 +1,1 @@
-{ ... }: { services.flatpak.packages = [ "com.spotify.Client" ]; }
+_: { services.flatpak.packages = [ "com.spotify.Client" ]; }

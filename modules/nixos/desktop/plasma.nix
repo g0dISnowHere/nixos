@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+_: {
   # KDE Plasma Desktop Environment — Self-Contained
   # Imports shared desktop infrastructure from common.nix
   # Provides: Plasma 6 DE + SDDM, plus all dependencies from common.nix

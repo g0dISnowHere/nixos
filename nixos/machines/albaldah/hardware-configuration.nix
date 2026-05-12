@@ -1,11 +1,13 @@
 { lib, modulesPath, ... }: {
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
-  boot.initrd.availableKernelModules =
-    [ "ata_piix" "sd_mod" "sr_mod" "uhci_hcd" "virtio_pci" "virtio_scsi" ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
-  boot.extraModulePackages = [ ];
+  boot = {
+    initrd.availableKernelModules =
+      [ "ata_piix" "sd_mod" "sr_mod" "uhci_hcd" "virtio_pci" "virtio_scsi" ];
+    initrd.kernelModules = [ ];
+    kernelModules = [ ];
+    extraModulePackages = [ ];
+  };
 
   # Filesystems are declared in ./disko.nix for install and rebuilds. Keep this
   # file focused on hardware detection so it can be safely regenerated with

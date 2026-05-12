@@ -1,5 +1,5 @@
 # https://nixos.wiki/wiki/Docker
-{ pkgs, ... }: {
+_: {
   imports = [ ./docker-options.nix ];
 
   my.virtualisation.docker.rootful = true;

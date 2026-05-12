@@ -2,7 +2,7 @@
 let
   inherit (pkgs) fetchFromGitHub lib wrapGAppsNoGuiHook;
   inherit (pkgs.python3Packages)
-    buildPythonPackage cryptography dbus-python pyusb pyyaml pygobject3 python
+    buildPythonPackage cryptography dbus-python pyusb pyyaml pygobject3
     setuptools;
 in buildPythonPackage rec {
   pname = "python-validity";

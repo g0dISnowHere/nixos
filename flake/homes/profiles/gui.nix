@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, inputs, desktopEnvironment ? null, ... }: {
+{ desktopEnvironment ? null, ... }: {
   # GUI profile
   # Extends the base profile with GUI applications and DE-specific settings
   # Use this profile for workstations and GUI-enabled machines
@@ -14,7 +14,7 @@
   # GNOME: dconf settings
     ++ (if desktopEnvironment == "gnome" then
       [
-        # ../../../modules/home/dconf/dconf.nix 
+        # ../../../modules/home/dconf/dconf.nix
       ]
     else
       [ ])

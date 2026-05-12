@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: {
+_: {
   # Global Nix daemon configuration
   # Applies to all machines
 

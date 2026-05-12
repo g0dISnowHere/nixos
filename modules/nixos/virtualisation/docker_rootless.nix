@@ -1,5 +1,5 @@
 # https://nixos.wiki/wiki/Docker
-{ pkgs, ... }: {
+_: {
   # Docker Rootless
   # Provides Docker daemon running without root privileges for enhanced security.
 

@@ -170,6 +170,21 @@ else
 fi
 
 echo ""
+echo "Shell:"
+run_check "shell lint failed" \
+  bash "${script_dir}/lint-shell.sh"
+
+echo ""
+echo "Nix:"
+run_check "Nix lint failed" \
+  bash "${script_dir}/lint-nix.sh"
+
+echo ""
+echo "Documentation:"
+run_check "markdown lint failed" \
+  bash "${script_dir}/lint-markdown.sh"
+
+echo ""
 if [[ "${FAILED}" -eq 0 ]]; then
   echo "=== ✓ All Validation Tests Passed ==="
   exit 0

@@ -14,36 +14,57 @@ fi
 echo "🔍 Running pre-commit checks..."
 echo ""
 
-# === Format Code ===
-echo "1️⃣  Formatting code with nix fmt..."
 # Capture the currently staged files so we can re-stage only those.
 staged_files_file="/tmp/pre-commit-staged-files.txt"
 git diff --name-only --cached > "$staged_files_file"
-if ! grep -E '\.nix$' "$staged_files_file" | grep -vq -x "dconf.nix"; then
-    echo "   ℹ️  No staged .nix files (excluding dconf.nix); skipping checks."
+has_nix_files=0
+has_markdown_files=0
+has_shell_files=0
+
+if grep -E '\.nix$' "$staged_files_file" | grep -vq -x "dconf.nix"; then
+    has_nix_files=1
+fi
+
+if grep -Eq '\.md$' "$staged_files_file"; then
+    has_markdown_files=1
+fi
+
+if grep -Eq '(^|/)[^/]+\.sh$|^scripts/secrets$|^\.githooks/pre-commit$' "$staged_files_file"; then
+    has_shell_files=1
+fi
+
+if [ "$has_nix_files" -eq 0 ] && [ "$has_markdown_files" -eq 0 ] && [ "$has_shell_files" -eq 0 ]; then
+    echo "   ℹ️  No staged .nix, .md, or shell files requiring repo checks; skipping."
     exit 0
 fi
 cleanup_staged_file() {
     rm -f "$staged_files_file"
 }
 trap cleanup_staged_file EXIT
-nix fmt
-if git diff-index --quiet HEAD --; then
-    echo "   ✓ No formatting changes"
-else
-    echo "   ℹ️  Code was reformatted, staging changes..."
-    # Re-stage only the files that were staged before formatting.
-    if [ -s "$staged_files_file" ]; then
-        while IFS= read -r path; do
-            if [ -e "$path" ] || [ -L "$path" ]; then
-                git add -- "$path"
-            else
-                if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
-                    git add -u -- "$path"
+
+# === Format Code ===
+if [ "$has_nix_files" -eq 1 ]; then
+    echo "1️⃣  Formatting code with nix fmt..."
+    nix fmt
+    if git diff-index --quiet HEAD --; then
+        echo "   ✓ No formatting changes"
+    else
+        echo "   ℹ️  Code was reformatted, staging changes..."
+        # Re-stage only the files that were staged before formatting.
+        if [ -s "$staged_files_file" ]; then
+            while IFS= read -r path; do
+                if [ -e "$path" ] || [ -L "$path" ]; then
+                    git add -- "$path"
+                else
+                    if git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+                        git add -u -- "$path"
+                    fi
                 fi
-            fi
-        done < "$staged_files_file"
+            done < "$staged_files_file"
+        fi
     fi
+else
+    echo "1️⃣  No staged .nix files; skipping nix fmt."
 fi
 echo ""
 

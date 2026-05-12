@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = { self, ... }@inputs:
+  outputs = inputs:
 
     let
       supportedSystems =
@@ -17,7 +17,7 @@
             };
           });
     in {
-      overlays.default = final: prev: rec {
+      overlays.default = final: _: rec {
         # documentation
         # https://nixos.org/manual/nixpkgs/stable/#sec-beam
 

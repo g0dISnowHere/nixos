@@ -9,10 +9,10 @@
     nixos-anywhere.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, disko, ... }:
+  outputs = inputs@{ nixpkgs, disko, ... }:
     let
       system = "x86_64-linux";
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
     in {
       nixosConfigurations.strato-vps = lib.nixosSystem {
         inherit system;

@@ -67,6 +67,19 @@ nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
 5. Replace `sha256` with the hash Nix prints.
 6. Re-run eval.
 
+## Factory Reset On NixOS
+
+The upstream README uses `/usr/share/python-validity/playground/factory-reset.py`, but the Nix package here does not ship that helper script. Use the packaged module entry point instead:
+
+```bash
+sudo systemctl stop python3-validity
+sudo validity-sensors-firmware
+sudo python3 -c 'from validitysensor.init import open as validity_open; from validitysensor.sensor import factory_reset; validity_open(); factory_reset()'
+sudo systemctl start python3-validity
+```
+
+If the reset succeeds, the command may exit with an exception after rebooting the sensor. That is expected.
+
 ## Validate After Any Change
 
 ```bash
@@ -81,6 +94,7 @@ Also test:
 - swaylock unlock
 - fresh GDM login
 - a polkit prompt
+- suspend/resume once to confirm `open-fprintd-suspend` and `open-fprintd-resume` still recover the sensor
 
 ## Likely Failure Point
 
@@ -91,3 +105,7 @@ If eval breaks after a `nixpkgs` update, the most likely local fix point is:
 Reason:
 - this wrapper carries compatibility glue for current Python packaging in `nixpkgs`
 - upstream `python-validity` packaging may lag behind
+
+If the sensor stops working after suspend, check the `open-fprintd-suspend` and `open-fprintd-resume` units first. The upstream package ships both helpers and this repo enables them for `centauri`.
+
+`python3-validity` is configured to restart automatically on exit so a transient USB loss does not leave fingerprint auth dead until the next manual restart.

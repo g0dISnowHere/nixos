@@ -173,6 +173,8 @@ Broader checks:
 
 ```bash
 nix flake check
+nix run .#shellcheckRepo
+nix run .#markdownlintRepo
 sh scripts/validate-fast.sh
 sh validate.sh
 ```
