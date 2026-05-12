@@ -7,6 +7,7 @@ Not place for long architecture story. If doc starts answering "why repo built
 like this", move that to canonical docs under `docs/`.
 
 Current entries:
+- `crowdsec-commands.md`
 - `useful-commands.md`
 - `secrets-commands.md`
 - `fingerprint-maintenance.md`

@@ -34,6 +34,8 @@ findings. Files here describe VPS as work area, not only one host definition.
 - [nixos-running-services-backup-and-migration-plan-2026-03-28.md](nixos-running-services-backup-and-migration-plan-2026-03-28.md)
 - [nixos-running-services-backup-manifest-2026-03-28.md](nixos-running-services-backup-manifest-2026-03-28.md)
 - [backup-reimport-runbook-2026-03-28.md](backup-reimport-runbook-2026-03-28.md)
+- [crowdsec-auth-domains.md](crowdsec-auth-domains.md)
 - [crowdsec-on-albaldah.md](crowdsec-on-albaldah.md)
+- [../reference/crowdsec-commands.md](../reference/crowdsec-commands.md)
 - [secret-rotation-checklist-2026-03-28.md](secret-rotation-checklist-2026-03-28.md)
 - [strato-vps/README.md](strato-vps/README.md)
