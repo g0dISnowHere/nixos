@@ -46,6 +46,11 @@ REMOTE_VSCODE_HOSTS=(
   "albaldah"
   "alhena"
 )
+DOCKER_HOSTS=(
+  "mirach"
+  "albaldah"
+  "alhena"
+)
 
 run_check() {
   local description="$1"
@@ -79,6 +84,51 @@ validate_remote_vscode_support() {
   fi
 
   echo "  ✓ ${host_name}: VS Code Remote support enabled"
+}
+
+# shellcheck disable=SC2329 # Invoked indirectly through run_check below.
+validate_docker_journald_logging() {
+  local host_name="$1"
+  local log_driver
+
+  if ! log_driver="$(
+    nix eval ".#nixosConfigurations.${host_name}.config.virtualisation.docker.daemon.settings.log-driver" 2>/dev/null | tr -d '"'
+  )"; then
+    echo "  ✗ ${host_name}: failed to evaluate docker log-driver"
+    return 1
+  fi
+
+  if [[ "${log_driver}" != "journald" ]]; then
+    echo "  ✗ ${host_name}: docker log-driver = ${log_driver}"
+    return 1
+  fi
+
+  echo "  ✓ ${host_name}: docker log-driver = journald"
+}
+
+# shellcheck disable=SC2329 # Invoked indirectly through run_check below.
+validate_albaldah_traefik_acquisition() {
+  local acquisitions_json
+
+  if ! acquisitions_json="$(
+    nix eval --json ".#nixosConfigurations.albaldah.config.services.crowdsec.localConfig.acquisitions" 2>/dev/null
+  )"; then
+    echo "  ✗ albaldah: failed to evaluate CrowdSec acquisitions"
+    return 1
+  fi
+
+  if ! jq -e '
+    any(
+      .[];
+      ((.labels.type // "") == "traefik")
+      and (((.filenames // []) | index("/var/log/traefik/access.json")) != null)
+    )
+  ' >/dev/null <<<"${acquisitions_json}"; then
+    echo "  ✗ albaldah: missing /var/log/traefik/access.json CrowdSec acquisition"
+    return 1
+  fi
+
+  echo "  ✓ albaldah: CrowdSec Traefik acquisition uses /var/log/traefik/access.json"
 }
 
 if [[ "${REGENERATE_DCONF}" -eq 1 ]]; then
@@ -148,6 +198,15 @@ for host_name in "${REMOTE_VSCODE_HOSTS[@]}"; do
   run_check "remote VS Code support missing for ${host_name}" \
     validate_remote_vscode_support "${host_name}"
 done
+
+echo ""
+echo "Docker Logging:"
+for host_name in "${DOCKER_HOSTS[@]}"; do
+  run_check "docker journald logging missing for ${host_name}" \
+    validate_docker_journald_logging "${host_name}"
+done
+run_check "albaldah CrowdSec Traefik acquisition drifted" \
+  validate_albaldah_traefik_acquisition
 
 echo ""
 echo "Home-Manager Configurations:"

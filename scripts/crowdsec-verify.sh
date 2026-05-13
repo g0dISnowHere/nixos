@@ -107,6 +107,16 @@ check_docker_user_chain() {
   "${sudo_cmd[@]}" iptables -S DOCKER-USER 2>/dev/null | grep -Fq "CROWDSEC_CHAIN"
 }
 
+# shellcheck disable=SC2329 # Invoked indirectly through check().
+check_docker_log_driver() {
+  docker info --format '{{.LoggingDriver}}' 2>/dev/null | grep -Fxq "journald"
+}
+
+# shellcheck disable=SC2329 # Invoked indirectly through check().
+check_traefik_access_log_path() {
+  "${sudo_cmd[@]}" test -r /var/log/traefik/access.json
+}
+
 printf 'CrowdSec verify\n'
 printf 'host: %s\n' "$(hostname -s)"
 printf '\n'
@@ -133,6 +143,11 @@ check "Firewall bouncer registered" check_bouncer_registration
 printf '\n'
 printf 'Firewall:\n'
 check "DOCKER-USER jumps into CrowdSec chain" check_docker_user_chain
+
+printf '\n'
+printf 'Traefik acquisition:\n'
+check "Docker log driver is journald" check_docker_log_driver
+check "Traefik access log readable at /var/log/traefik/access.json" check_traefik_access_log_path
 
 printf '\n'
 if [[ "$failed" -eq 0 ]]; then

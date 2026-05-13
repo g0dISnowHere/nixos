@@ -251,7 +251,7 @@ ssh albaldah 'sudo cscli decisions list -n 20 | tail -n 20'
 ## Test CrowdSec Traefik Log Readability On `albaldah`
 
 ```bash
-ssh albaldah 'sudo ls -l /var/log/traefik/access.log | tail -n 20 && sudo -u crowdsec head -n 1 /var/log/traefik/access.log | tail -n 20'
+ssh albaldah "docker info --format '{{.LoggingDriver}}' | tail -n 20 && sudo ls -l /var/log/traefik/access.json | tail -n 20 && sudo head -n 5 /var/log/traefik/access.json | tail -n 20"
 ```
 
 ## Test CrowdSec AppSec Reachability From Traefik On `albaldah`

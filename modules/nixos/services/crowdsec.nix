@@ -57,7 +57,7 @@ let
   dockerIngressCidrs =
     [ "172.17.0.0/16" "172.30.0.0/16" "172.31.0.0/16" "172.32.0.0/16" ];
   dockerIngressInterfaces = [ "docker0" "br-*" ];
-  traefikAccessLogPath = "/var/log/traefik/access.log";
+  traefikAccessLogPath = "/var/log/traefik/access.json";
   firewallBouncerApiKeyPath =
     "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
   reRegisterFirewallBouncer =
@@ -191,8 +191,8 @@ in {
     };
   };
 
-  # Keep service-readable ingress logs out of user homes because crowdsec runs
-  # with ProtectHome and should not depend on traversing /home.
+  # Traefik access logs are expected as a host-readable bind mount so CrowdSec
+  # can parse HTTP traffic without depending on Docker's runtime log stream.
   systemd.tmpfiles.rules = [ "d /var/log/traefik 0755 root root -" ];
 
   networking.firewall = {

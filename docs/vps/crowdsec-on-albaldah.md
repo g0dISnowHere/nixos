@@ -80,24 +80,23 @@ Important:
 
 ## Log Sources
 
-The engine currently acquires SSH logs from `journald` only:
+The engine currently acquires from:
 
-- `_SYSTEMD_UNIT=sshd.service`
-
-It also acquires:
-
-- Traefik access logs from `/var/log/traefik/access.log`
+- `journald` for `_SYSTEMD_UNIT=sshd.service`
+- Traefik access logs from `/var/log/traefik/access.json`
 - AppSec requests on `0.0.0.0:7422`
 
 This keeps the VPS baseline functional and makes the Traefik/AppSec path live.
 
 Important:
 
-- keep Traefik access logs in a system path such as `/var/log/traefik/`
-- do not point CrowdSec at log files under `/home`
-- `crowdsec.service` runs with systemd hardening such as `ProtectHome`, so a
-  home-directory log path can silently break Traefik ingestion even when unix
-  permissions look correct from an interactive shell
+- Traefik runtime logs and monitoring logs may still go to Docker's `journald`
+  stream, but CrowdSec's HTTP traffic parsing depends on the dedicated access
+  log file
+- the expected Traefik split is:
+  - runtime logs to stdout/stderr
+  - access logs to `/var/log/traefik/access.json`
+- keep the access log on a host-readable system path, not under `/home`
 
 The following still need dedicated acquisitions or component wiring before they
 become fully effective on `albaldah`:
@@ -255,6 +254,15 @@ docker exec traefik wget -S -O- http://host.docker.internal:8080/health | tail -
 docker exec traefik wget -S -O- --post-data '{}' http://host.docker.internal:7422/ | tail -n 20
 ```
 
+Check Traefik log ingestion path:
+
+```bash
+docker info --format '{{.LoggingDriver}}' | tail -n 20
+sudo ls -l /var/log/traefik/access.json | tail -n 20
+sudo head -n 5 /var/log/traefik/access.json | tail -n 20
+sudo journalctl -u crowdsec -b | rg -i 'traefik|tail|acquis'
+```
+
 Expected shape:
 
 - the LAPI call must connect and return HTTP
@@ -300,11 +308,12 @@ Link:
 
 - [docs/reference/crowdsec-commands.md](../reference/crowdsec-commands.md)
 
-Check whether the expected log source is readable by the runtime user:
+Check whether the expected Traefik access log file exists:
 
 ```bash
-sudo ls -l /var/log/traefik/access.log
-sudo -u crowdsec head -n 1 /var/log/traefik/access.log
+docker info --format '{{.LoggingDriver}}' | tail -n 20
+sudo ls -l /var/log/traefik/access.json | tail -n 20
+sudo head -n 5 /var/log/traefik/access.json | tail -n 20
 ```
 
 Watch live CrowdSec logs while generating test traffic:
@@ -371,10 +380,12 @@ sudo journalctl -u crowdsec -b | rg -i 'Appsec listening|Appsec Runner|Shutting 
 - firewall bouncer warns that Docker traffic is not configured
   - check `sudo iptables -S DOCKER-USER`
   - current repo state should attach `DOCKER-USER` to `CROWDSEC_CHAIN`
-- Traefik ingestion appears dead even though file permissions look fine
-  - do not place Traefik logs under `/home`
-  - `crowdsec.service` is hardened with `ProtectHome`, so interactive shell
-    access can succeed while the service still cannot traverse that path
+- Traefik ingestion appears dead
+  - confirm `/var/log/traefik/access.json` exists and is growing
+  - confirm Docker is still using the repo-wide `journald` driver for runtime
+    logs, but do not confuse that with the dedicated access log path
+  - if Traefik only writes stdout logs and no dedicated access log file,
+    CrowdSec will not see HTTP access events on this host
 - AppSec starts, then `7422` disappears immediately
   - check whether `journalctl datasource ... stopping` appears during startup
   - on this host the fix was to disable `PrivateUsers` for `crowdsec.service`

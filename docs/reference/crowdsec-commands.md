@@ -77,8 +77,9 @@ sudo journalctl -u crowdsec -u crowdsec-firewall-bouncer -u crowdsec-console-enr
 ## Log Source Checks
 
 ```bash
-sudo ls -l /var/log/traefik/access.log | tail -n 20
-sudo -u crowdsec head -n 1 /var/log/traefik/access.log | tail -n 20
+docker info --format '{{.LoggingDriver}}' | tail -n 20
+sudo ls -l /var/log/traefik/access.json | tail -n 20
+sudo head -n 5 /var/log/traefik/access.json | tail -n 20
 sudo journalctl -u crowdsec -b | rg -i 'Appsec listening|Appsec Runner|Shutting down Appsec server' | tail -n 20
 ```
 

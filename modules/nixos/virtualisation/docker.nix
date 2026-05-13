@@ -10,6 +10,7 @@ _: {
     daemon.settings = {
       # userland-proxy = true;
       experimental = true;
+      log-driver = "journald";
       registry-mirrors = [ "https://mirror.gcr.io" ];
     };
 
