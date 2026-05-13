@@ -13,7 +13,7 @@ Tailscale routing, Docker, and a `disko` install path.
 
 - [default.nix](../../nixos/machines/albaldah/default.nix)
   - host-specific behavior such as networking, bootloader, Tailscale-only admin
-    access, timezone, and the attached Home Manager user
+    access, and the attached Home Manager user
 - [hardware-configuration.nix](../../nixos/machines/albaldah/hardware-configuration.nix)
   - hardware detection only
   - does not own `/` or `/boot`

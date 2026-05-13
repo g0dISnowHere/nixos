@@ -37,7 +37,6 @@
     services."serial-getty@ttyS0".enable = true;
   };
 
-  time.timeZone = lib.mkForce "Etc/UTC";
   services.resolved.enable = true;
 
   boot.loader.grub = {

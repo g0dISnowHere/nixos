@@ -13,6 +13,10 @@
       kernelModules = [ ];
     };
     kernelModules = [ "kvm-intel" ];
+    kernelParams = [
+      "nohz_full=2-7" # NixOS produces many wakeups per second, which is bad for battery life. This kernel parameter disables the timer tick on the last 6 cores
+      "mitigations=off" # Disable all CPU mitigations (Spectre, Meltdown, etc.) FIXME dangerous.
+    ];
     extraModulePackages = [ ];
   };
 
