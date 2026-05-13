@@ -86,6 +86,11 @@ Current secret helpers include:
 - `scripts/set-user-password-secret.sh` for provisioning or rotating the
   encrypted `secrets/users/<name>/password.yaml` secret
 
+Current status helpers include:
+
+- `scripts/crowdsec-verify.sh` for a fast read-only CrowdSec health check on
+  hosts using this repo's CrowdSec wiring
+
 ## Reading This Directory
 
 Treat these scripts as convenience layers around the core design. If you are

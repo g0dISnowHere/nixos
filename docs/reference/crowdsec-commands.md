@@ -11,6 +11,7 @@ Use with:
 ## Core Health
 
 ```bash
+scripts/crowdsec-verify.sh
 sudo systemctl status crowdsec crowdsec-firewall-bouncer crowdsec-console-enroll | tail -n 40
 sudo journalctl -u crowdsec -u crowdsec-firewall-bouncer -u crowdsec-console-enroll -b -n 100 --no-pager | tail -n 80
 sudo cscli version

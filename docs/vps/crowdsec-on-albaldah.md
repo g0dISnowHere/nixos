@@ -193,6 +193,7 @@ sudo nixos-rebuild switch --flake .#albaldah
 Check the key units:
 
 ```bash
+scripts/crowdsec-verify.sh
 systemctl status \
   crowdsec \
   crowdsec-firewall-bouncer \
