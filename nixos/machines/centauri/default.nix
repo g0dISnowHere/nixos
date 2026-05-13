@@ -6,7 +6,10 @@
   imports = [
     ./hardware-configuration.nix
     ./bootloader.nix
-    ./other-hardware.nix
+    ./bluetooth.nix
+    ./graphics.nix
+    ./input.nix
+    ./printing.nix
     ../../../modules/nixos/system/autoupgrade.nix
     ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
