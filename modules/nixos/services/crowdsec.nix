@@ -57,7 +57,7 @@ let
   dockerIngressCidrs =
     [ "172.17.0.0/16" "172.30.0.0/16" "172.31.0.0/16" "172.32.0.0/16" ];
   dockerIngressInterfaces = [ "docker0" "br-*" ];
-  traefikAccessLogPath = "/var/log/traefik/access.json";
+  traefikAccessLogPath = "/var/log/traefik/access.log";
   firewallBouncerApiKeyPath =
     "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
   reRegisterFirewallBouncer =

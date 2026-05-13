@@ -114,7 +114,7 @@ check_docker_log_driver() {
 
 # shellcheck disable=SC2329 # Invoked indirectly through check().
 check_traefik_access_log_path() {
-  "${sudo_cmd[@]}" test -r /var/log/traefik/access.json
+  "${sudo_cmd[@]}" test -r /var/log/traefik/access.log
 }
 
 printf 'CrowdSec verify\n'
@@ -147,7 +147,7 @@ check "DOCKER-USER jumps into CrowdSec chain" check_docker_user_chain
 printf '\n'
 printf 'Traefik acquisition:\n'
 check "Docker log driver is journald" check_docker_log_driver
-check "Traefik access log readable at /var/log/traefik/access.json" check_traefik_access_log_path
+check "Traefik access log readable at /var/log/traefik/access.log" check_traefik_access_log_path
 
 printf '\n'
 if [[ "$failed" -eq 0 ]]; then

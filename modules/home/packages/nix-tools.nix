@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
     age
+    jq
     nix-output-monitor
     nix-tree
     graphviz

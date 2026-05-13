@@ -117,18 +117,87 @@ validate_albaldah_traefik_acquisition() {
     return 1
   fi
 
-  if ! jq -e '
-    any(
-      .[];
-      ((.labels.type // "") == "traefik")
-      and (((.filenames // []) | index("/var/log/traefik/access.json")) != null)
-    )
-  ' >/dev/null <<<"${acquisitions_json}"; then
-    echo "  ✗ albaldah: missing /var/log/traefik/access.json CrowdSec acquisition"
+  if ! grep -Fq '"/var/log/traefik/access.log"' <<<"${acquisitions_json}" \
+    || ! grep -Fq '"type":"traefik"' <<<"${acquisitions_json}"; then
+    echo "  ✗ albaldah: missing /var/log/traefik/access.log CrowdSec acquisition"
     return 1
   fi
 
-  echo "  ✓ albaldah: CrowdSec Traefik acquisition uses /var/log/traefik/access.json"
+  echo "  ✓ albaldah: CrowdSec Traefik acquisition uses /var/log/traefik/access.log"
+}
+
+# shellcheck disable=SC2329 # Invoked indirectly through run_check below.
+validate_local_prometheus_exporter() {
+  local host_name="$1"
+  local exporter_name="$2"
+  local expected_port="$3"
+  local expected_address="$4"
+  local enabled
+  local port
+  local address
+
+  if ! enabled="$(
+    nix eval ".#nixosConfigurations.${host_name}.config.services.prometheus.exporters.${exporter_name}.enable" 2>/dev/null
+  )"; then
+    echo "  ✗ ${host_name}: failed to evaluate ${exporter_name} exporter enable flag"
+    return 1
+  fi
+
+  if [[ "${enabled}" != "true" ]]; then
+    echo "  ✗ ${host_name}: ${exporter_name} exporter enable = ${enabled}"
+    return 1
+  fi
+
+  if ! port="$(
+    nix eval ".#nixosConfigurations.${host_name}.config.services.prometheus.exporters.${exporter_name}.port" 2>/dev/null
+  )"; then
+    echo "  ✗ ${host_name}: failed to evaluate ${exporter_name} exporter port"
+    return 1
+  fi
+
+  if [[ "${port}" != "${expected_port}" ]]; then
+    echo "  ✗ ${host_name}: ${exporter_name} exporter port = ${port}"
+    return 1
+  fi
+
+  if ! address="$(
+    nix eval ".#nixosConfigurations.${host_name}.config.services.prometheus.exporters.${exporter_name}.listenAddress" 2>/dev/null | tr -d '"'
+  )"; then
+    echo "  ✗ ${host_name}: failed to evaluate ${exporter_name} exporter listenAddress"
+    return 1
+  fi
+
+  if [[ "${address}" != "${expected_address}" ]]; then
+    echo "  ✗ ${host_name}: ${exporter_name} exporter listenAddress = ${address}"
+    return 1
+  fi
+
+  echo "  ✓ ${host_name}: ${exporter_name} exporter listens on ${expected_address}:${expected_port}"
+}
+
+# shellcheck disable=SC2329 # Invoked indirectly through run_check below.
+validate_journald_retention() {
+  local host_name="$1"
+  local extra_config
+
+  if ! extra_config="$(
+    nix eval ".#nixosConfigurations.${host_name}.config.services.journald.extraConfig" 2>/dev/null | tr -d '"'
+  )"; then
+    echo "  ✗ ${host_name}: failed to evaluate journald extraConfig"
+    return 1
+  fi
+
+  if ! grep -Fq "SystemMaxUse=1G" <<<"${extra_config}"; then
+    echo "  ✗ ${host_name}: missing SystemMaxUse=1G in journald config"
+    return 1
+  fi
+
+  if ! grep -Fq "MaxRetentionSec=7day" <<<"${extra_config}"; then
+    echo "  ✗ ${host_name}: missing MaxRetentionSec=7day in journald config"
+    return 1
+  fi
+
+  echo "  ✓ ${host_name}: journald retention uses 1G / 7day limits"
 }
 
 if [[ "${REGENERATE_DCONF}" -eq 1 ]]; then
@@ -207,6 +276,17 @@ for host_name in "${DOCKER_HOSTS[@]}"; do
 done
 run_check "albaldah CrowdSec Traefik acquisition drifted" \
   validate_albaldah_traefik_acquisition
+
+echo ""
+echo "Monitoring Baseline:"
+for host_name in "${DOCKER_HOSTS[@]}"; do
+  run_check "node exporter missing or drifted for ${host_name}" \
+    validate_local_prometheus_exporter "${host_name}" node 9100 127.0.0.1
+  run_check "systemd exporter missing or drifted for ${host_name}" \
+    validate_local_prometheus_exporter "${host_name}" systemd 9558 127.0.0.1
+  run_check "journald retention drifted for ${host_name}" \
+    validate_journald_retention "${host_name}"
+done
 
 echo ""
 echo "Home-Manager Configurations:"
