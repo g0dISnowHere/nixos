@@ -102,7 +102,7 @@ in {
         format = "yaml";
         key = "token";
         owner = config.services.crowdsec.user;
-        group = config.services.crowdsec.group;
+        inherit (config.services.crowdsec) group;
         mode = "0400";
       };
     })
@@ -120,7 +120,7 @@ in {
         sopsFile = importedCapiCredentialsSecretFile;
         format = "yaml";
         owner = config.services.crowdsec.user;
-        group = config.services.crowdsec.group;
+        inherit (config.services.crowdsec) group;
         mode = "0400";
       };
     })
@@ -130,7 +130,7 @@ in {
     "crowdsec-config.yaml" = {
       file = crowdsecConfigWithCti;
       owner = config.services.crowdsec.user;
-      group = config.services.crowdsec.group;
+      inherit (config.services.crowdsec) group;
       mode = "0400";
       restartUnits = [ "crowdsec.service" ];
     };
@@ -184,71 +184,78 @@ in {
     };
   };
 
-  services.crowdsec-firewall-bouncer.enable = true;
-  services.crowdsec-firewall-bouncer.settings.iptables_chains =
-    [ "INPUT" "DOCKER-USER" ];
+  services = {
+    crowdsec-firewall-bouncer = {
+      enable = true;
+      settings.iptables_chains = [ "INPUT" "DOCKER-USER" ];
+    };
+  };
 
   # Keep service-readable ingress logs out of user homes because crowdsec runs
   # with ProtectHome and should not depend on traversing /home.
   systemd.tmpfiles.rules = [ "d /var/log/traefik 0755 root root -" ];
 
-  networking.firewall.extraInputRules = ''
-    ip saddr { ${
-      lib.concatStringsSep ", " dockerIngressCidrs
-    } } tcp dport { 8080, 7422 } accept comment "allow Docker stacks to reach CrowdSec LAPI and AppSec"
-    iifname { ${
-      lib.concatStringsSep ", "
-      (map (iface: ''"${iface}"'') dockerIngressInterfaces)
-    } } tcp dport { 8080, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec LAPI and AppSec"
-  '';
+  networking.firewall = {
+    extraInputRules = ''
+      ip saddr { ${
+        lib.concatStringsSep ", " dockerIngressCidrs
+      } } tcp dport { 8080, 7422 } accept comment "allow Docker stacks to reach CrowdSec LAPI and AppSec"
+      iifname { ${
+        lib.concatStringsSep ", "
+        (map (iface: ''"${iface}"'') dockerIngressInterfaces)
+      } } tcp dport { 8080, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec LAPI and AppSec"
+    '';
 
-  networking.firewall.extraCommands = ''
-    ${lib.concatMapStringsSep "\n" (cidr: ''
-      iptables -C nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null \
-        || iptables -I nixos-fw 3 -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept
-    '') dockerIngressCidrs}
-  '';
+    extraCommands = ''
+      ${lib.concatMapStringsSep "\n" (cidr: ''
+        iptables -C nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null \
+          || iptables -I nixos-fw 3 -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept
+      '') dockerIngressCidrs}
+    '';
 
-  networking.firewall.extraStopCommands = ''
-    ${lib.concatMapStringsSep "\n" (cidr: ''
-      iptables -D nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null || true
-    '') dockerIngressCidrs}
-  '';
+    extraStopCommands = ''
+      ${lib.concatMapStringsSep "\n" (cidr: ''
+        iptables -D nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null || true
+      '') dockerIngressCidrs}
+    '';
+  };
 
   systemd.services = {
-    crowdsec.serviceConfig.ExecStart = lib.mkIf hasCtiApiKey (lib.mkForce [
-      " "
-      "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
-        config.sops.templates."crowdsec-config.yaml".path
-      } -info"
-    ]);
-    crowdsec.serviceConfig = {
-      DynamicUser = lib.mkForce false;
-      # CrowdSec's journalctl datasource exits immediately inside the service's
-      # user namespace even when the runtime user is in systemd-journal.
-      # Keep journal access working so SSH ingestion does not tear down AppSec
-      # and file datasources on startup.
-      PrivateUsers = lib.mkForce false;
-      StateDirectory = "crowdsec";
-      SupplementaryGroups = [ "systemd-journal" ];
-    };
-    crowdsec.serviceConfig.ExecStartPre = lib.mkForce [
-      " "
-      (pkgs.writeShellScript "crowdsec-prestart" ''
-        set -euo pipefail
+    crowdsec = {
+      serviceConfig = {
+        ExecStart = lib.mkIf hasCtiApiKey (lib.mkForce [
+          " "
+          "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
+            config.sops.templates."crowdsec-config.yaml".path
+          } -info"
+        ]);
+        DynamicUser = lib.mkForce false;
+        # CrowdSec's journalctl datasource exits immediately inside the service's
+        # user namespace even when the runtime user is in systemd-journal.
+        # Keep journal access working so SSH ingestion does not tear down AppSec
+        # and file datasources on startup.
+        PrivateUsers = lib.mkForce false;
+        StateDirectory = "crowdsec";
+        SupplementaryGroups = [ "systemd-journal" ];
+        ExecStartPre = lib.mkForce [
+          " "
+          (pkgs.writeShellScript "crowdsec-prestart" ''
+            set -euo pipefail
 
-        ${lib.getExe' pkgs.coreutils "mkdir"} -p \
-          ${lib.escapeShellArg crowdsecHubStateDir}
-      '')
-      "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
-        if hasCtiApiKey then
-          config.sops.templates."crowdsec-config.yaml".path
-        else
-          "/etc/crowdsec/config.yaml"
-      } -t -error"
-    ];
-    crowdsec.after = [ "crowdsec-console-config-init.service" ];
-    crowdsec.requires = [ "crowdsec-console-config-init.service" ];
+            ${lib.getExe' pkgs.coreutils "mkdir"} -p \
+              ${lib.escapeShellArg crowdsecHubStateDir}
+          '')
+          "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
+            if hasCtiApiKey then
+              config.sops.templates."crowdsec-config.yaml".path
+            else
+              "/etc/crowdsec/config.yaml"
+          } -t -error"
+        ];
+      };
+      after = [ "crowdsec-console-config-init.service" ];
+      requires = [ "crowdsec-console-config-init.service" ];
+    };
 
     crowdsec-console-config-init = {
       description = "Initialize writable CrowdSec console config";
@@ -362,13 +369,12 @@ in {
       };
     };
 
-    crowdsec-firewall-bouncer-register.after =
-      lib.mkIf (!hasImportedCapiCredentials)
-      [ "crowdsec-capi-register.service" ];
-    crowdsec-firewall-bouncer-register.requires =
-      lib.mkIf (!hasImportedCapiCredentials)
-      [ "crowdsec-capi-register.service" ];
-    crowdsec-firewall-bouncer-register.script =
-      lib.mkForce (builtins.readFile reRegisterFirewallBouncer);
+    crowdsec-firewall-bouncer-register = {
+      after = lib.mkIf (!hasImportedCapiCredentials)
+        [ "crowdsec-capi-register.service" ];
+      requires = lib.mkIf (!hasImportedCapiCredentials)
+        [ "crowdsec-capi-register.service" ];
+      script = lib.mkForce (builtins.readFile reRegisterFirewallBouncer);
+    };
   };
 }
