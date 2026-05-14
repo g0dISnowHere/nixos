@@ -42,7 +42,8 @@ in builtins.concatStringsSep "\n" [
   (builtins.concatStringsSep "\n" keys)
   "creation_rules:"
   (renderScopedRules "users" "(yaml|yml)" policy.scopes.users)
-  (renderScopedRules "services" "(yaml|yml|json|env|ini)" policy.scopes.services)
+  (renderScopedRules "services" "(yaml|yml|json|env|ini)"
+    policy.scopes.services)
   renderMachineRules
   ""
 ]

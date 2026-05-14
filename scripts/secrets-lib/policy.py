@@ -93,7 +93,8 @@ def relevant_files(policy, repo_root, host):
         paths.extend(
             path
             for path in machine_dir.rglob("*")
-            if path.is_file() and path.suffix in {".yaml", ".yml", ".json", ".env", ".ini"}
+            if path.is_file()
+            and path.suffix in {".yaml", ".yml", ".json", ".env", ".ini"}
         )
 
     unique_paths = sorted({path.resolve() for path in paths})
