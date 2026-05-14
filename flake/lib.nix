@@ -36,11 +36,11 @@ let
           (builtins.head policy.operator.recipients))
       ] ++ map (host: renderKeyLine host policy.hosts.${host}.recipient)
         policyHostNames;
-      userRules = renderScopedRules "users" "yaml" policy.scopes.users;
-      serviceRules = renderScopedRules "services" "(yaml|json|env|ini)"
+      userRules = renderScopedRules "users" "(yaml|yml)" policy.scopes.users;
+      serviceRules = renderScopedRules "services" "(yaml|yml|json|env|ini)"
         policy.scopes.services;
       machineRules = builtins.concatStringsSep "\n" (map (host:
-        renderRule "^secrets/machines/${host}/.*\\.(yaml|json|env|ini)$" [
+        renderRule "^secrets/machines/${host}/.*\\.(yaml|yml|json|env|ini)$" [
           policy.operator.alias
           host
         ]) policyHostNames);

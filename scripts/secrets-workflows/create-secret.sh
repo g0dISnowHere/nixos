@@ -120,7 +120,7 @@ esac
 
 file_ext="${target_name##*.}"
 if [[ "${file_ext}" == "${target_name}" ]]; then
-  secrets_ui_error "Target file name must include an extension such as .yaml, .json, .env, or .ini."
+  secrets_ui_error "Target file name must include an extension such as .yaml, .yml, .json, .env, or .ini."
   exit 1
 fi
 

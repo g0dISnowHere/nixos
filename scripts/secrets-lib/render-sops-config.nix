@@ -27,7 +27,7 @@ let
       in renderRule "^secrets/${scopeName}/${name}/.*\\.${extensionPattern}$"
       (operatorRecipientAliases ++ hosts)) names);
   renderMachineRules = builtins.concatStringsSep "\n" (map (host:
-    renderRule "^secrets/machines/${host}/.*\\.(yaml|json|env|ini)$"
+    renderRule "^secrets/machines/${host}/.*\\.(yaml|yml|json|env|ini)$"
     (operatorRecipientAliases ++ [ host ]))
     (sort (builtins.attrNames policy.hosts)));
   operatorKeys = builtins.genList (index:
@@ -41,8 +41,8 @@ in builtins.concatStringsSep "\n" [
   "keys:"
   (builtins.concatStringsSep "\n" keys)
   "creation_rules:"
-  (renderScopedRules "users" "yaml" policy.scopes.users)
-  (renderScopedRules "services" "(yaml|json|env|ini)" policy.scopes.services)
+  (renderScopedRules "users" "(yaml|yml)" policy.scopes.users)
+  (renderScopedRules "services" "(yaml|yml|json|env|ini)" policy.scopes.services)
   renderMachineRules
   ""
 ]

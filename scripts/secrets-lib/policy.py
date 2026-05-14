@@ -24,7 +24,7 @@ def managed_secret_files(repo_root):
     for path in secrets_root.rglob("*"):
         if not path.is_file():
             continue
-        if path.suffix not in {".yaml", ".json", ".env", ".ini"}:
+        if path.suffix not in {".yaml", ".yml", ".json", ".env", ".ini"}:
             continue
         if path.name.endswith(".example"):
             continue
@@ -38,14 +38,14 @@ def relpath(path, repo_root):
 
 def scope_owners(policy, relative_path):
     owners = []
-    match = re.match(r"^secrets/users/([^/]+)/.+\.yaml$", relative_path)
+    match = re.match(r"^secrets/users/([^/]+)/.+\.(yaml|yml)$", relative_path)
     if match:
         name = match.group(1)
         if name in policy["scopes"]["users"]:
             owners.append(f"users.{name}")
 
     match = re.match(
-        r"^secrets/services/([^/]+)/.+\.(yaml|json|env|ini)$", relative_path
+        r"^secrets/services/([^/]+)/.+\.(yaml|yml|json|env|ini)$", relative_path
     )
     if match:
         name = match.group(1)
@@ -53,7 +53,7 @@ def scope_owners(policy, relative_path):
             owners.append(f"services.{name}")
 
     match = re.match(
-        r"^secrets/machines/([^/]+)/.+\.(yaml|json|env|ini)$", relative_path
+        r"^secrets/machines/([^/]+)/.+\.(yaml|yml|json|env|ini)$", relative_path
     )
     if match:
         host = match.group(1)
@@ -73,7 +73,7 @@ def relevant_files(policy, repo_root, host):
                 paths.extend(
                     path
                     for path in scope_dir.rglob("*")
-                    if path.is_file() and path.suffix == ".yaml"
+                    if path.is_file() and path.suffix in {".yaml", ".yml"}
                 )
 
     for name, scope in policy["scopes"]["services"].items():
@@ -84,7 +84,7 @@ def relevant_files(policy, repo_root, host):
                     path
                     for path in scope_dir.rglob("*")
                     if path.is_file()
-                    and path.suffix in {".yaml", ".json", ".env", ".ini"}
+                    and path.suffix in {".yaml", ".yml", ".json", ".env", ".ini"}
                     and not path.name.endswith(".example")
                 )
 
@@ -93,7 +93,7 @@ def relevant_files(policy, repo_root, host):
         paths.extend(
             path
             for path in machine_dir.rglob("*")
-            if path.is_file() and path.suffix in {".yaml", ".json", ".env", ".ini"}
+            if path.is_file() and path.suffix in {".yaml", ".yml", ".json", ".env", ".ini"}
         )
 
     unique_paths = sorted({path.resolve() for path in paths})

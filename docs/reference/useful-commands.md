@@ -139,6 +139,26 @@ EDITOR=nano sops secrets/users/djoolz/password.yaml
 
 The file stores `hashedPassword`, not a plaintext password hash.
 
+## Basic SOPS Commands
+
+Edit a secret file:
+
+```bash
+EDITOR=nano sops secrets/services/example/example.yaml
+```
+
+Print decrypted contents:
+
+```bash
+sops decrypt secrets/services/example/example.yaml
+```
+
+Refresh recipient metadata for one file:
+
+```bash
+sops updatekeys secrets/services/example/example.yaml
+```
+
 ## Apply The Declarative `djoolz` Password
 
 ```bash
