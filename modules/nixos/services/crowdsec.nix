@@ -181,6 +181,16 @@ in {
         console_path = consoleConfigPath;
         online_client.credentials_path = onlineApiCredentialsPath;
       };
+
+      general.prometheus = {
+        enabled = true;
+        level = "full";
+        # Listen on Docker-reachable addresses, but keep public access blocked
+        # at the firewall. This preserves host-local curl access and lets the
+        # monitoring stack scrape via host.docker.internal.
+        listen_addr = "0.0.0.0";
+        listen_port = 6060;
+      };
     };
   };
 
@@ -199,23 +209,23 @@ in {
     extraInputRules = ''
       ip saddr { ${
         lib.concatStringsSep ", " dockerIngressCidrs
-      } } tcp dport { 8080, 7422 } accept comment "allow Docker stacks to reach CrowdSec LAPI and AppSec"
+      } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker stacks to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
       iifname { ${
         lib.concatStringsSep ", "
         (map (iface: ''"${iface}"'') dockerIngressInterfaces)
-      } } tcp dport { 8080, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec LAPI and AppSec"
+      } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
     '';
 
     extraCommands = ''
       ${lib.concatMapStringsSep "\n" (cidr: ''
-        iptables -C nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null \
-          || iptables -I nixos-fw 3 -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept
+        iptables -C nixos-fw -s ${cidr} -p tcp -m multiport --dports 6060,8080,8082,7422 -j nixos-fw-accept 2>/dev/null \
+          || iptables -I nixos-fw 3 -s ${cidr} -p tcp -m multiport --dports 6060,8080,8082,7422 -j nixos-fw-accept
       '') dockerIngressCidrs}
     '';
 
     extraStopCommands = ''
       ${lib.concatMapStringsSep "\n" (cidr: ''
-        iptables -D nixos-fw -s ${cidr} -p tcp -m multiport --dports 8080,7422 -j nixos-fw-accept 2>/dev/null || true
+        iptables -D nixos-fw -s ${cidr} -p tcp -m multiport --dports 6060,8080,8082,7422 -j nixos-fw-accept 2>/dev/null || true
       '') dockerIngressCidrs}
     '';
   };

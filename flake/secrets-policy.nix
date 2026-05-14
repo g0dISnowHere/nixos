@@ -41,6 +41,7 @@
       fleet-test = { hosts = [ "albaldah" "alhena" "centauri" "mirach" ]; };
       nextcloud-aio = { hosts = [ "albaldah" ]; };
       traefik = { hosts = [ "albaldah" ]; };
+      monitoring = { hosts = [ "albaldah" ]; };
     };
   };
 }

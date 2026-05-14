@@ -83,7 +83,7 @@ Important:
 The engine currently acquires from:
 
 - `journald` for `_SYSTEMD_UNIT=sshd.service`
-- Traefik access logs from `/var/log/traefik/access.json`
+- Traefik access logs from `/var/log/traefik/access.log`
 - AppSec requests on `0.0.0.0:7422`
 
 This keeps the VPS baseline functional and makes the Traefik/AppSec path live.
@@ -95,7 +95,7 @@ Important:
   log file
 - the expected Traefik split is:
   - runtime logs to stdout/stderr
-  - access logs to `/var/log/traefik/access.json`
+  - access logs to `/var/log/traefik/access.log`
 - keep the access log on a host-readable system path, not under `/home`
 
 The following still need dedicated acquisitions or component wiring before they
@@ -258,8 +258,8 @@ Check Traefik log ingestion path:
 
 ```bash
 docker info --format '{{.LoggingDriver}}' | tail -n 20
-sudo ls -l /var/log/traefik/access.json | tail -n 20
-sudo head -n 5 /var/log/traefik/access.json | tail -n 20
+sudo ls -l /var/log/traefik/access.log | tail -n 20
+sudo head -n 5 /var/log/traefik/access.log | tail -n 20
 sudo journalctl -u crowdsec -b | rg -i 'traefik|tail|acquis'
 ```
 
@@ -312,8 +312,8 @@ Check whether the expected Traefik access log file exists:
 
 ```bash
 docker info --format '{{.LoggingDriver}}' | tail -n 20
-sudo ls -l /var/log/traefik/access.json | tail -n 20
-sudo head -n 5 /var/log/traefik/access.json | tail -n 20
+sudo ls -l /var/log/traefik/access.log | tail -n 20
+sudo head -n 5 /var/log/traefik/access.log | tail -n 20
 ```
 
 Watch live CrowdSec logs while generating test traffic:
@@ -381,7 +381,7 @@ sudo journalctl -u crowdsec -b | rg -i 'Appsec listening|Appsec Runner|Shutting 
   - check `sudo iptables -S DOCKER-USER`
   - current repo state should attach `DOCKER-USER` to `CROWDSEC_CHAIN`
 - Traefik ingestion appears dead
-  - confirm `/var/log/traefik/access.json` exists and is growing
+  - confirm `/var/log/traefik/access.log` exists and is growing
   - confirm Docker is still using the repo-wide `journald` driver for runtime
     logs, but do not confuse that with the dedicated access log path
   - if Traefik only writes stdout logs and no dedicated access log file,

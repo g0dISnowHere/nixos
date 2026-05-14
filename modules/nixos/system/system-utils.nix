@@ -33,5 +33,6 @@
     git
     smartmontools
     vim
+    openssl
   ];
 }

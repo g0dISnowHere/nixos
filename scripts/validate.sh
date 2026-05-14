@@ -131,10 +131,15 @@ validate_local_prometheus_exporter() {
   local host_name="$1"
   local exporter_name="$2"
   local expected_port="$3"
-  local expected_address="$4"
+  local expected_default_address="$4"
   local enabled
   local port
   local address
+  local expected_address="${expected_default_address}"
+
+  if [[ "${host_name}" == "albaldah" ]]; then
+    expected_address="0.0.0.0"
+  fi
 
   if ! enabled="$(
     nix eval ".#nixosConfigurations.${host_name}.config.services.prometheus.exporters.${exporter_name}.enable" 2>/dev/null
