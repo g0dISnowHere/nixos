@@ -1,5 +1,12 @@
 # Repository Guidelines
 
+## Context Budget
+- Be conservative with context.
+- Never read large files wholesale by default. Use targeted search, line ranges, AST-aware tools, `rg`, `jq`, `tail`, `head`, `sed -n`, or short scripts to extract only relevant sections.
+- Before opening any file over ~300 lines, identify relevant symbols, line numbers, or keys first.
+- For logs, generated outputs, minified assets, lockfiles, vendored code, build artifacts, and datasets, use targeted tools only.
+- Use targeted extraction tools like `rg`, `jq`, `tail`, `head`, and `sed -n` to pull only relevant parts of logs, files, and command output. Avoid full-file or full-output reads unless needed.
+
 ## Project Structure & Module Organization
 - `flake.nix` declares inputs; `outputs.nix` wires flake-parts modules.
 - `parts/` is the home for flake-parts per-system modules such as formatting, dev shells, packages, systems, and checks. Some of that wiring may still live inline in `outputs.nix` during refactors; prefer moving it into focused files rather than growing `outputs.nix`.
