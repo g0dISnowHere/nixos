@@ -14,6 +14,7 @@
     ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
     ../../../modules/nixos/services/fingerprint-06cb-009a.nix
+    ../../../modules/nixos/services/monitoring-baseline.nix
     # ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
     ../../../modules/nixos/services/platformio.nix # USB serial and debugger udev access for PlatformIO
     ../../../modules/nixos/services/scanner.nix # SANE scanner support

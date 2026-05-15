@@ -9,7 +9,6 @@
     ./boot.nix
     ./docker-compose-secrets.nix
     ../../../modules/nixos/system/autoupgrade.nix
-    ../../../modules/nixos/services/monitoring-docker-scrape-access.nix
   ];
 
   users.users.djoolz = { extraGroups = [ "wheel" ]; };

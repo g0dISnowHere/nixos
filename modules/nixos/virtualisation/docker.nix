@@ -1,6 +1,6 @@
 # https://nixos.wiki/wiki/Docker
 _: {
-  imports = [ ./docker-options.nix ];
+  imports = [ ./docker-options.nix ./monitoring-docker-scrape-access.nix ];
 
   my.virtualisation.docker.rootful = true;
 

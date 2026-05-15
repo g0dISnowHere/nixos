@@ -38,8 +38,11 @@
         # Developer-focused newer packages
         pkgs-unstable.devenv
         pkgs-unstable.gh
-      ] ++ pkgs.lib.optionals (desktopEnvironment != null)
-      [ pkgs-unstable.vscode ];
+      ] ++ pkgs.lib.optionals (desktopEnvironment != null) [
+        pkgs-unstable.vscode
+        pkgs-unstable.antigravity
+        pkgs-unstable.t3code
+      ];
 
     localBinInPath = true;
 
