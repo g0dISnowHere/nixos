@@ -1,8 +1,7 @@
-{ lib, ... }: {
+{ ... }: {
   imports = [ ./tailscale.nix ];
 
-  my.tailscale = {
-    enableSSH = lib.mkDefault true;
-    advertiseExitNode = lib.mkDefault true;
-  };
+  # Router role: host may advertise subnet/exit routes via host-specific config.
+  # Keep this module minimal so it does not force behavior on every router host.
+  my.tailscale = { };
 }

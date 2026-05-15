@@ -1,5 +1,5 @@
 { hostname, inputs, lib, pkgs, ... }: {
-  imports = [ inputs.nixos-wsl.nixosModules.default ];
+  imports = [ ./firewall.nix inputs.nixos-wsl.nixosModules.default ];
 
   networking.hostName = hostname;
 
@@ -19,6 +19,8 @@
   users.users.djoolz.extraGroups = [ "wheel" ];
 
   environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
+
+  my.tailscale.enableSSH = true;
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
   system.stateVersion = lib.mkDefault "25.11";

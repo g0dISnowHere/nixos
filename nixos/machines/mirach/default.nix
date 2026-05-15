@@ -5,6 +5,7 @@
 
   imports = [
     ./hardware-configuration.nix
+    ./firewall.nix
     ./libvirtd.nix
     ./power.nix
     ../../../modules/nixos/system/autoupgrade.nix
@@ -56,7 +57,11 @@
     binfmt = true;
   };
 
-  my.tailscale.advertiseRoutes = [ "192.168.3.0/24" ];
+  my.tailscale = {
+    enableSSH = true;
+    advertiseExitNode = true;
+    advertiseRoutes = [ "192.168.3.0/24" ];
+  };
 
   my.autoUpdate = {
     enable = true;

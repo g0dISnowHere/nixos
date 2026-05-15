@@ -138,7 +138,11 @@ assert_rg 'systemd\.listenAddress = lib\.mkForce "0\.0\.0\.0";' \
 
 assert_rg 'networking\.firewall\.interfaces\.tailscale0\.allowedTCPPorts = \[[^]]*9100[^]]*9558[^]]*\];' \
   modules/nixos/virtualisation/monitoring-docker-scrape-access.nix \
-  "docker scrape access keeps Tailscale-only firewall allowance for exporter ports"
+  "docker scrape access keeps tailscale firewall allowance for exporter ports"
+
+assert_rg 'iifname \{ "docker0", "br-\*" \} tcp dport \{ 9100, 9558 \} accept' \
+  modules/nixos/virtualisation/monitoring-docker-scrape-access.nix \
+  "docker scrape access allows Docker bridge interfaces to reach exporter ports"
 
   echo "All static monitoring module checks passed."
 }
@@ -171,6 +175,8 @@ run_live_checks() {
     "firewall runtime rules include monitoring exporter ports"
   assert_cmd_contains "sudo nft list ruleset" "tailscale0" \
     "firewall runtime rules include tailscale0 interface rule for monitoring ports"
+  assert_cmd_contains "sudo nft list ruleset" "docker0" \
+    "firewall runtime rules include docker bridge rule for monitoring ports"
 
   echo "All live monitoring module checks passed."
 }

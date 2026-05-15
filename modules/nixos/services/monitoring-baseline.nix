@@ -5,12 +5,14 @@ _: {
         enable = true;
         port = 9100;
         listenAddress = "0.0.0.0";
+        openFirewall = false;
       };
 
       systemd = {
         enable = true;
         port = 9558;
         listenAddress = "0.0.0.0";
+        openFirewall = false;
       };
     };
     journald.audit = true;

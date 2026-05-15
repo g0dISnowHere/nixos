@@ -5,6 +5,7 @@
 
   imports = [
     ./hardware-configuration.nix
+    ./firewall.nix
     ./bootloader.nix
     ./bluetooth.nix
     ./graphics.nix

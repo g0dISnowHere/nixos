@@ -216,18 +216,6 @@ in {
       } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
     '';
 
-    extraCommands = ''
-      ${lib.concatMapStringsSep "\n" (cidr: ''
-        iptables -C nixos-fw -s ${cidr} -p tcp -m multiport --dports 6060,8080,8082,7422 -j nixos-fw-accept 2>/dev/null \
-          || iptables -I nixos-fw 3 -s ${cidr} -p tcp -m multiport --dports 6060,8080,8082,7422 -j nixos-fw-accept
-      '') dockerIngressCidrs}
-    '';
-
-    extraStopCommands = ''
-      ${lib.concatMapStringsSep "\n" (cidr: ''
-        iptables -D nixos-fw -s ${cidr} -p tcp -m multiport --dports 6060,8080,8082,7422 -j nixos-fw-accept 2>/dev/null || true
-      '') dockerIngressCidrs}
-    '';
   };
 
   systemd.services = {

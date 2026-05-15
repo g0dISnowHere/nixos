@@ -28,7 +28,7 @@
         ../../modules/nixos/services/monitoring-baseline.nix
         ../../modules/nixos/services/vscode-remote.nix
         ../../modules/nixos/services/crowdsec.nix
-        ../../modules/nixos/services/tailscale-router.nix
+        ../../modules/nixos/services/tailscale-client.nix
         ../../modules/nixos/virtualisation/docker.nix
         inputs.disko.nixosModules.disko
         ../../modules/nixos/system/disko-install-test-compat.nix

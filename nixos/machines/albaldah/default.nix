@@ -5,6 +5,7 @@
 
   imports = [
     ./hardware-configuration.nix
+    ./firewall.nix
     ./provider-networking.nix
     ./boot.nix
     ./docker-compose-secrets.nix
@@ -15,12 +16,15 @@
 
   environment.systemPackages = with pkgs; [ curl git htop tmux vim ];
 
-  networking.firewall = { allowedTCPPorts = [ 80 443 ]; };
-
   my.autoUpdate = {
     enable = true;
     mode = "updater";
     onCalendar = "weekly";
+  };
+
+  my.tailscale = {
+    enableSSH = true;
+    advertiseExitNode = true;
   };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.

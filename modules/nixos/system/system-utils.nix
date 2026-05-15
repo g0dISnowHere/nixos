@@ -34,5 +34,6 @@
     smartmontools
     vim
     openssl
+    nftables
   ];
 }
