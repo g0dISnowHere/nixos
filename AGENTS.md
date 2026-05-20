@@ -97,6 +97,32 @@
 - Preserve explicit structure and avoid reintroducing older mixed-concern layouts.
 - If you add new machines or major module families, update this file so it remains the canonical agent guide.
 
+## Karpathy Guidelines
+- Apply these behavioral rules when writing, reviewing, or refactoring code to reduce common LLM failure modes. For trivial tasks, use judgment.
+
+### 1. Think Before Coding
+- State assumptions explicitly before implementation when they affect behavior.
+- If the request has multiple plausible interpretations, surface them instead of silently choosing one.
+- If a simpler approach exists, call it out and prefer it unless the user asks otherwise.
+- If key requirements are unclear, stop and ask focused clarification questions.
+
+### 2. Simplicity First
+- Implement the minimum code required to satisfy the request.
+- Do not add speculative features, abstractions, configurability, or impossible-scenario handling.
+- When the solution feels overbuilt, simplify before finalizing.
+
+### 3. Surgical Changes
+- Touch only files and lines required for the task.
+- Do not refactor or "clean up" adjacent unrelated code.
+- Match existing style and patterns unless the user requested a style change.
+- Remove only unused code/imports created by your own edits.
+- If unrelated issues are noticed, mention them separately instead of changing them.
+
+### 4. Goal-Driven Execution
+- Define concrete, verifiable success criteria before making substantial changes.
+- For multi-step tasks, state a short step plan where each step includes a verification check.
+- Validate outcomes with the smallest meaningful check (`nix eval`, targeted script, or repo validation command) before handing off.
+
 ## Agent-Specific Instructions
 - Treat `AGENTS.md` as the canonical repository guidance for automated coding agents.
 - `.github/copilot-instructions.md` is a short companion mirror; keep it consistent with this file and avoid letting it become a second source of truth.
