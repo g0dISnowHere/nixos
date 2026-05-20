@@ -1,6 +1,10 @@
 _: {
-  perSystem = { pkgs, ... }:
+  perSystem = { pkgs, inputs', ... }:
     let
+      flakeLinterPkg = if builtins.hasAttr "flake-linter" pkgs then
+        pkgs."flake-linter"
+      else
+        inputs'.flake-linter.packages.default;
       markdownlintConfig = pkgs.writeText "markdownlint.jsonc" ''
         {
           "default": true,
@@ -104,11 +108,23 @@ _: {
           deadnix --fail "''${nix_files[@]}"
         '';
       };
+
+      flakelint = pkgs.writeShellApplication {
+        name = "flakelint-repo";
+        runtimeInputs = [ pkgs.git flakeLinterPkg ];
+        text = ''
+          repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
+          cd "$repo_root"
+
+          flake-linter .
+        '';
+      };
     in {
       packages = {
         markdownlintRepo = markdownlint;
         shellcheckRepo = shellcheck;
         nixlintRepo = nixlint;
+        flakelintRepo = flakelint;
       };
 
       checks = {
@@ -213,6 +229,14 @@ _: {
           fi
 
           deadnix --fail "''${nix_files[@]}"
+          touch "$out"
+        '';
+
+        flake-linter = pkgs.runCommand "flake-linter-check" {
+          nativeBuildInputs = [ flakeLinterPkg ];
+        } ''
+          cd ${../.}
+          flake-linter .
           touch "$out"
         '';
       };

@@ -1,6 +1,11 @@
 _: {
-  perSystem = { pkgs, system, ... }:
-    let nixLdLibraryPath = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc ];
+  perSystem = { pkgs, system, inputs', ... }:
+    let
+      nixLdLibraryPath = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc ];
+      flakeLinterPkg = if builtins.hasAttr "flake-linter" pkgs then
+        pkgs."flake-linter"
+      else
+        inputs'.flake-linter.packages.default;
     in {
       devShells.default = pkgs.mkShell {
         packages = with pkgs; [
@@ -8,6 +13,7 @@ _: {
           nixpkgs-fmt
           statix
           deadnix
+          flakeLinterPkg
           markdownlint-cli
           shellcheck
         ];

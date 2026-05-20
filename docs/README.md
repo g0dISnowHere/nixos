@@ -36,7 +36,7 @@ When new thing worth keeping:
 
 - `secrets-workflows.md`: SOPS operator guide
 - `architecture/`: design boundaries, structure decisions
-- `reference/`: quick lookup material
+- `reference/`: quick lookup material (`flake-linter.md` includes lint commands and response steps)
 - `dev-templates.md`: local flake template workflow
 - `vps/`: VPS context, runbooks
 - `dotfiles/`: why `dotfiles/` exist, how fit repo

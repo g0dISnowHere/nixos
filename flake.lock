@@ -80,6 +80,26 @@
         "type": "github"
       }
     },
+    "flake-linter": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1779003807,
+        "narHash": "sha256-lx2fOvMU6kRDaS2DzHvcP41xnpZ/j4roNCFzZR9hDMo=",
+        "owner": "Mic92",
+        "repo": "flake-linter",
+        "rev": "6cabd0cc572b9163752ae0034a248888a3d2aaa4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "flake-linter",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -463,6 +483,7 @@
     "root": {
       "inputs": {
         "disko": "disko",
+        "flake-linter": "flake-linter",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "nirinit": "nirinit",
