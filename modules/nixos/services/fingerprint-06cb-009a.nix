@@ -34,6 +34,12 @@ in {
         "hybrid-sleep.target"
         "suspend-then-hibernate.target"
       ];
+      open-fprintd-resume.serviceConfig = {
+        Restart = "on-failure";
+        RestartSec = "2s";
+        StartLimitIntervalSec = 60;
+        StartLimitBurst = 5;
+      };
       open-fprintd-suspend.wantedBy = [
         "suspend.target"
         "hibernate.target"

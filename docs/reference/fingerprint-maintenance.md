@@ -109,3 +109,32 @@ Reason:
 If the sensor stops working after suspend, check the `open-fprintd-suspend` and `open-fprintd-resume` units first. The upstream package ships both helpers and this repo enables them for `centauri`.
 
 `python3-validity` is configured to restart automatically on exit so a transient USB loss does not leave fingerprint auth dead until the next manual restart.
+
+## Resume Reliability Hardening
+
+`open-fprintd-resume.service` is configured with bounded retries to survive transient resume-time USB races:
+
+- `Restart=on-failure`
+- `RestartSec=2s`
+- `StartLimitIntervalSec=60`
+- `StartLimitBurst=5`
+
+This is wired in:
+
+- `modules/nixos/services/fingerprint-06cb-009a.nix`
+
+Validate after deploy:
+
+```bash
+systemctl status open-fprintd-resume.service | tail -n 20
+journalctl -b -u open-fprintd-resume.service --no-pager | tail -n 40
+```
+
+## Larger Mitigations (If Failures Persist)
+
+If retries are not enough, next options are:
+
+1. Disable autosuspend for `06cb:009a` via a focused udev rule (`power/control=on`).
+2. Add custom post-resume recovery ordering (explicit restart/re-probe flow with delays).
+3. Add USB unbind/rebind recovery for the sensor before restarting the fingerprint daemons.
+4. Move back to standard `services.fprintd` once `06cb:009a` is upstream-supported by `libfprint`.
