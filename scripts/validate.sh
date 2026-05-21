@@ -47,6 +47,7 @@ REMOTE_VSCODE_HOSTS=(
   "alhena"
 )
 DOCKER_HOSTS=(
+  "centauri"
   "mirach"
   "albaldah"
   "alhena"
@@ -137,7 +138,7 @@ validate_local_prometheus_exporter() {
   local address
   local expected_address="${expected_default_address}"
 
-  if [[ "${host_name}" == "albaldah" ]]; then
+  if [[ " ${DOCKER_HOSTS[*]} " == *" ${host_name} "* ]]; then
     expected_address="0.0.0.0"
   fi
 
@@ -205,6 +206,46 @@ validate_journald_retention() {
   echo "  ✓ ${host_name}: journald retention uses 1G / 7day limits"
 }
 
+# shellcheck disable=SC2329 # Invoked indirectly through run_check below.
+validate_monitoring_inventory() {
+  local inventory_json
+
+  if ! inventory_json="$(
+    nix eval --json .#monitoringInventory 2>/dev/null
+  )"; then
+    echo "  ✗ monitoring inventory failed to evaluate"
+    return 1
+  fi
+
+  if ! jq -e '
+    (.hosts | keys == ["albaldah", "centauri", "mirach"]) and
+    (.groups.all_hosts == ["albaldah", "centauri", "mirach"]) and
+    (.groups.workstations == ["centauri"]) and
+    (.groups.local_servers == ["mirach"]) and
+    (.groups.vps_hosts == ["albaldah"]) and
+    (.groups.public_edge_hosts == ["albaldah"]) and
+    (.groups.docker_hosts == ["albaldah", "centauri", "mirach"]) and
+    (.groups.frontend_hosts == ["albaldah", "centauri"]) and
+    (.groups.monitoring_hosts == ["albaldah"]) and
+    (.groups.security_hosts == ["albaldah"]) and
+    (all(.hosts[]; has("host_role") and has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
+    (.hosts.albaldah.host_role == "vps") and
+    (.hosts.albaldah.exposure_tier == "public_edge") and
+    (.hosts.albaldah.service_roles == ["edge", "monitoring", "security", "frontend"]) and
+    (.hosts.centauri.host_role == "workstation") and
+    (.hosts.centauri.exposure_tier == "tailscale_only") and
+    (.hosts.centauri.service_roles == ["frontend"]) and
+    (.hosts.mirach.host_role == "local_server") and
+    (.hosts.mirach.exposure_tier == "lan_only") and
+    (.hosts.mirach.service_roles == ["infra", "vm_host"])
+  ' <<<"${inventory_json}" >/dev/null; then
+    echo "  ✗ monitoring inventory contents do not match the current fleet contract"
+    return 1
+  fi
+
+  echo "  ✓ monitoring inventory export matches the current three-host fleet"
+}
+
 if [[ "${REGENERATE_DCONF}" -eq 1 ]]; then
   echo "Regenerating dconf.nix:"
   dconf_file="modules/home/dconf/dconf.nix"
@@ -248,6 +289,9 @@ fi
 
 echo ""
 echo "NixOS Configurations:"
+
+run_check "monitoring inventory export failed to evaluate" \
+  validate_monitoring_inventory
 
 echo "  Centauri:"
 echo "    - desktop: gnome ($(nix eval .#nixosConfigurations.centauri.config.services.desktopManager.gnome.enable 2>/dev/null))"

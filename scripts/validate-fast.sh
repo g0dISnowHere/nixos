@@ -36,6 +36,8 @@ fi
 
 echo ""
 echo "Key Evaluations:"
+run_check "monitoringInventory failed to evaluate" \
+  nix eval .#monitoringInventory
 run_check "nixosConfigurations.centauri failed to evaluate" \
   nix eval .#nixosConfigurations.centauri.config.system.build.toplevel
 run_check "centauri fingerprint PAM wiring missing" \

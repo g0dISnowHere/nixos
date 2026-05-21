@@ -1,6 +1,7 @@
 inputs:
 
-(inputs."flake-parts".lib.mkFlake { inherit inputs; } {
+let monitoringInventory = import ./flake/monitoring-inventory.nix;
+in inputs."flake-parts".lib.mkFlake { inherit inputs; } {
 
   imports = [
     # To import a flake module
@@ -39,6 +40,9 @@ inputs:
     };
 
   flake = {
+    inherit monitoringInventory;
+    monitoringInventoryJson = builtins.toJSON monitoringInventory;
+
     # `nixosConfigurations` are defined by importing flake/machines/*.nix
     # which use self.lib.mkNixosSystem plus explicit capability modules.
 
@@ -62,6 +66,5 @@ inputs:
 
     # Home-manager configurations are defined in flake/homes/*.nix
   };
-
   # See flake.parts for more features, such as `perSystem`
-})
+}
