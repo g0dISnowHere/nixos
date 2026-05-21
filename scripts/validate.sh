@@ -46,12 +46,13 @@ REMOTE_VSCODE_HOSTS=(
   "albaldah"
   "alhena"
 )
-DOCKER_HOSTS=(
-  "centauri"
-  "mirach"
-  "albaldah"
-  "alhena"
-)
+MONITORING_INVENTORY_JSON="$(nix eval --raw .#monitoringInventoryJson 2>/dev/null || true)"
+MONITORING_DOCKER_HOSTS=()
+if [[ -n "${MONITORING_INVENTORY_JSON}" ]]; then
+  mapfile -t MONITORING_DOCKER_HOSTS < <(
+    jq -r '.groups.docker_hosts[]' <<<"${MONITORING_INVENTORY_JSON}"
+  )
+fi
 
 run_check() {
   local description="$1"
@@ -138,7 +139,7 @@ validate_local_prometheus_exporter() {
   local address
   local expected_address="${expected_default_address}"
 
-  if [[ " ${DOCKER_HOSTS[*]} " == *" ${host_name} "* ]]; then
+  if [[ " ${MONITORING_DOCKER_HOSTS[*]} " == *" ${host_name} "* ]]; then
     expected_address="0.0.0.0"
   fi
 
@@ -210,7 +211,9 @@ validate_journald_retention() {
 validate_monitoring_inventory() {
   local inventory_json
 
-  if ! inventory_json="$(
+  if [[ -n "${MONITORING_INVENTORY_JSON}" ]]; then
+    inventory_json="${MONITORING_INVENTORY_JSON}"
+  elif ! inventory_json="$(
     nix eval --json .#monitoringInventory 2>/dev/null
   )"; then
     echo "  ✗ monitoring inventory failed to evaluate"
@@ -319,7 +322,7 @@ done
 
 echo ""
 echo "Docker Logging:"
-for host_name in "${DOCKER_HOSTS[@]}"; do
+for host_name in "${MONITORING_DOCKER_HOSTS[@]}"; do
   run_check "docker journald logging missing for ${host_name}" \
     validate_docker_journald_logging "${host_name}"
 done
@@ -328,7 +331,7 @@ run_check "albaldah CrowdSec Traefik acquisition drifted" \
 
 echo ""
 echo "Monitoring Baseline:"
-for host_name in "${DOCKER_HOSTS[@]}"; do
+for host_name in "${MONITORING_DOCKER_HOSTS[@]}"; do
   run_check "node exporter missing or drifted for ${host_name}" \
     validate_local_prometheus_exporter "${host_name}" node 9100 127.0.0.1
   run_check "systemd exporter missing or drifted for ${host_name}" \
