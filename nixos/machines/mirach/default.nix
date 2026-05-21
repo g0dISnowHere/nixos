@@ -8,6 +8,7 @@
     ./firewall.nix
     ./libvirtd.nix
     ./power.nix
+    ./ethernet-diagnostics.nix
     ../../../modules/nixos/system/autoupgrade.nix
     ../../../modules/nixos/services/zigbee2mqtt.nix
     # ../../../modules/nixos/services/audio.nix

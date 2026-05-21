@@ -74,3 +74,12 @@ To remove the elevated-privileges taint cleanly:
 
 This is separate from the `host-passthrough` CPU taint. Changing `runAsRoot`
 does not affect the CPU passthrough warning.
+
+## Temporary Ethernet Hang Diagnostics
+
+`mirach` currently includes temporary diagnostics for `enp0s25` hang analysis via
+[ethernet-diagnostics.nix](./ethernet-diagnostics.nix).
+
+Operational notes and documented-only mitigation/test options live in:
+
+- `docs/findings/2026-05-21-mirach-enp0s25-hang-diagnostics.md`
