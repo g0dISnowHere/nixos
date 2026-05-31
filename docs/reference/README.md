@@ -12,3 +12,4 @@ Current entries:
 - `secrets-commands.md`
 - `fingerprint-maintenance.md`
 - `flake-linter.md`
+- `log-search.md`
