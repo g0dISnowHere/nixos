@@ -7,3 +7,4 @@ dotfiles/modules/ui/noctalia/colors.json
 .codex
 .direnv/
 __pycache__
+enp0s25-diag/

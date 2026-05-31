@@ -43,7 +43,6 @@
   # User configuration
   # Shared modules add service-specific groups like libvirtd and docker.
   users.users.djoolz.extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
-
   # Home-manager configuration for this machine
   # Match centauri's user environment and desktop applications.
   home-manager.users.djoolz = {

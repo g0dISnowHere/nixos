@@ -71,6 +71,7 @@ in {
       # Apply runtime NIC tuning that e1000e module parameters do not fully cover.
       ethtool --set-eee ${physicalInterface} eee off || true
       ethtool --change ${physicalInterface} wol d || true
+      ethtool -K ${physicalInterface} tso off gso off gro off || true
     '';
   };
 

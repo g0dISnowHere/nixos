@@ -9,7 +9,7 @@ Temporary diagnostics are enabled on `mirach` for Intel `e1000e` hang investigat
 
 Logs are written to:
 
-- `/var/log/enp0s25-diag/`
+- `/home/djoolz/Documents/01_config/mine/enp0s25-diag/`
 
 ## Enabled Diagnostics
 
@@ -21,6 +21,7 @@ Services:
 
 - `enp0s25-diag-poller.service`
 - `enp0s25-hang-capture.service`
+- `enp0s25-router-ping-watchdog.service`
 
 Key captured data:
 
@@ -30,24 +31,31 @@ Key captured data:
 - `nstat -az`
 - `ss -s`
 - recent network-relevant kernel lines
+- CPU, interrupt, softnet, socket, qdisc, and focused NIC error counters
 
-## Option 3 (Documented, Not Enabled): A/B Offload Test
+Triggered captures are cooldown-gated so a single hang storm does not create a
+new file for every repeated kernel line. Periodic snapshots keep only a short
+rolling window; incident context directories preserve the preceding window.
+
+## Option 3 (Enabled 2026-05-31): A/B Offload Test
 
 Purpose: check whether hangs correlate with offload features.
 
-Baseline day (no changes):
+Baseline evidence:
 
 ```bash
 journalctl -k --since today | rg "Detected Hardware Unit Hang" | wc -l
 ```
 
-Test day (temporary):
+Current test:
 
 ```bash
 sudo ethtool -K enp0s25 tso off gso off gro off
 ```
 
-Collect same hang count and compare frequency.
+This is now applied by `nixos/machines/mirach/libvirtd.nix` in the
+`enp0s25-link-tuning` service, alongside EEE disablement and WoL disablement.
+Collect the same hang count after the change and compare frequency.
 
 Revert:
 
@@ -55,7 +63,8 @@ Revert:
 sudo ethtool -K enp0s25 tso on gso on gro on
 ```
 
-If this helps, consider adding a host-local systemd oneshot or NixOS module setting so behavior is explicit and reproducible.
+If this helps, keep the host-local systemd oneshot setting. If it does not,
+the next likely fix is to avoid this NIC for the bridged workload.
 
 ## Option 4 (Documented, Not Enabled): Runtime Reset Hook
 
