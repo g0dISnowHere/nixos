@@ -48,6 +48,23 @@ assert_cmd_contains() {
   fi
 }
 
+assert_cmd_rg() {
+  local cmd="$1"
+  local pattern="$2"
+  local message="$3"
+  local output
+
+  if ! output="$(bash -lc "${cmd}" 2>&1)"; then
+    fail "${message} (command failed: ${cmd}; output: ${output})"
+  fi
+
+  if rg -q "${pattern}" <<<"${output}"; then
+    pass "${message}"
+  else
+    fail "${message} (missing pattern '${pattern}' in output of: ${cmd})"
+  fi
+}
+
 probe_port() {
   local port="$1"
   local label="$2"
@@ -136,14 +153,6 @@ assert_rg 'systemd\.listenAddress = lib\.mkForce "0\.0\.0\.0";' \
   modules/nixos/virtualisation/monitoring-docker-scrape-access.nix \
   "docker scrape access forces systemd exporter to 0.0.0.0"
 
-assert_rg 'networking\.firewall\.interfaces\.tailscale0\.allowedTCPPorts = \[[^]]*9100[^]]*9558[^]]*\];' \
-  modules/nixos/virtualisation/monitoring-docker-scrape-access.nix \
-  "docker scrape access keeps tailscale firewall allowance for exporter ports"
-
-assert_rg 'iifname \{ "docker0", "br-\*" \} tcp dport \{ 9100, 9558 \} accept' \
-  modules/nixos/virtualisation/monitoring-docker-scrape-access.nix \
-  "docker scrape access allows Docker bridge interfaces to reach exporter ports"
-
   echo "All static monitoring module checks passed."
 }
 
@@ -173,10 +182,10 @@ run_live_checks() {
 
   assert_cmd_contains "sudo nft list ruleset" "9100, 9558" \
     "firewall runtime rules include monitoring exporter ports"
-  assert_cmd_contains "sudo nft list ruleset" "tailscale0" \
-    "firewall runtime rules include tailscale0 interface rule for monitoring ports"
-  assert_cmd_contains "sudo nft list ruleset" "docker0" \
-    "firewall runtime rules include docker bridge rule for monitoring ports"
+  assert_cmd_contains "sudo nft list ruleset" "iifname \"tailscale0\" tcp dport { 9100, 9558 } accept" \
+    "firewall runtime rules include tailscale0 interface allowance for monitoring ports"
+  assert_cmd_rg "sudo nft list ruleset" "iifname\\s+\\{\\s*\"(docker0|br-\\*)\"\\s*,\\s*\"(docker0|br-\\*)\"\\s*\\}\\s+tcp dport\\s+\\{\\s*9100\\s*,\\s*9558\\s*\\}\\s+accept" \
+    "firewall runtime rules include docker bridge interface allowance for monitoring ports"
 
   echo "All live monitoring module checks passed."
 }
