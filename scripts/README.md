@@ -90,6 +90,9 @@ Current status helpers include:
 
 - `scripts/crowdsec-verify.sh` for a fast read-only CrowdSec health check on
   hosts using this repo's CrowdSec wiring
+- `scripts/repair-mirach-gdm-users.sh` for diagnosing and repairing `mirach`
+  GDM greeter account activation failures caused by corrupted local account
+  state; it is read-only by default and requires `--apply` for mutation
 
 ## Reading This Directory
 
