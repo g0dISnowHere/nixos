@@ -3,7 +3,9 @@
 Repo exports reusable project templates from root flake under `templates`.
 
 Template body lives in `dev-templates/<name>/`. Root export lives in
-`parts/templates.nix`.
+`parts/templates.nix`. Migrated templates use `devenv.nix` + `.envrc` with
+`use devenv`. Template `flake.nix` files are kept as legacy/reference material
+so their package and overlay details are not lost.
 
 ## Use
 
@@ -25,6 +27,9 @@ From repo root, shorter local form works:
 nix flake new --template .#empty /tmp/template-test | tail -n 20
 ```
 
+After initialization, use `direnv allow` for devenv-backed templates or run
+`devenv shell` directly.
+
 ## List Templates
 
 ```bash
@@ -39,6 +44,8 @@ Look under `templates` output.
 - add matching explicit export in `parts/templates.nix`
 - keep template names stable once projects use them
 - prefer explicit exports over recursive discovery
+- keep migrated templates on `devenv.nix`; keep stub templates failing clearly until ported
+- keep legacy `flake.nix` files alongside them as preserved reference material
 - keep templates self-contained so generated project not depend on this repo
 
 ## Validation

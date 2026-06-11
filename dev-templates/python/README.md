@@ -19,7 +19,7 @@ direnv allow
 or:
 
 ```sh
-nix develop
+devenv shell
 ```
 
 The shell will create and activate `.venv` automatically with `uv`.

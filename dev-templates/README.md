@@ -1,4 +1,4 @@
-# Nix flake templates for easy dev environments
+# Devenv templates for easy dev environments
 
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
@@ -29,7 +29,10 @@ nix flake new --template .#rust ${NEW_PROJECT_DIRECTORY}
 Once your preferred template has been initialized, you can use the provided shell in two ways:
 
 1. If you have [`nix-direnv`][nix-direnv] installed, you can initialize the environment by running `direnv allow`.
-2. If you don't have `nix-direnv` installed, you can run `nix develop` to open up the Nix-defined shell.
+2. Otherwise, run `devenv shell` in the project directory.
+
+Legacy `flake.nix` template files are kept in-tree as reference material; the
+active shell entrypoint is `devenv.nix`.
 
 ## Available templates
 
