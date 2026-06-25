@@ -133,6 +133,7 @@ in {
           sops-nix.nixosModules.sops
 
           # Global Nix daemon settings
+          ../modules/nixos/system/devenv.nix
           ../modules/nixos/system/nix-settings.nix
           ../modules/nixos/system/secrets.nix
           ../modules/nixos/users/djoolz/default.nix

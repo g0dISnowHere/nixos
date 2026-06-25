@@ -19,7 +19,7 @@ nix flake check -L
 Run from dev shell:
 
 ```bash
-nix develop
+devenv shell
 flake-linter .
 ```
 

@@ -39,7 +39,7 @@
 ## Build, Test, and Development Commands
 - `sh setup.sh` configures git hooks and verifies the local Nix environment after cloning.
 - `git config core.hooksPath .githooks` enables the repository pre-commit hooks manually.
-- `nix develop` enters the dev shell with formatting and linting tools.
+- `devenv shell` enters the dev shell with formatting and linting tools.
 - `nix flake show` is the quick structure check.
 - `nix flake check` validates the flake and should be used before larger changes land.
 - Prefer fast evals during iteration:

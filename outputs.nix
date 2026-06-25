@@ -12,7 +12,6 @@ in inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     # Import home-manager's flake module
     inputs.home-manager.flakeModules.home-manager
     inputs.treefmt-nix.flakeModule
-    ./parts/devshells.nix
     ./parts/formatter.nix
     ./parts/checks.nix
     ./parts/templates.nix
@@ -60,6 +59,7 @@ in inputs."flake-parts".lib.mkFlake { inherit inputs; } {
       flatpak-media = ./modules/nixos/flatpak/media.nix;
       flatpak-messaging = ./modules/nixos/flatpak/messaging.nix;
       flatpak-productivity = ./modules/nixos/flatpak/productivity.nix;
+      devenv = ./modules/nixos/system/devenv.nix;
       docker = ./modules/nixos/virtualisation/docker.nix;
       docker-rootless = ./modules/nixos/virtualisation/docker_rootless.nix;
     };

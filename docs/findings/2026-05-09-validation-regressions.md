@@ -5,7 +5,7 @@
 - Scope: repo validation flow after the lint/check script split
 - Affected files:
   - `parts/checks.nix`
-  - `parts/devshells.nix`
+  - `devenv.nix` (current shell) / `parts/devshells.nix` (historical shell at the time)
   - `scripts/validate.sh`
   - `scripts/validate-fast.sh`
 
@@ -17,10 +17,10 @@
 - Fix direction: derive the Nix file list from build-time inputs that are available in the store, or move the file enumeration outside the sandbox.
 
 ## Issue 2: `shellcheck` missing from the default dev shell
-- Location: `parts/devshells.nix` around lines `5-12`
-- Problem: the new validation scripts call `scripts/lint-shell.sh`, but the default `nix develop` shell does not install `shellcheck`.
-- Impact: the documented local workflow now depends on a tool that is not on `PATH`, so `sh validate.sh` and `sh scripts/validate-fast.sh` fail unless `shellcheck` is installed separately.
-- Fix direction: add `shellcheck` to `devShells.default`, or make the shell lint script self-contained with an explicit tool path.
+- Historical location: `parts/devshells.nix` around lines `5-12`
+- Problem at the time: the new validation scripts called `scripts/lint-shell.sh`, but the default `nix develop` shell did not install `shellcheck`.
+- Impact: the documented local workflow depended on a tool that was not on `PATH`, so `sh validate.sh` and `sh scripts/validate-fast.sh` failed unless `shellcheck` was installed separately.
+- Resolution direction: add `shellcheck` to the repo shell environment (`devenv.nix` now; previously `devShells.default`), or make the shell lint script self-contained with an explicit tool path.
 
 ## Notes
 - The new validation scripts are fine as an integration point.

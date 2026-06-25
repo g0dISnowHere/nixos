@@ -126,7 +126,7 @@ If you just want to understand the repo:
 If you want to work on the repo:
 
 ```bash
-nix develop
+devenv shell
 ```
 
 That gives you the main formatting and linting tools used in this repo.
@@ -141,10 +141,10 @@ useful commands to start with:
 
 ```bash
 nix flake show | tail -n 20
+devenv shell -- echo ok
 nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
 nix eval .#homeConfigurations."djoolz@workstation".activationPackage | tail -n 20
 nix flake new --template .#empty /tmp/template-test | tail -n 20
-nix develop
 ```
 
 What they do:
@@ -153,7 +153,7 @@ What they do:
   - shows the main outputs the flake provides
 - `nix eval ...`
   - checks that a machine or Home Manager config evaluates without building it
-- `nix develop`
+- `devenv shell`
   - opens the repo development shell with the main tools preloaded
 - `nix flake new --template ...`
   - creates a new project from one of the local development templates

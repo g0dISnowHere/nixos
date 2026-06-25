@@ -2,7 +2,7 @@
 , makeWrapper, alsa-lib, atk, cairo, cups, dbus, expat, fontconfig, freetype
 , gdk-pixbuf, glib, gtk3, libX11, libXcomposite, libXcursor, libXdamage, libXext
 , libXfixes, libXi, libXinerama, libXrandr, libXrender, libXtst, libdrm
-, libglvnd, libxkbcommon, mesa, nspr, nss, pango, xorg, zlib, }:
+, libglvnd, libxkbcommon, libxxf86vm, mesa, nspr, nss, pango, zlib, }:
 
 stdenvNoCC.mkDerivation rec {
   pname = "jjazzlab";
@@ -46,7 +46,7 @@ stdenvNoCC.mkDerivation rec {
     nspr
     nss
     pango
-    xorg.libXxf86vm
+    libxxf86vm
     zlib
   ];
 
