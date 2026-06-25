@@ -15,7 +15,7 @@
     # Enable GDM display manager (login screen)
     displayManager.gdm = {
       enable = true;
-      wayland = true;
+      # wayland = true;
     };
 
     # GNOME-specific Flatpak applications
