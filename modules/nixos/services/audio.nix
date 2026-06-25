@@ -56,8 +56,7 @@ in {
     qpwgraph # in favor of helvum
     qsynth
 
-    surge-XT
-    helvum
+    surge-xt
     easyeffects
     (writeShellScriptBin "ewi-carla" ''
       export LV2_PATH="${lv2Path}''${LV2_PATH:+:$LV2_PATH}"

@@ -1,6 +1,6 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
-    neofetch
+    fastfetch
     zip
     unzip
     p7zip

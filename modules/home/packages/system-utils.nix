@@ -1,6 +1,6 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
-    neofetch
+    fastfetch
     zip
     unzip
     p7zip

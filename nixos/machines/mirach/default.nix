@@ -18,6 +18,7 @@
     ../../../modules/nixos/services/flatpak.nix # Flatpak infrastructure
     ../../../modules/nixos/flatpak/browsers.nix
     ../../../modules/nixos/flatpak/development.nix
+    ../../../modules/nixos/flatpak/productivity.nix
   ];
 
   # Hostname
