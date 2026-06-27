@@ -9,3 +9,5 @@ dotfiles/modules/ui/noctalia/colors.json
 __pycache__
 enp0s25-diag/
 .serena
+.claude
+.gemini
