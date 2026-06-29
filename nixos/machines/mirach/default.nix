@@ -34,7 +34,7 @@
       };
     };
   };
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages;
   hardware.firmware = [ pkgs.linux-firmware ];
   swapDevices = [{
     device = "/var/lib/swapfile";

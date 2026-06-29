@@ -1,2 +1,5 @@
 # User zsh entrypoint.
 # Interactive shell behavior is managed by NixOS programs.zsh.
+
+# bun completions
+[ -s "/home/djoolz/.bun/_bun" ] && source "/home/djoolz/.bun/_bun"
