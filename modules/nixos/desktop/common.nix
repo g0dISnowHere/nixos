@@ -38,12 +38,10 @@
     cantarell-fonts
     noto-fonts
     noto-fonts-color-emoji
-    nerd-fonts.jetbrains-mono
   ];
 
   fonts.fontconfig = {
     defaultFonts = {
-      monospace = [ "JetBrainsMono Nerd Font Mono" ];
       sansSerif = [ "Noto Sans" "Cantarell" ];
       serif = [ "Noto Serif" ];
       emoji = [ "Noto Color Emoji" ];

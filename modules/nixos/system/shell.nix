@@ -15,6 +15,10 @@
     pkgs-zellij.zellij
     zoxide
   ];
+  fonts = {
+    packages = with pkgs; [ nerd-fonts.jetbrains-mono ];
+    fontconfig.defaultFonts.monospace = [ "JetBrainsMono Nerd Font Mono" ];
+  };
 
   users.defaultUserShell = pkgs.zsh;
 
@@ -47,7 +51,68 @@
         c = "z";
       };
       histSize = 50000;
+      # Prefer pnpm in interactive shells. Keep npm compatibility narrow so
+      # common muscle-memory commands work without pretending npm and pnpm are
+      # fully interchangeable.
       interactiveShellInit = ''
+        alias npx='pnpm dlx'
+        alias pnpx='pnpm dlx'
+
+        npm() {
+          if (( $# == 0 )); then
+            command pnpm
+            return
+          fi
+
+          local subcommand="$1"
+          shift
+
+          case "$subcommand" in
+            install|i)
+              if (( $# == 0 )); then
+                command pnpm install
+              else
+                command pnpm add "$@"
+              fi
+              ;;
+            add)
+              command pnpm add "$@"
+              ;;
+            uninstall|remove|rm)
+              command pnpm remove "$@"
+              ;;
+            update|upgrade|up)
+              command pnpm update "$@"
+              ;;
+            ci)
+              command pnpm install --frozen-lockfile "$@"
+              ;;
+            exec)
+              command pnpm exec "$@"
+              ;;
+            run)
+              command pnpm run "$@"
+              ;;
+            create)
+              command pnpm create "$@"
+              ;;
+            init)
+              if (( $# > 0 )) && [[ "$1" != -* ]]; then
+                command pnpm create "$@"
+              else
+                command pnpm init "$@"
+              fi
+              ;;
+            test|start|pack|publish|outdated|why|view|info)
+              command pnpm "$subcommand" "$@"
+              ;;
+            *)
+              print -u2 "npm -> pnpm wrapper: unsupported subcommand '$subcommand'; use pnpm directly."
+              return 1
+              ;;
+          esac
+        }
+
         SAVEHIST=50000
         setopt HIST_IGNORE_DUPS
         setopt HIST_IGNORE_SPACE
