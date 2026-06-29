@@ -1,16 +1,16 @@
 { pkgs, pkgs-unstable, ... }: {
-  # System-level AI CLI tools that should remain available on hosts without
-  # Home Manager. Keep this limited to headless-safe command-line tooling.
   environment.systemPackages = [
-    pkgs.gemini-cli
     pkgs.ripgrep
     pkgs.bubblewrap
+    pkgs.rtk
     pkgs-unstable.opencode
     pkgs-unstable.fabric-ai
-    pkgs-unstable.codex
   ];
 
-  # Codex currently probes this FHS path before falling back to its vendored
+  environment.sessionVariables.OPENAI_BASE_URL =
+    "https://headroom.int.djoolz.de";
+
+  # Codex can run inside a sandbox that expects bwrap at /usr/bin/bwrap as a
   # sandbox helper. Keep the system bubblewrap available there on NixOS hosts.
   systemd.tmpfiles.rules =
     [ "L+ /usr/bin/bwrap - - - - ${pkgs.bubblewrap}/bin/bwrap" ];

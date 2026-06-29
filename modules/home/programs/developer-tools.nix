@@ -44,15 +44,9 @@
     sessionVariables = {
       GOPATH = "$HOME/go";
       GOBIN = "$HOME/go/bin";
-      NPM_CONFIG_PREFIX = "$HOME/.npm-global";
       CARGO_HOME = "$HOME/.cargo";
     };
 
-    sessionPath = [
-      "$HOME/go/bin"
-      "$HOME/.npm-global/bin"
-      "$HOME/.cargo/bin"
-      "$HOME/.local/bin"
-    ];
+    sessionPath = [ "$HOME/go/bin" "$HOME/.cargo/bin" "$HOME/.local/bin" ];
   };
 }

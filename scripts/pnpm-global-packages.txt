@@ -1,0 +1,8 @@
+# One pnpm package spec per line.
+# Keep Node runtimes and other base toolchains in Nix; keep fast-moving CLIs here.
+@earendil-works/pi-coding-agent
+@github/copilot
+@google/gemini-cli
+@oh-my-pi/pi-coding-agent
+@openai/codex
+headroom-ai

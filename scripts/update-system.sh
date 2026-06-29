@@ -19,6 +19,8 @@ Options:
   --repo-url URL            Git URL used to bootstrap the checkout when absent.
   --branch BRANCH           Git branch allowed for automation. Default: main
   --validation-mode MODE    one of: eval, none. Default: eval
+  --sync-pnpm-globals       Run scripts/sync-pnpm-globals.sh after a successful
+                           rebuild.
 EOF
 }
 
@@ -30,6 +32,7 @@ remote="origin"
 repo_url="git@github.com:g0dISnowHere/nixos.git"
 branch="main"
 validation_mode="eval"
+sync_pnpm_globals=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -64,6 +67,10 @@ while [[ $# -gt 0 ]]; do
     --validation-mode)
       validation_mode="${2:?missing validation mode}"
       shift 2
+      ;;
+    --sync-pnpm-globals)
+      sync_pnpm_globals=1
+      shift
       ;;
     -h|--help)
       usage
@@ -111,6 +118,7 @@ trap cleanup EXIT
 
 reboot_state_dir="/var/lib/auto-update"
 reboot_state_file="${reboot_state_dir}/reboot-required"
+did_switch_system=0
 
 run_as_repo_user() {
   if [[ "$(id -un)" == "$repo_user" ]]; then
@@ -212,8 +220,22 @@ switch_system() {
       exit 1
     fi
   fi
+
+  did_switch_system=1
 }
 
+sync_pnpm_globals_after_switch() {
+  local sync_script
+  sync_script="${repo_root}/scripts/sync-pnpm-globals.sh"
+
+  if [[ ! -r "$sync_script" ]]; then
+    printf 'pnpm global sync requested but script is missing: %s\n' "$sync_script" >&2
+    exit 1
+  fi
+
+  printf 'Syncing pnpm global packages for %s\n' "$repo_user"
+  run_as_repo_user bash "$sync_script"
+}
 run_updater_flow() {
   local before_rev after_pull_rev after_commit_rev pushed_new_commit
   before_rev="$(git_user rev-parse HEAD)"
@@ -470,6 +492,10 @@ case "$mode" in
     run_consumer_flow
     ;;
 esac
+
+if [[ "$mode" != "bootstrap" && "$sync_pnpm_globals" -eq 1 && "$did_switch_system" -eq 1 ]]; then
+  sync_pnpm_globals_after_switch
+fi
 
 if [[ "$mode" != "bootstrap" ]]; then
   post_switch_summary

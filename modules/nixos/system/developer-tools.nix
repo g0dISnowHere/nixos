@@ -1,9 +1,6 @@
 { desktopEnvironment ? null, pkgs, pkgs-unstable, ... }:
 let
-  nixLdLibraryPath = [
-    "${pkgs.zlib}/lib"
-    "${pkgs.stdenv.cc.cc.lib}/lib"
-  ];
+  nixLdLibraryPath = [ "${pkgs.zlib}/lib" "${pkgs.stdenv.cc.cc.lib}/lib" ];
 
   uvWrapped = pkgs.symlinkJoin {
     name = "uv-wrapped";
@@ -39,7 +36,6 @@ in {
         # python3Packages.pipx
         uvWrapped
 
-
         # Go
         go
         gopls
@@ -50,6 +46,7 @@ in {
         npm-check-updates
         yarn
         pnpm
+        # pkgs-unstable.bun
 
         # Rust
         rustc
@@ -78,7 +75,12 @@ in {
     sessionVariables = {
       GOPATH = "$HOME/go";
       GOBIN = "$HOME/go/bin";
-      NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+      PNPM_HOME = "$HOME/.local/share/pnpm";
+      "pnpm_config_global_dir" = "$HOME/.local/share/pnpm/global";
+      "pnpm_config_global_bin_dir" = "$HOME/.local/share/pnpm/bin";
+      "pnpm_config_minimum_release_age" = "20160";
+      "pnpm_config_minimum_release_age_strict" = "true";
+      "pnpm_config_minimum_release_age_ignore_missing_time" = "false";
       CARGO_HOME = "$HOME/.cargo";
 
       # Needed for Python wheels/native extensions loaded via dlopen()
@@ -86,7 +88,7 @@ in {
     };
 
     extraInit = ''
-      export PATH="$HOME/go/bin:$HOME/.npm-global/bin:$HOME/.cargo/bin:$PATH"
+      export PATH="$HOME/go/bin:$HOME/.local/share/pnpm/bin:$HOME/.cargo/bin:$PATH"
 
     '';
   };
@@ -97,7 +99,7 @@ in {
     # Headroom vendors helper binaries that expect the standard C++ runtime at
     # conventional FHS paths. Expose libstdc++.so.6 through nix-ld for
     # headless AI-tool installs done outside nixpkgs.
-    libraries = [ pkgs.stdenv.cc.cc pkgs.zlib];
+    libraries = [ pkgs.stdenv.cc.cc pkgs.zlib ];
   };
 
 }

@@ -70,7 +70,10 @@ Current update helpers include:
   - the timer/service path runs as root for `nixos-rebuild switch`
   - git operations still run as the configured repo user so existing SSH keys
     remain usable
-
+  - optional `--sync-pnpm-globals` support runs repo-managed pnpm global CLI
+    sync after a successful rebuild
+- `scripts/sync-pnpm-globals.sh` for reconciling the repo's pnpm global CLI
+  manifest with the current user's pnpm global install set
 Current secret helpers include:
 
 - `scripts/secrets` as the operator-facing SOPS orchestrator
