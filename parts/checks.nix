@@ -31,6 +31,17 @@ _: {
           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
           cd "$repo_root"
 
+          markdownlint_args=()
+
+          if [[ "$#" -gt 0 && "$1" == "--fix" ]]; then
+            markdownlint_args+=(--fix)
+            shift
+          fi
+
+          if [[ "$#" -gt 0 ]]; then
+            exec markdownlint --config "${markdownlintConfig}" "''${markdownlint_args[@]}" "$@"
+          fi
+
           markdown_files=()
           while IFS= read -r -d "" path; do
             case "$path" in
@@ -47,7 +58,7 @@ _: {
             exit 0
           fi
 
-          exec markdownlint --config "${markdownlintConfig}" "''${markdown_files[@]}" "$@"
+          exec markdownlint --config "${markdownlintConfig}" "''${markdownlint_args[@]}" "''${markdown_files[@]}"
         '';
       };
 

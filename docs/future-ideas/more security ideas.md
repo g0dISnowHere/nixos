@@ -240,7 +240,7 @@ site.security.kernel = {
 };
 ```
 
-### Safe-ish baseline
+## Safe-ish baseline
 
 ```nix
 boot.kernel.sysctl = {
@@ -255,7 +255,7 @@ boot.kernel.sysctl = {
 };
 ```
 
-### Riskier tier
+## Riskier tier
 
 ```nix
 boot.kernelParams = [

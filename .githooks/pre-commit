@@ -68,8 +68,24 @@ else
 fi
 echo ""
 
+# === Auto-fix staged Markdown ===
+if [ "$has_markdown_files" -eq 1 ]; then
+    markdown_files=()
+    while IFS= read -r path; do
+        markdown_files+=("$path")
+    done < <(grep -E '\.md$' "$staged_files_file")
+
+    echo "2️⃣  Auto-fixing staged Markdown..."
+    bash ./scripts/lint-markdown.sh --fix "${markdown_files[@]}"
+    git add -- "${markdown_files[@]}"
+else
+    echo "2️⃣  No staged .md files; skipping markdown autofix."
+fi
+
+echo ""
+
 # === Validate Configuration ===
-echo "2️⃣  Running validation script..."
+echo "3️⃣  Running validation script..."
 if sh ./scripts/validate-fast.sh > /tmp/validate-output.txt 2>&1; then
     cat /tmp/validate-output.txt | grep "^  ✓\|^  ✗\|^==="
     echo ""
