@@ -125,15 +125,6 @@
         zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"
         bindkey '^[[Z' reverse-menu-complete
 
-        # Use one default persistent session for plain terminal SSH/mosh.
-        # Keep VS Code remote terminals as normal shells and only print a hint.
-        if [[ -n "$SSH_TTY" && -z "$ZELLIJ" ]] && command -v zellij >/dev/null 2>&1; then
-          if [[ -n "$VSCODE_IPC_HOOK_CLI" || "$TERM_PROGRAM" == "vscode" ]]; then
-            print -P "%F{yellow}zellij available:%f run 'zellij attach -c remote'"
-          else
-            exec zellij attach -c remote
-          fi
-        fi
       '';
       ohMyZsh = {
         enable = true;
