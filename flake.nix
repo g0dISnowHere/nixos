@@ -70,6 +70,10 @@
       # Keep sops-nix on the same nixpkgs revision as the rest of the flake.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixd = {
+      url = "github:nix-community/nixd";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
@@ -85,6 +89,11 @@
 
     nixos-06cb-009a-fingerprint-sensor = {
       url = "github:ahbnr/nixos-06cb-009a-fingerprint-sensor/24.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    herdr = {
+      url = "github:ogulcancelik/herdr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

@@ -1,4 +1,4 @@
-{ desktopEnvironment ? null, pkgs, pkgs-unstable, ... }:
+{ desktopEnvironment ? null, pkgs, pkgs-unstable, inputs, ... }:
 let
   nixLdLibraryPath = [ "${pkgs.zlib}/lib" "${pkgs.stdenv.cc.cc.lib}/lib" ];
 
@@ -55,6 +55,8 @@ in {
         clippy
         rustfmt
 
+        # Nix
+        inputs.nixd.packages.${pkgs.system}.nixd
         # Native build tooling
         pkgconf
         gcc
@@ -64,6 +66,7 @@ in {
         # Developer-focused newer packages
         pkgs-unstable.devenv
         pkgs-unstable.gh
+        inputs.herdr.packages.${pkgs.system}.default
       ] ++ pkgs.lib.optionals (desktopEnvironment != null) [
         pkgs-unstable.vscode
         pkgs-unstable.antigravity
