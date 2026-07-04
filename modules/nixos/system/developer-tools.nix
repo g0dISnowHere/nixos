@@ -64,9 +64,13 @@ in {
         cmake
 
         # Developer-focused newer packages
+        jujutsu
+        lazygit
         pkgs-unstable.devenv
         pkgs-unstable.gh
-        inputs.herdr.packages.${pkgs.system}.default
+        inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
+
       ] ++ pkgs.lib.optionals (desktopEnvironment != null) [
         pkgs-unstable.vscode
         pkgs-unstable.antigravity

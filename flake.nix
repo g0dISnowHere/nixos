@@ -97,6 +97,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hunk = {
+      url = "github:modem-dev/hunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ## This looks promising. No idea how to make it work though.
     # lan-mouse.url = "github:feschber/lan-mouse";
   };
