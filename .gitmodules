@@ -1,0 +1,9 @@
+[submodule "third-party/skills/mattpocock-skills"]
+	path = third-party/skills/mattpocock-skills
+	url = https://github.com/mattpocock/skills
+[submodule "third-party/skills/stop-slop"]
+	path = third-party/skills/stop-slop
+	url = https://github.com/hardikpandya/stop-slop
+[submodule "third-party/skills/caveman"]
+	path = third-party/skills/caveman
+	url = https://github.com/JuliusBrussee/caveman

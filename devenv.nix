@@ -37,5 +37,10 @@ in {
 
     echo "NixOS configuration development environment"
     echo "Current system: ${pkgs.stdenv.hostPlatform.system}"
+
+    # Keep AI skill symlinks current
+    if command -v git &>/dev/null && git -C "$REPO_ROOT" rev-parse --git-dir &>/dev/null 2>&1; then
+      bash "$REPO_ROOT/scripts/setup-ai-skills"
+    fi
   '';
 }
