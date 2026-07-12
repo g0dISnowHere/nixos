@@ -23,6 +23,8 @@
     home.stateVersion = "25.11";
   };
 
+  security.audit.backlogLimit = 8192;
+
   my.autoUpdate = {
     enable = true;
     mode = "updater";
