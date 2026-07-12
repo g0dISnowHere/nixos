@@ -1,4 +1,10 @@
-{ isNixosIntegrated ? false, lib, repoRoot, ... }: {
+{
+  isNixosIntegrated ? false,
+  lib,
+  repoRoot,
+  ...
+}:
+{
   # User-specific settings that should not live in the reusable baseline
   # profiles under flake/homes/profiles/.
   programs.git = {
@@ -6,44 +12,44 @@
       name = "g0disnowhere";
       email = "jojuble@gmail.com";
     };
-    includes = [{ path = "${repoRoot}/dotfiles/git/config.inc"; }];
+    includes = [ { path = "${repoRoot}/dotfiles/git/config.inc"; } ];
   };
 
-  programs.ssh.matchBlocks = lib.optionalAttrs (!isNixosIntegrated) {
+  programs.ssh.settings = lib.optionalAttrs (!isNixosIntegrated) {
     centauri = {
-      hostname = "centauri";
-      user = "djoolz";
-      identitiesOnly = true;
+      HostName = "centauri";
+      User = "djoolz";
+      IdentitiesOnly = true;
     };
     albaldah = {
-      hostname = "albaldah";
-      user = "djoolz";
-      identitiesOnly = true;
+      HostName = "albaldah";
+      User = "djoolz";
+      IdentitiesOnly = true;
     };
     albaldah-root = {
-      hostname = "albaldah";
-      user = "root";
-      identitiesOnly = true;
+      HostName = "albaldah";
+      User = "root";
+      IdentitiesOnly = true;
     };
     mirach = {
-      hostname = "192.168.3.223";
-      user = "djoolz";
-      identitiesOnly = true;
+      HostName = "192.168.3.223";
+      User = "djoolz";
+      IdentitiesOnly = true;
     };
     mirach-root = {
-      hostname = "192.168.3.223";
-      user = "root";
-      identitiesOnly = true;
+      HostName = "192.168.3.223";
+      User = "root";
+      IdentitiesOnly = true;
     };
     alhena = {
-      hostname = "192.168.3.211";
-      user = "djoolz";
-      identitiesOnly = true;
+      HostName = "192.168.3.211";
+      User = "djoolz";
+      IdentitiesOnly = true;
     };
     alhena-root = {
-      hostname = "192.168.3.211";
-      user = "root";
-      identitiesOnly = true;
+      HostName = "192.168.3.211";
+      User = "root";
+      IdentitiesOnly = true;
     };
   };
 }

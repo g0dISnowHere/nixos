@@ -1,15 +1,20 @@
-{ isNixosIntegrated ? false, lib, ... }: {
+{
+  isNixosIntegrated ? false,
+  lib,
+  ...
+}:
+{
   programs.ssh = {
     enable = !isNixosIntegrated;
     enableDefaultConfig = false;
-    matchBlocks = lib.optionalAttrs (!isNixosIntegrated) {
+    settings = lib.optionalAttrs (!isNixosIntegrated) {
       "*" = {
-        addKeysToAgent = "yes";
-        compression = true;
-        hashKnownHosts = true;
-        identityFile = [ "~/.ssh/id_ed25519" ];
-        serverAliveInterval = 60;
-        serverAliveCountMax = 3;
+        AddKeysToAgent = "yes";
+        Compression = true;
+        HashKnownHosts = true;
+        IdentityFile = [ "~/.ssh/id_ed25519" ];
+        ServerAliveInterval = 60;
+        ServerAliveCountMax = 3;
       };
     };
   };
