@@ -1,0 +1,15 @@
+{
+  "name": "mine-pnpm-globals",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.11.0",
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "latest",
+    "@github/copilot": "latest",
+    "@google/gemini-cli": "latest",
+    "@oh-my-pi/pi-coding-agent": "latest",
+    "@openai/codex": "latest",
+    "bun": "latest",
+    "headroom-ai": "latest"
+  }
+}

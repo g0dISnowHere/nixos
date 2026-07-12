@@ -70,10 +70,16 @@ Current update helpers include:
   - the timer/service path runs as root for `nixos-rebuild switch`
   - git operations still run as the configured repo user so existing SSH keys
     remain usable
-  - optional `--sync-pnpm-globals` support runs repo-managed pnpm global CLI
-    sync after a successful rebuild
-- `scripts/sync-pnpm-globals.sh` for reconciling the repo's pnpm global CLI
-  manifest with the current user's pnpm global install set
+  - optional `--sync-pnpm-globals` support installs repo-managed npm CLI tools
+    after a successful rebuild
+  - optional `--sync-uv-tools` support installs repo-managed Python CLI tools
+    after a successful rebuild
+- `scripts/sync-pnpm-globals.sh` installs locked `pnpm-globals/` dependencies
+  into the current user's XDG data directory and writes managed wrappers in
+  `$HOME/.local/bin`
+- `scripts/sync-uv-tools.sh` installs locked `uv-tools/` dependencies into the
+  current user's XDG data directory and writes managed wrappers in
+  `$HOME/.local/bin`
 Current secret helpers include:
 
 - `scripts/secrets` as the operator-facing SOPS orchestrator

@@ -1,0 +1,11 @@
+minimumReleaseAge: 4320
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+allowBuilds:
+  "@github/keytar": true
+  "@google/genai": true
+  bun: true
+  node-pty: true
+  onnxruntime-node: true
+  protobufjs: true
+  sharp: true

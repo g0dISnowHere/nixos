@@ -1,6 +1,15 @@
-{ desktopEnvironment ? null, pkgs, pkgs-unstable, inputs, ... }:
+{
+  desktopEnvironment ? null,
+  pkgs,
+  pkgs-unstable,
+  inputs,
+  ...
+}:
 let
-  nixLdLibraryPath = [ "${pkgs.zlib}/lib" "${pkgs.stdenv.cc.cc.lib}/lib" ];
+  nixLdLibraryPath = [
+    "${pkgs.zlib}/lib"
+    "${pkgs.stdenv.cc.cc.lib}/lib"
+  ];
 
   uvWrapped = pkgs.symlinkJoin {
     name = "uv-wrapped";
@@ -23,9 +32,11 @@ let
         --set LD_LIBRARY_PATH ${pkgs.lib.concatStringsSep ":" nixLdLibraryPath}
     '';
   };
-in {
+in
+{
   environment = {
-    systemPackages = with pkgs;
+    systemPackages =
+      with pkgs;
       [
         # Python
         python3
@@ -46,8 +57,6 @@ in {
         npm-check-updates
         yarn
         pnpm
-        # pkgs-unstable.bun
-
         # Rust
         rustc
         cargo
@@ -71,7 +80,8 @@ in {
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
 
-      ] ++ pkgs.lib.optionals (desktopEnvironment != null) [
+      ]
+      ++ pkgs.lib.optionals (desktopEnvironment != null) [
         pkgs-unstable.vscode
         pkgs-unstable.antigravity
         pkgs-unstable.t3code
@@ -82,12 +92,6 @@ in {
     sessionVariables = {
       GOPATH = "$HOME/go";
       GOBIN = "$HOME/go/bin";
-      PNPM_HOME = "$HOME/.local/share/pnpm";
-      "pnpm_config_global_dir" = "$HOME/.local/share/pnpm/global";
-      "pnpm_config_global_bin_dir" = "$HOME/.local/share/pnpm/bin";
-      "pnpm_config_minimum_release_age" = "20160";
-      "pnpm_config_minimum_release_age_strict" = "true";
-      "pnpm_config_minimum_release_age_ignore_missing_time" = "false";
       CARGO_HOME = "$HOME/.cargo";
 
       # Needed for Python wheels/native extensions loaded via dlopen()
@@ -95,7 +99,7 @@ in {
     };
 
     extraInit = ''
-      export PATH="$HOME/go/bin:$HOME/.local/share/pnpm/bin:$HOME/.cargo/bin:$PATH"
+      export PATH="$HOME/go/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
     '';
   };
@@ -106,7 +110,10 @@ in {
     # Headroom vendors helper binaries that expect the standard C++ runtime at
     # conventional FHS paths. Expose libstdc++.so.6 through nix-ld for
     # headless AI-tool installs done outside nixpkgs.
-    libraries = [ pkgs.stdenv.cc.cc pkgs.zlib ];
+    libraries = [
+      pkgs.stdenv.cc.cc
+      pkgs.zlib
+    ];
   };
 
 }
