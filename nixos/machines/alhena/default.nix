@@ -1,5 +1,14 @@
-{ hostname, inputs, lib, pkgs, ... }: {
-  imports = [ ./firewall.nix inputs.nixos-wsl.nixosModules.default ];
+{
+  hostname,
+  inputs,
+  lib,
+  ...
+}:
+{
+  imports = [
+    ./firewall.nix
+    inputs.nixos-wsl.nixosModules.default
+  ];
 
   networking.hostName = hostname;
 
@@ -12,13 +21,17 @@
   # Hardware configuration for NVIDIA GPU support in containers
   hardware.nvidia-container-toolkit = {
     enable = true;
-    suppressNvidiaDriverAssertion =
-      true; # Suppress assertion since NVIDIA driver is provided by WSL/Windows host
+    suppressNvidiaDriverAssertion = true; # Suppress assertion since NVIDIA driver is provided by WSL/Windows host
   };
 
   users.users.djoolz.extraGroups = [ "wheel" ];
 
-  environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
+  # Home Manager configuration for this machine.
+  home-manager.users.djoolz = {
+    imports = [ ../../../flake/homes/users/djoolz/server.nix ];
+    # Do not change casually. See docs/architecture/state-version-reasons.md.
+    home.stateVersion = "25.11";
+  };
 
   my.tailscale.enableSSH = true;
 

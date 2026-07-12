@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ ... }: {
   # STRATO VPS
   # Remote x86_64 server currently documented under vps docs/
   # Role: headless VPS with SSH, Tailscale, and container workloads
@@ -12,9 +12,16 @@
     ../../../modules/nixos/system/autoupgrade.nix
   ];
 
-  users.users.djoolz = { extraGroups = [ "wheel" ]; };
+  users.users.djoolz = {
+    extraGroups = [ "wheel" ];
+  };
 
-  environment.systemPackages = with pkgs; [ curl git htop tmux vim ];
+  # Home Manager configuration for this machine.
+  home-manager.users.djoolz = {
+    imports = [ ../../../flake/homes/users/djoolz/server.nix ];
+    # Do not change casually. See docs/architecture/state-version-reasons.md.
+    home.stateVersion = "25.11";
+  };
 
   my.autoUpdate = {
     enable = true;

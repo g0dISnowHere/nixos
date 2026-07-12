@@ -23,6 +23,7 @@
     albaldah = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "albaldah";
+      enableHomeManager = true;
       modules = [
         ../../modules/nixos/system/base.nix
         ../../modules/nixos/services/monitoring-baseline.nix
@@ -40,6 +41,7 @@
     alhena = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "alhena";
+      enableHomeManager = true;
       modules = [
         ../../modules/nixos/system/base.nix
         ../../modules/nixos/system/wsl.nix
