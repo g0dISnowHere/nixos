@@ -74,6 +74,9 @@ Current update helpers include:
     after a successful rebuild
   - optional `--sync-uv-tools` support installs repo-managed Python CLI tools
     after a successful rebuild
+  - if a package-specific nixpkgs escape hatch is ever needed again, prefer a
+    `nixpkgs-<pkg>-pinned` input name and probe the main package set during
+    lockfile updates before keeping the pin
 - `scripts/sync-pnpm-globals.sh` installs locked `pnpm-globals/` dependencies
   into the current user's XDG data directory and writes managed wrappers in
   `$HOME/.local/bin`

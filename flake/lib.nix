@@ -1,20 +1,30 @@
 { inputs, ... }:
 let
   inherit (inputs)
-    nixpkgs home-manager nix-flatpak nixpkgs-unstable sops-nix nixpkgs-broken
-    nixpkgs-zellij;
+    nixpkgs
+    home-manager
+    nix-flatpak
+    nixpkgs-unstable
+    sops-nix
+    ;
+  mkPkgs =
+    nixpkgsInput: system:
+    import nixpkgsInput {
+      inherit system;
+      config.allowUnfree = true;
+    };
   repoRootEnv = builtins.getEnv "REPO_ROOT";
-  repoRootDefault =
-    if repoRootEnv != "" then repoRootEnv else builtins.toString ../.;
-  secretsPolicy = import (builtins.path {
-    path = ./secrets-policy.nix;
-    name = "secrets-policy.nix";
-  });
+  repoRootDefault = if repoRootEnv != "" then repoRootEnv else builtins.toString ../.;
+  secretsPolicy = import (
+    builtins.path {
+      path = ./secrets-policy.nix;
+      name = "secrets-policy.nix";
+    }
+  );
   sort = builtins.sort builtins.lessThan;
   operatorAlias = secretsPolicy.operator.alias;
-  renderAgeList = aliases:
-    builtins.concatStringsSep "\n"
-    (map (alias: "          - *${alias}") aliases);
+  renderAgeList =
+    aliases: builtins.concatStringsSep "\n" (map (alias: "          - *${alias}") aliases);
   renderKeyLine = alias: recipient: "  - &${alias} ${recipient}";
   renderRule = pathRegex: aliases: ''
       - path_regex: ${pathRegex}
@@ -22,29 +32,41 @@ let
           - age:
     ${renderAgeList aliases}
   '';
-  renderScopedRules = scopeName: extensionPattern: scopes:
-    let names = sort (builtins.attrNames scopes);
-    in builtins.concatStringsSep "\n" (map (name:
-      let hosts = sort scopes.${name}.hosts;
-      in renderRule "^secrets/${scopeName}/${name}/.*\\.${extensionPattern}$"
-      ([ operatorAlias ] ++ hosts)) names);
-  renderSopsConfig = policy:
+  renderScopedRules =
+    scopeName: extensionPattern: scopes:
+    let
+      names = sort (builtins.attrNames scopes);
+    in
+    builtins.concatStringsSep "\n" (
+      map (
+        name:
+        let
+          hosts = sort scopes.${name}.hosts;
+        in
+        renderRule "^secrets/${scopeName}/${name}/.*\\.${extensionPattern}$" ([ operatorAlias ] ++ hosts)
+      ) names
+    );
+  renderSopsConfig =
+    policy:
     let
       policyHostNames = sort (builtins.attrNames policy.hosts);
       keys = [
-        (renderKeyLine policy.operator.alias
-          (builtins.head policy.operator.recipients))
-      ] ++ map (host: renderKeyLine host policy.hosts.${host}.recipient)
-        policyHostNames;
+        (renderKeyLine policy.operator.alias (builtins.head policy.operator.recipients))
+      ]
+      ++ map (host: renderKeyLine host policy.hosts.${host}.recipient) policyHostNames;
       userRules = renderScopedRules "users" "(yaml|yml)" policy.scopes.users;
-      serviceRules = renderScopedRules "services" "(yaml|yml|json|env|ini)"
-        policy.scopes.services;
-      machineRules = builtins.concatStringsSep "\n" (map (host:
-        renderRule "^secrets/machines/${host}/.*\\.(yaml|yml|json|env|ini)$" [
-          policy.operator.alias
-          host
-        ]) policyHostNames);
-    in builtins.concatStringsSep "\n" [
+      serviceRules = renderScopedRules "services" "(yaml|yml|json|env|ini)" policy.scopes.services;
+      machineRules = builtins.concatStringsSep "\n" (
+        map (
+          host:
+          renderRule "^secrets/machines/${host}/.*\\.(yaml|yml|json|env|ini)$" [
+            policy.operator.alias
+            host
+          ]
+        ) policyHostNames
+      );
+    in
+    builtins.concatStringsSep "\n" [
       "keys:"
       (builtins.concatStringsSep "\n" keys)
       "creation_rules:"
@@ -53,73 +75,84 @@ let
       machineRules
       ""
     ];
-in {
+in
+{
   flake.lib = {
     inherit secretsPolicy renderSopsConfig;
     renderedSopsConfig = renderSopsConfig secretsPolicy;
     # Helper function to create a NixOS system configuration.
     # Machine behavior is assembled from explicit capability modules.
-    mkNixosSystem = { system, hostname, desktopEnvironment ? null
-      , enableHomeManager ? false, modules ? [ ], extraSpecialArgs ? { } }:
+    mkNixosSystem =
+      {
+        system,
+        hostname,
+        desktopEnvironment ? null,
+        enableHomeManager ? false,
+        modules ? [ ],
+        extraSpecialArgs ? { },
+      }:
       let
-        desktopEnvironmentModule = if desktopEnvironment != null then
-          ../modules/nixos/desktop/${desktopEnvironment}.nix
-        else
-          { };
-        homeManagerModule = if enableHomeManager then [
-          # Home Manager integration
-          home-manager.nixosModules.home-manager
-          ({ pkgs, ... }: {
-            home-manager.backupCommand =
-              pkgs.writeShellScript "home-manager-backup" ''
-                set -eu
+        desktopEnvironmentModule =
+          if desktopEnvironment != null then ../modules/nixos/desktop/${desktopEnvironment}.nix else { };
+        homeManagerModule =
+          if enableHomeManager then
+            [
+              # Home Manager integration
+              home-manager.nixosModules.home-manager
+              ({ pkgs, ... }: {
+                home-manager.backupCommand = pkgs.writeShellScript "home-manager-backup" ''
+                  set -eu
 
-                target_path="$1"
-                backup_root="$HOME/.local/state/home-manager-backups"
-                timestamp="$(date +%Y%m%d-%H%M%S-%N)"
+                  target_path="$1"
+                  backup_root="$HOME/.local/state/home-manager-backups"
+                  timestamp="$(date +%Y%m%d-%H%M%S-%N)"
 
-                case "$target_path" in
-                  "$HOME"/*)
-                    relative_path="''${target_path#$HOME/}"
-                    ;;
-                  *)
-                    relative_path="external/$(basename "$target_path")"
-                    ;;
-                esac
+                  case "$target_path" in
+                    "$HOME"/*)
+                      relative_path="''${target_path#$HOME/}"
+                      ;;
+                    *)
+                      relative_path="external/$(basename "$target_path")"
+                      ;;
+                  esac
 
-                backup_dir="$backup_root/$(dirname "$relative_path")"
-                backup_name="$(basename "$target_path").$timestamp"
-                backup_path="$backup_dir/$backup_name"
+                  backup_dir="$backup_root/$(dirname "$relative_path")"
+                  backup_name="$(basename "$target_path").$timestamp"
+                  backup_path="$backup_dir/$backup_name"
 
-                mkdir -p "$backup_dir"
-                mv "$target_path" "$backup_path"
+                  mkdir -p "$backup_dir"
+                  mv "$target_path" "$backup_path"
 
-                find "$backup_root" -type f -mtime +30 -delete
-                find "$backup_root" -depth -type d -empty -delete
-              '';
-          })
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              sharedModules = [ sops-nix.homeManagerModules.sops ];
-              extraSpecialArgs = {
-                inherit desktopEnvironment dotfilesRoot inputs repoRoot;
-                isNixosIntegrated = true;
-                pkgs-unstable = import nixpkgs-unstable {
-                  inherit system;
-                  config.allowUnfree = true;
+                  find "$backup_root" -type f -mtime +30 -delete
+                  find "$backup_root" -depth -type d -empty -delete
+                '';
+              })
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  sharedModules = [ sops-nix.homeManagerModules.sops ];
+                  extraSpecialArgs = {
+                    inherit
+                      desktopEnvironment
+                      dotfilesRoot
+                      inputs
+                      repoRoot
+                      ;
+                    isNixosIntegrated = true;
+                    pkgs-unstable = mkPkgs nixpkgs-unstable system;
+                  };
                 };
-              };
-            };
-          }
-        ] else
-          [ ];
+              }
+            ]
+          else
+            [ ];
         # Prefer an explicit live checkout path when provided. Fall back to the
         # flake source path so evaluation still works in pure contexts.
         repoRoot = repoRootDefault;
         dotfilesRoot = "${repoRoot}/dotfiles";
-      in nixpkgs.lib.nixosSystem {
+      in
+      nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           # Machine-specific hardware and config
@@ -139,23 +172,21 @@ in {
           ../modules/nixos/users/djoolz/default.nix
           ../modules/nixos/users/djoolz/ssh.nix
           { nixpkgs.config.allowUnfree = true; }
-        ] ++ homeManagerModule ++ modules;
+        ]
+        ++ homeManagerModule
+        ++ modules;
 
         specialArgs = {
-          inherit inputs hostname desktopEnvironment repoRoot dotfilesRoot;
-          pkgs-unstable = import nixpkgs-unstable {
-            inherit system;
-            config.allowUnfree = true;
-          };
-          pkgs-tailscale = import nixpkgs-broken {
-            inherit system;
-            config.allowUnfree = true;
-          };
-          pkgs-zellij = import nixpkgs-zellij {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        } // extraSpecialArgs;
+          inherit
+            inputs
+            hostname
+            desktopEnvironment
+            repoRoot
+            dotfilesRoot
+            ;
+          pkgs-unstable = mkPkgs nixpkgs-unstable system;
+        }
+        // extraSpecialArgs;
       };
   };
 }

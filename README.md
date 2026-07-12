@@ -179,6 +179,11 @@ sh scripts/validate-fast.sh | tail -n 20
 sh validate.sh | tail -n 20
 ```
 
+After `nix flake update`, rerun the fast evals plus `devenv shell -- fcheck`.
+If a package-specific pin is temporarily unavoidable, name it
+`nixpkgs-<pkg>-pinned` and manually probe the package from the main `nixpkgs`
+input before deciding to keep that pin.
+
 When you are ready to apply a machine config locally, the basic NixOS command is:
 
 ```bash

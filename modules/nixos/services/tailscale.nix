@@ -1,13 +1,21 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.my.tailscale;
-  extraUpFlags = lib.optionals cfg.enableSSH [ "--ssh" ]
+  extraUpFlags =
+    lib.optionals cfg.enableSSH [ "--ssh" ]
     ++ lib.optionals cfg.advertiseExitNode [ "--advertise-exit-node" ]
-    ++ lib.optionals (cfg.advertiseRoutes != [ ])
-    [ "--advertise-routes=${lib.concatStringsSep "," cfg.advertiseRoutes}" ]
+    ++ lib.optionals (cfg.advertiseRoutes != [ ]) [
+      "--advertise-routes=${lib.concatStringsSep "," cfg.advertiseRoutes}"
+    ]
     ++ lib.optionals cfg.acceptRoutes [ "--accept-routes" ];
   needsForwarding = cfg.advertiseExitNode || cfg.advertiseRoutes != [ ];
-in {
+in
+{
   # Tailscale VPN Service
   # Provides secure mesh VPN networking with per-role/per-host routing behavior.
 
@@ -39,7 +47,7 @@ in {
   };
 
   config = {
-    # enable the tailscale service using the tailscale-specific nixpkgs version
+    # Use the main package set; no Tailscale-specific nixpkgs pin remains.
     services.tailscale = {
       enable = true;
       package = pkgs.tailscale;

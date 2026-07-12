@@ -255,43 +255,21 @@ The namespace proposal is not in this list because you already have the good par
 
 11. Centralize allowUnfree (Reduce repetition)
 
-You set config.allowUnfree = true in 5 places in flake/lib.nix:
-- Main nixpkgs
-- pkgs-unstable (twice - once for HM, once for NixOS)
-- pkgs-tailscale
-- pkgs-zellij
-
-Extract this:
-
-```nix
-let                                                                                                                                
-    mkPkgs = nixpkgs: system: import nixpkgs {                                                                                       
-    inherit system;                                                                                                                
-    config.allowUnfree = true;                                                                                                     
-    };                                                                                                                               
-in {                                                                                                                               
-    # Then use mkPkgs everywhere                                                                                                     
-    pkgs-unstable = mkPkgs nixpkgs-unstable system;                                                                                  
-    pkgs-tailscale = mkPkgs nixpkgs-broken system;                                                                                   
-    pkgs-zellij = mkPkgs nixpkgs-zellij system;                                                                                      
-}                                                                                                                                  
-```
+This was accurate at review time, but the follow-up cleanup landed:
+- `mkPkgs` now centralizes the extra imported package sets that need
+  `config.allowUnfree = true`
+- the dead Tailscale-specific pin path is gone
+- the temporary Zellij pin was removed once main `nixpkgs` built it again
 
 12. Rethink the pkgs- overlay strategy* (Architecture smell)
 
-You're maintaining 4 separate nixpkgs pins:
-- nixpkgs (main)
-- nixpkgs-unstable (for newer packages)
-- nixpkgs-broken (for tailscale? the name is concerning)
-- nixpkgs-zellij (for one package?)
+Current shape:
+- main `nixpkgs` for the base system
+- `nixpkgs-unstable` for intentionally newer packages
 
-Questions:
-- Why does tailscale need its own nixpkgs pin named "broken"?
-- Why does zellij need its own pin instead of using unstable?
-- Are these pins actively maintained or frozen at old commits?
-
-Recommendation: Audit which packages actually need non-main pins and why. Document it. Consider using overlays instead of multiple
-full nixpkgs evaluations.
+If a package-specific escape hatch is ever needed again, prefer
+`nixpkgs-<pkg>-pinned` naming, keep the consumer narrow, and retire the pin as
+soon as the main package set builds the package again.
 
 13. Make monitoring-inventory.nix more useful (Leverage existing structure)
 
@@ -388,17 +366,15 @@ Add docs/reference/nixpkgs-pins.md:
 ```markdown
 # Nixpkgs Pins                                                                                                                     
                                                                                                                                     
-We use multiple nixpkgs versions:                                                                                                  
-                                                                                                                                    
-- **nixpkgs** (main): <date>, used for core system                                                                                 
-- **nixpkgs-unstable**: <date>, used for: devenv, gh, vscode, crowdsec, AI tools                                                   
-- **nixpkgs-broken**: <date>, used for: tailscale (reason: ...)                                                                    
-- **nixpkgs-zellij**: <date>, used for: zellij (reason: ...)                                                                       
-                                                                                                                                    
-## Update schedule                                                                                                                 
-- Main: follows NixOS release channel                                                                                              
-- Unstable: updated monthly                                                                                                        
-- Broken/zellij: updated only when needed                                                                                          
+We use two nixpkgs versions today:
+
+- **nixpkgs** (main): core system and default package source
+- **nixpkgs-unstable**: selected newer packages such as devenv, gh, vscode,
+  crowdsec, and AI tooling
+
+The older package-specific Tailscale and Zellij pins were retired. If a future
+package-specific pin is unavoidable, keep it narrowly scoped and remove it once
+main `nixpkgs` recovers.
                                                                                                                                     
 ## Rationale                                                                                                                       
 [Why we can't use just main + unstable]                                                                                            
@@ -516,7 +492,7 @@ Priority ranking for these 10
 
 If I had to pick the top 3:
 
-1. #12 - Audit pkgs- pins* - The "nixpkgs-broken" name is a red flag; understand what's actually happening
+1. #12 - Audit pkgs- pins* - This was the right instinct: the dead tailscale pin is gone and the zellij pin was removable once main nixpkgs recovered
 2. #13 - Leverage monitoring-inventory.nix - You built good structure, now use it
 3. #19 - Drop tailscale wrappers - Simplify without losing functionality  
 

@@ -1,4 +1,4 @@
-{ pkgs, pkgs-zellij, ... }: {
+{ pkgs, ... }: {
   # Shared interactive shell defaults belong at the system layer so headless
   # machines get the same baseline even without Home Manager.
   environment.systemPackages = with pkgs; [
@@ -12,7 +12,7 @@
     tmux
     tree
     which
-    pkgs-zellij.zellij
+    zellij
     zoxide
   ];
   fonts = {
@@ -128,8 +128,14 @@
       '';
       ohMyZsh = {
         enable = true;
-        plugins =
-          [ "git" "tailscale" "docker" "docker-compose" "vscode" "direnv" ];
+        plugins = [
+          "git"
+          "tailscale"
+          "docker"
+          "docker-compose"
+          "vscode"
+          "direnv"
+        ];
         theme = "robbyrussell";
       };
     };
