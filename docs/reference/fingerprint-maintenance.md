@@ -108,18 +108,20 @@ Reason:
 
 If the sensor stops working after suspend, check the `open-fprintd-suspend`, `open-fprintd-resume`, `python3-validity-suspend`, and `python3-validity-resume` units first.
 
-`python3-validity` is configured to restart aggressively on exit (`Restart=always`, `RestartSec=1s`, start-limit disabled) so a transient USB loss does not leave fingerprint auth dead until the next manual restart. It is also stopped explicitly before sleep and restarted explicitly after resume.
+`python3-validity` is configured to restart aggressively on exit (`Restart=always`, `RestartSec=1s`, `StartLimitIntervalSec=0`) so a transient USB loss does not leave fingerprint auth dead until the next manual restart. It is also stopped explicitly before sleep and restarted explicitly after resume.
 
 ## Resume Reliability Hardening
 
-Resume handling is hardened in two layers:
+Resume handling is hardened in three layers:
 
-1. `open-fprintd-resume.service` retries to survive transient resume-time USB races:
+1. USB autosuspend is disabled for `06cb:009a`:
+   - udev rule forces `power/control=on`
+2. `open-fprintd-resume.service` retries to survive transient resume-time USB races:
    - `Restart=on-failure`
    - `RestartSec=2s`
    - `StartLimitIntervalSec=60`
    - `StartLimitBurst=5`
-2. `python3-validity` is managed explicitly around sleep:
+3. `python3-validity` is managed explicitly around sleep:
    - `python3-validity-suspend.service` stops it before sleep
    - `python3-validity-resume.service` restarts it after `open-fprintd-resume.service`
    - steady-state daemon restart policy is `Restart=always`, `RestartSec=1s`, `StartLimitIntervalSec=0`
@@ -135,14 +137,18 @@ systemctl status open-fprintd-resume.service | tail -n 20
 systemctl status python3-validity.service | tail -n 20
 journalctl -b -u open-fprintd-resume.service --no-pager | tail -n 40
 journalctl -b -u python3-validity-resume.service --no-pager | tail -n 40
+cat /sys/bus/usb/devices/1-9/power/control
 ```
+
+Expected steady state:
+
+- `/sys/bus/usb/devices/1-9/power/control` = `on`
+- `python3-validity-resume.service` exists and runs after `open-fprintd-resume.service`
 
 ## Larger Mitigations (If Failures Persist)
 
 If retries are not enough, apply mitigations in this order:
 
-1. Disable autosuspend for `06cb:009a` via a focused udev rule (`power/control=on`).
-   - This is the clean first step and should be tried before adding custom resume orchestration.
-2. Add USB unbind/rebind recovery for the sensor before restarting the fingerprint daemons.
-3. Add custom post-resume recovery ordering with additional delays if the current explicit stop/restart flow is still not enough.
-4. Move back to standard `services.fprintd` once `06cb:009a` is upstream-supported by `libfprint`.
+1. Add USB unbind/rebind recovery for the sensor before restarting the fingerprint daemons.
+2. Add custom post-resume recovery ordering with additional delays if the current explicit stop/restart flow is still not enough.
+3. Move back to standard `services.fprintd` once `06cb:009a` is upstream-supported by `libfprint`.

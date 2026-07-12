@@ -32,23 +32,27 @@ The recurring chain is:
 
 ## What Was Changed
 
-Implemented first-line hardening in:
+Implemented hardening in:
 
 - `modules/nixos/services/fingerprint-06cb-009a.nix`
 
-Change:
+Changes:
 
-- Added bounded retry policy for `open-fprintd-resume.service`:
-  - `Restart=on-failure`
-  - `RestartSec=2s`
-  - `StartLimitIntervalSec=60`
-  - `StartLimitBurst=5`
+1. Added bounded retry policy for `open-fprintd-resume.service`:
+   - `Restart=on-failure`
+   - `RestartSec=2s`
+   - `StartLimitIntervalSec=60`
+   - `StartLimitBurst=5`
+2. Disabled USB autosuspend for `06cb:009a` via udev (`power/control=on`).
+3. Added explicit sleep orchestration for `python3-validity`:
+   - `python3-validity-suspend.service` stops it before sleep
+   - `python3-validity-resume.service` restarts it after `open-fprintd-resume.service`
+   - steady-state daemon restart policy is `Restart=always`, `RestartSec=1s`, `StartLimitIntervalSec=0`
 
 ## General Mitigation Outline
 
-If failures continue after this change:
+If failures continue after these changes:
 
-1. Disable USB autosuspend for `06cb:009a` via targeted udev rule.
-2. Add explicit post-resume reinit ordering (delayed service restart/re-probe flow).
-3. Add USB unbind/rebind recovery for the device before daemon restart.
-4. Replace custom stack with upstream `services.fprintd` once `06cb:009a` is supported in `libfprint`.
+1. Add USB unbind/rebind recovery for the device before daemon restart.
+2. Add more explicit delayed post-resume reinit ordering if the sensor still races re-enumeration.
+3. Replace custom stack with upstream `services.fprintd` once `06cb:009a` is supported in `libfprint`.
