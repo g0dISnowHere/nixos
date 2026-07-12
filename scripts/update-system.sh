@@ -21,6 +21,7 @@ Options:
   --validation-mode MODE    one of: eval, none. Default: eval
   --sync-pnpm-globals       Run scripts/sync-pnpm-globals.sh after a successful
                            rebuild.
+  --sync-uv-tools       Run scripts/sync-uv-tools.sh after a successful rebuild.
 EOF
 }
 
@@ -33,6 +34,7 @@ repo_url="git@github.com:g0dISnowHere/nixos.git"
 branch="main"
 validation_mode="eval"
 sync_pnpm_globals=0
+sync_uv_tools=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -70,6 +72,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --sync-pnpm-globals)
       sync_pnpm_globals=1
+      shift
+      ;;
+    --sync-uv-tools)
+      sync_uv_tools=1
       shift
       ;;
     -h|--help)
@@ -229,11 +235,24 @@ sync_pnpm_globals_after_switch() {
   sync_script="${repo_root}/scripts/sync-pnpm-globals.sh"
 
   if [[ ! -r "$sync_script" ]]; then
-    printf 'pnpm global sync requested but script is missing: %s\n' "$sync_script" >&2
+    printf 'pnpm global sync requested but script missing: %s\n' "$sync_script" >&2
     exit 1
   fi
 
   printf 'Syncing pnpm global packages for %s\n' "$repo_user"
+  run_as_repo_user bash "$sync_script"
+}
+
+sync_uv_tools_after_switch() {
+  local sync_script
+  sync_script="${repo_root}/scripts/sync-uv-tools.sh"
+
+  if [[ ! -r "$sync_script" ]]; then
+    printf 'uv tools sync requested but script missing: %s\n' "$sync_script" >&2
+    exit 1
+  fi
+
+  printf 'Syncing uv tools for %s\n' "$repo_user"
   run_as_repo_user bash "$sync_script"
 }
 run_updater_flow() {
@@ -493,8 +512,12 @@ case "$mode" in
     ;;
 esac
 
-if [[ "$mode" != "bootstrap" && "$sync_pnpm_globals" -eq 1 && "$did_switch_system" -eq 1 ]]; then
+if [[ "$mode" != "bootstrap" && "$did_switch_system" -eq 1 && "$sync_pnpm_globals" -eq 1 ]]; then
   sync_pnpm_globals_after_switch
+fi
+
+if [[ "$mode" != "bootstrap" && "$did_switch_system" -eq 1 && "$sync_uv_tools" -eq 1 ]]; then
+  sync_uv_tools_after_switch
 fi
 
 if [[ "$mode" != "bootstrap" ]]; then

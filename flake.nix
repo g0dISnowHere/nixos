@@ -6,11 +6,9 @@
     # Nixpkgs unstable for packages that need newer versions
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     # Use nixpkgs commit from previous working flake.lock
-    nixpkgs-broken.url =
-      "github:nixos/nixpkgs/ce01daebf8489ba97bd1609d185ea276efdeb121";
+    nixpkgs-broken.url = "github:nixos/nixpkgs/ce01daebf8489ba97bd1609d185ea276efdeb121";
     # Pin zellij until nixpkgs rustc catches up with zellij 0.44.x.
-    nixpkgs-zellij.url =
-      "github:nixos/nixpkgs/d96b37bbeb9840f1c0ebfe90585ef5067b69bbb3";
+    nixpkgs-zellij.url = "github:nixos/nixpkgs/d96b37bbeb9840f1c0ebfe90585ef5067b69bbb3";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -26,8 +24,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/";
 
     noctalia = {
-      url =
-        "github:noctalia-dev/noctalia-shell?rev=a1329203910dcd8ef97fb5e4049c8f59b34f6c59";
+      url = "github:noctalia-dev/noctalia-shell?rev=a1329203910dcd8ef97fb5e4049c8f59b34f6c59";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -67,9 +64,9 @@
     ## encrypted key management
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      # Keep sops-nix on the same nixpkgs revision as the rest of the flake.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     nixd = {
       url = "github:nix-community/nixd";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -84,7 +81,7 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
-    systems.url = "github:nix-systems/default";
+    systems.url = "github:nix-systems/default-linux";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     nixos-06cb-009a-fingerprint-sensor = {
@@ -100,6 +97,7 @@
     hunk = {
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.bun2nix.inputs.systems.follows = "systems";
     };
 
     ## This looks promising. No idea how to make it work though.
