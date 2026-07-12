@@ -170,7 +170,7 @@ sync_locked_project() {
   remove_obsolete_wrappers
 
   for tool_dir in "${legacy_tool_dirs[@]}"; do
-    rm -rf "${legacy_uv_tools_dir}/${tool_dir}"
+    rm -rf "${legacy_uv_tools_dir:?}/${tool_dir}"
   done
 
   printf 'uv tools: sync complete\n'
