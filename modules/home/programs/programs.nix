@@ -1,8 +1,18 @@
-_: {
+{ lib, ... }: {
   programs = {
     # firefox.enable = true;
 
-    git = { enable = true; };
+    git = {
+      enable = true;
+    };
+
+    zsh = {
+      enable = true;
+      initContent = ''
+        # bun completions
+        [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+      '';
+    };
 
     direnv = {
       enable = true;
@@ -60,4 +70,14 @@ _: {
     #   };
     # };
   };
+
+  home.activation.migrateLegacyZshrc = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+    target="$HOME/.zshrc"
+
+    if [ -L "$target" ]; then
+      rm -f "$target"
+    elif [ -e "$target" ]; then
+      mv "$target" "$target.pre-home-manager"
+    fi
+  '';
 }

@@ -1,15 +1,20 @@
 { pkgs, lib, ... }:
 let
   nixLdLibraryPath = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc ];
-  flakeLinterPkg =
-    if builtins.hasAttr "flake-linter" pkgs then pkgs."flake-linter" else null;
-  nixFastBuildPkg = if builtins.hasAttr "nix-fast-build" pkgs then
-    pkgs."nix-fast-build"
-  else
-    null;
-in {
-  packages = with pkgs;
-    [ python3 nixpkgs-fmt statix deadnix markdownlint-cli shellcheck ]
+  flakeLinterPkg = if builtins.hasAttr "flake-linter" pkgs then pkgs."flake-linter" else null;
+  nixFastBuildPkg = if builtins.hasAttr "nix-fast-build" pkgs then pkgs."nix-fast-build" else null;
+in
+{
+  packages =
+    with pkgs;
+    [
+      python3
+      nixpkgs-fmt
+      statix
+      deadnix
+      markdownlint-cli
+      shellcheck
+    ]
     ++ lib.optional (flakeLinterPkg != null) flakeLinterPkg
     ++ lib.optional (nixFastBuildPkg != null) nixFastBuildPkg;
 
@@ -38,9 +43,5 @@ in {
     echo "NixOS configuration development environment"
     echo "Current system: ${pkgs.stdenv.hostPlatform.system}"
 
-    # Keep AI skill symlinks current
-    if command -v git &>/dev/null && git -C "$REPO_ROOT" rev-parse --git-dir &>/dev/null 2>&1; then
-      bash "$REPO_ROOT/scripts/setup-ai-skills"
-    fi
   '';
 }

@@ -6,7 +6,6 @@ set -e
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd -P)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-DOTFILES_LINKER="${REPO_ROOT}/dotfiles/scripts/link.sh"
 
 echo "🔧 Setting up NixOS flake repository..."
 echo ""
@@ -15,6 +14,15 @@ echo ""
 echo "📌 Configuring git pre-commit hooks..."
 git config core.hooksPath .githooks
 echo "   ✓ Git configured to use .githooks"
+echo ""
+
+# Initialise AI skill submodules
+echo "📦 Initialising AI skill submodules..."
+git submodule update --init \
+  third-party/skills/mattpocock-skills \
+  third-party/skills/stop-slop \
+  third-party/skills/caveman
+echo "   ✓ AI skill submodules ready"
 echo ""
 
 # Verify nix environment
@@ -26,27 +34,6 @@ else
     exit 1
 fi
 echo ""
-
-if [ -f "${DOTFILES_LINKER}" ]; then
-    echo "🔗 Dotfile links..."
-    if [ -t 0 ]; then
-        printf "   Link repo-managed dotfiles into your home directory now? [y/N] "
-        read -r link_dotfiles
-    else
-        link_dotfiles="n"
-    fi
-
-    case "${link_dotfiles}" in
-        y|Y|yes|YES)
-            bash "${DOTFILES_LINKER}"
-            echo "   ✓ Dotfiles linked"
-            ;;
-        *)
-            echo "   Skipped. Run this later with: dotfiles/scripts/link.sh"
-            ;;
-    esac
-    echo ""
-fi
 
 # Test validation script
 echo "🧪 Testing validation script..."
