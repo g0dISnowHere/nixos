@@ -1,15 +1,17 @@
 { lib, pkgs, ... }: {
   # Shared Desktop Infrastructure
   # Imported by all desktop environment modules (gnome.nix, plasma.nix, etc.)
-  # Provides: audio, printing, Bluetooth, network service discovery, X11 base
-  # Each DE module imports this and adds its own desktop environment + display manager
+  # Provides: audio and X11 base
+  # Host files import optional capabilities like printing, Bluetooth, and service discovery explicitly
 
   # X11 windowing system base
   services = {
     xserver = {
       enable = true;
       videoDrivers = [ "modesetting" ];
-      xkb = { layout = "de"; };
+      xkb = {
+        layout = "de";
+      };
     };
 
     # Audio (PipeWire)
@@ -23,15 +25,6 @@
       jack.enable = lib.mkDefault false;
     };
 
-    # Printing
-    printing.enable = true;
-
-    # Network service discovery (printer auto-detection, etc.)
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
-    };
   };
 
   fonts.packages = with pkgs; [
@@ -42,7 +35,10 @@
 
   fonts.fontconfig = {
     defaultFonts = {
-      sansSerif = [ "Noto Sans" "Cantarell" ];
+      sansSerif = [
+        "Noto Sans"
+        "Cantarell"
+      ];
       serif = [ "Noto Serif" ];
       emoji = [ "Noto Color Emoji" ];
     };
@@ -53,7 +49,4 @@
 
   security.rtkit.enable = lib.mkDefault true;
 
-  # Bluetooth
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
 }

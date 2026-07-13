@@ -10,38 +10,52 @@
 
   hosts = {
     albaldah = {
-      recipient =
-        "age1hl3u09qjx5mz5939agcjpr8u0wecsu8vqcqn38ykeq2qswp6s4eqlhz9cq";
-      class = "homelab";
+      recipient = "age1hl3u09qjx5mz5939agcjpr8u0wecsu8vqcqn38ykeq2qswp6s4eqlhz9cq";
     };
     alhena = {
-      recipient =
-        "age1089ktlqhw7fh82pps74m8upuxp2m2ljzl73ya9ujtyr8s8nf8e6s2u5gvh";
-      class = "workstation";
+      recipient = "age1089ktlqhw7fh82pps74m8upuxp2m2ljzl73ya9ujtyr8s8nf8e6s2u5gvh";
     };
     centauri = {
-      recipient =
-        "age1hus8yrj5y6aa0fntqp8glv7pqxqnhczt8y0xhaxznxvk6e2s4vls5v2dcc";
-      class = "workstation";
+      recipient = "age1hus8yrj5y6aa0fntqp8glv7pqxqnhczt8y0xhaxznxvk6e2s4vls5v2dcc";
     };
     mirach = {
-      recipient =
-        "age1d860j0aa5d2fru0rfpyp4mxtyzwt6fw8crvlzerw542gqtfnnd3qfprgw2";
-      class = "workstation";
+      recipient = "age1d860j0aa5d2fru0rfpyp4mxtyzwt6fw8crvlzerw542gqtfnnd3qfprgw2";
     };
   };
 
   scopes = {
     users = {
-      djoolz = { hosts = [ "albaldah" "alhena" "centauri" "mirach" ]; };
+      djoolz = {
+        hosts = [
+          "albaldah"
+          "alhena"
+          "centauri"
+          "mirach"
+        ];
+      };
     };
 
     services = {
-      crowdsec = { hosts = [ "albaldah" ]; };
-      fleet-test = { hosts = [ "albaldah" "alhena" "centauri" "mirach" ]; };
-      nextcloud-aio = { hosts = [ "albaldah" ]; };
-      traefik = { hosts = [ "albaldah" ]; };
-      monitoring = { hosts = [ "albaldah" ]; };
+      crowdsec = {
+        hosts = [ "albaldah" ];
+      };
+      fleet-test = {
+        hosts = [
+          "albaldah"
+          "alhena"
+          "centauri"
+          "mirach"
+        ];
+      };
+      nextcloud-aio = {
+        hosts = [ "albaldah" ];
+      };
+      traefik = {
+        hosts = [ "albaldah" ];
+      };
+      monitoring = {
+        hosts = [ "albaldah" ];
+      };
     };
   };
 }

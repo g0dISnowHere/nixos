@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, pkgs-unstable, ... }: {
   home.packages = with pkgs; [
     vlc
     wireshark
@@ -12,5 +12,6 @@
     syncthing
     obsidian
     chromium
+    pkgs-unstable.vscode
   ];
 }

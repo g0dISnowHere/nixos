@@ -1,7 +1,7 @@
 { ... }: {
   imports = [ ./tailscale.nix ];
 
-  # Router role: host may advertise subnet/exit routes via host-specific config.
-  # Keep this module minimal so it does not force behavior on every router host.
+  # Host may advertise subnet or exit routes via host-specific config.
+  # Keep this module minimal so it does not force routing behavior on every host.
   my.tailscale = { };
 }

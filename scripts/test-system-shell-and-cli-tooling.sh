@@ -77,11 +77,11 @@ assert_not_contains "$centauri_session_vars" "pnpm_config_global_dir" "system co
 assert_not_contains "$centauri_session_vars" "pnpm_config_global_bin_dir" "system config no longer exports pnpm global bin dir"
 assert_not_contains "$centauri_session_vars" "pnpm_config_minimum_release_age" "system config leaves pnpm globals policy to pnpm-globals/.npmrc"
 
-standalone_session_vars="$(nix eval --json '.#homeConfigurations."djoolz@workstation".config.home.sessionVariables')"
+standalone_session_vars="$(nix eval --json '.#homeConfigurations."djoolz@gnome".config.home.sessionVariables')"
 assert_not_contains "$standalone_session_vars" "NPM_CONFIG_PREFIX" "standalone Home Manager no longer exports npm global prefix"
 assert_not_contains "$standalone_session_vars" "PNPM_HOME" "standalone Home Manager does not export PNPM_HOME"
 
-standalone_packages="$(nix eval --json '.#homeConfigurations."djoolz@workstation".config.home.packages')"
+standalone_packages="$(nix eval --json '.#homeConfigurations."djoolz@gnome".config.home.packages')"
 assert_not_contains "$standalone_packages" "gemini-cli-" "standalone Home Manager leaves gemini-cli to pnpm-globals"
 assert_not_contains "$standalone_packages" "codex-" "standalone Home Manager leaves codex to pnpm-globals"
 assert_not_contains "$standalone_packages" "bun-" "standalone Home Manager leaves bun to pnpm-globals"
@@ -104,7 +104,7 @@ assert_contains "$centauri_zsh_init" "npm() {" "interactive shell installs npm c
 assert_contains "$centauri_zsh_init" 'command pnpm create "$@"' "interactive shell preserves npm init/create scaffolder flow"
 assert_contains "$centauri_zsh_init" "unsupported subcommand" "interactive shell warns on unsupported npm subcommands"
 
-standalone_ssh="$(nix eval --json --apply 'x: x.config.programs.ssh.settings."*".data' '.#homeConfigurations."djoolz@workstation"')"
+standalone_ssh="$(nix eval --json --apply 'x: x.config.programs.ssh.settings."*".data' '.#homeConfigurations."djoolz@gnome"')"
 assert_contains "$standalone_ssh" "$literal_ssh_identity" "standalone Home Manager still keeps SSH settings identity"
 
 integrated_ssh_settings="$(nix eval --json .#nixosConfigurations.centauri.config.home-manager.users.djoolz.programs.ssh.settings)"

@@ -1,1 +1,3 @@
-_: { services.printing.enable = true; }
+_: {
+  imports = [ ../../../modules/nixos/services/printing.nix ];
+}

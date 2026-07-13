@@ -223,22 +223,16 @@ validate_monitoring_inventory() {
   if ! jq -e '
     (.hosts | keys == ["albaldah", "centauri", "mirach"]) and
     (.groups.all_hosts == ["albaldah", "centauri", "mirach"]) and
-    (.groups.workstations == ["centauri"]) and
-    (.groups.local_servers == ["mirach"]) and
-    (.groups.vps_hosts == ["albaldah"]) and
     (.groups.public_edge_hosts == ["albaldah"]) and
     (.groups.docker_hosts == ["albaldah", "centauri", "mirach"]) and
     (.groups.frontend_hosts == ["albaldah", "centauri"]) and
     (.groups.monitoring_hosts == ["albaldah"]) and
     (.groups.security_hosts == ["albaldah"]) and
-    (all(.hosts[]; has("host_role") and has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
-    (.hosts.albaldah.host_role == "vps") and
+    (all(.hosts[]; has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
     (.hosts.albaldah.exposure_tier == "public_edge") and
     (.hosts.albaldah.service_roles == ["edge", "monitoring", "security", "frontend"]) and
-    (.hosts.centauri.host_role == "workstation") and
     (.hosts.centauri.exposure_tier == "tailscale_only") and
     (.hosts.centauri.service_roles == ["frontend"]) and
-    (.hosts.mirach.host_role == "local_server") and
     (.hosts.mirach.exposure_tier == "lan_only") and
     (.hosts.mirach.service_roles == ["infra", "vm_host"])
   ' <<<"${inventory_json}" >/dev/null; then
@@ -307,7 +301,7 @@ echo "    - libvirtd: $(nix eval .#nixosConfigurations.mirach.config.virtualisat
 echo "    - docker: $(nix eval .#nixosConfigurations.mirach.config.virtualisation.docker.enable 2>/dev/null)"
 echo "    - system evaluates: ✓"
 
-echo "  Strato VPS:"
+echo "  Albaldah:"
 echo "    - hostname: $(nix eval .#nixosConfigurations.albaldah.config.networking.hostName 2>/dev/null | tr -d '"')"
 echo "    - networkmanager: $(nix eval .#nixosConfigurations.albaldah.config.networking.networkmanager.enable 2>/dev/null)"
 echo "    - tailscale: $(nix eval .#nixosConfigurations.albaldah.config.services.tailscale.enable 2>/dev/null)"
@@ -342,10 +336,10 @@ done
 
 echo ""
 echo "Home-Manager Configurations:"
-if nix eval ".#homeConfigurations.\"djoolz@workstation\".activationPackage" > /dev/null 2>&1; then
-  echo "  ✓ djoolz@workstation evaluates"
+if nix eval ".#homeConfigurations.\"djoolz@gnome\".activationPackage" > /dev/null 2>&1; then
+  echo "  ✓ djoolz@gnome evaluates"
 else
-  echo "  ✗ djoolz@workstation failed"
+  echo "  ✗ djoolz@gnome failed"
   FAILED=$((FAILED + 1))
 fi
 

@@ -8,6 +8,16 @@
   imports = [
     ./firewall.nix
     inputs.nixos-wsl.nixosModules.default
+    ../../../modules/nixos/system/base.nix
+    ../../../modules/nixos/system/home-manager.nix
+    ../../../modules/nixos/system/ai-tools.nix
+    ../../../modules/nixos/system/developer-tools.nix
+    ../../../modules/nixos/system/wsl.nix
+    ../../../modules/nixos/services/monitoring-baseline.nix
+    ../../../modules/nixos/services/vscode-remote.nix
+    ../../../modules/nixos/services/ssh-server.nix
+    ../../../modules/nixos/services/tailscale-client.nix
+    ../../../modules/nixos/virtualisation/docker.nix
   ];
 
   networking.hostName = hostname;
@@ -28,7 +38,7 @@
 
   # Home Manager configuration for this machine.
   home-manager.users.djoolz = {
-    imports = [ ../../../flake/homes/users/djoolz/server.nix ];
+    imports = [ ../../../flake/homes/users/djoolz/base.nix ];
     # Do not change casually. See docs/architecture/state-version-reasons.md.
     home.stateVersion = "25.11";
   };

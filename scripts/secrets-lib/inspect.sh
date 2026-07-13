@@ -157,7 +157,6 @@ secrets_update_policy_host_recipient() {
   local host_name="$1"
   local recipient="$2"
   local create_flag="${3:-0}"
-  local class_name="${4:-}"
   local args=(
     "${SECRETS_POLICY_TOOL}"
     set-host-recipient
@@ -170,9 +169,6 @@ secrets_update_policy_host_recipient() {
     args+=(--create)
   fi
 
-  if [[ -n "${class_name}" ]]; then
-    args+=(--class-name "${class_name}")
-  fi
 
   python3 "${args[@]}"
   unset SECRETS_POLICY_JSON

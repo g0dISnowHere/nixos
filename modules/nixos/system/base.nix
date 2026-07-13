@@ -1,7 +1,5 @@
 _: {
   imports = [
-    ./ai-tools.nix
-    ./developer-tools.nix
     ./locale.nix
     ./nix-tools.nix
     ./shell.nix

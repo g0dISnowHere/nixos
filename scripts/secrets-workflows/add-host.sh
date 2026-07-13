@@ -19,7 +19,6 @@ sync .sops.yaml, then rekey and verify the resulting secret access.
 
 Options:
   --host NAME            Override the host alias
-  --class NAME           Set host metadata class (default: workstation)
   --user-scope NAME      Add the host to this user scope (repeatable)
   --no-user-scopes       Do not add the host to any user scope
   --dry-run              Show the intended changes only
@@ -29,7 +28,6 @@ EOF
 }
 
 host_name="$(hostname -s)"
-host_class="workstation"
 dry_run=0
 assume_yes=0
 no_user_scopes=0
@@ -39,10 +37,6 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --host)
       host_name="${2:?missing value for --host}"
-      shift 2
-      ;;
-    --class)
-      host_class="${2:?missing value for --class}"
       shift 2
       ;;
     --user-scope)
@@ -160,7 +154,6 @@ fi
 
 secrets_ui_section "Add Host"
 secrets_ui_kv "Host alias" "${host_name}"
-secrets_ui_kv "Host class" "${host_class}"
 secrets_ui_kv "Host public key" "${SECRETS_HOST_PUBLIC_KEY}"
 printf '\nUser scopes to join:\n'
 if [[ "${#selected_user_scopes[@]}" -eq 0 ]]; then
@@ -178,7 +171,6 @@ fi
 if [[ "${dry_run}" -eq 1 ]]; then
   printf '\nDry run plan:\n'
   printf '  - add host %s -> %s to flake/secrets-policy.nix\n' "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}"
-  printf '  - set host class to %s\n' "${host_class}"
   if [[ "${#selected_user_scopes[@]}" -gt 0 ]]; then
     printf '  - add %s to user scopes: %s\n' "${host_name}" "$(printf '%s ' "${selected_user_scopes[@]}" | sed 's/ $//')"
   else
@@ -196,7 +188,7 @@ if [[ "${assume_yes}" -ne 1 ]] && ! secrets_ui_confirm "Add ${host_name} with th
   exit 1
 fi
 
-secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 1 "${host_class}"
+secrets_update_policy_host_recipient "${host_name}" "${SECRETS_HOST_PUBLIC_KEY}" 1
 for scope_name in "${selected_user_scopes[@]}"; do
   mapfile -t scope_hosts < <(secrets_get_user_scope_hosts "${scope_name}")
   scope_hosts+=("${host_name}")

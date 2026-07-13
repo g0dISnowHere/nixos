@@ -56,8 +56,8 @@ run_check "nixosConfigurations.mirach failed to evaluate" \
   nix eval .#nixosConfigurations.mirach.config.system.build.toplevel
 run_check "nixosConfigurations.albaldah failed to evaluate" \
   nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel
-run_check "homeConfigurations.djoolz@workstation failed to evaluate" \
-  nix eval ".#homeConfigurations.\"djoolz@workstation\".activationPackage"
+run_check "homeConfigurations.djoolz@gnome failed to evaluate" \
+  nix eval ".#homeConfigurations.\"djoolz@gnome\".activationPackage"
 
 echo ""
 echo "Secrets Policy:"

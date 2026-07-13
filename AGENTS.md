@@ -123,6 +123,20 @@
 - For multi-step tasks, state a short step plan where each step includes a verification check.
 - Validate outcomes with the smallest meaningful check (`nix eval`, targeted script, or repo validation command) before handing off.
 
+## Agent skills
+
+### Issue tracker
+
+Issues for this repo live in GitHub Issues for `g0dISnowHere/nixos`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+This repo uses the default triage label vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo uses a single-context domain-doc layout: root `CONTEXT.md` when present, plus root `docs/adr/`. See `docs/agents/domain.md`.
+
 ## Agent-Specific Instructions
 - Treat `AGENTS.md` as the canonical repository guidance for automated coding agents.
 - `.github/copilot-instructions.md` is a short companion mirror; keep it consistent with this file and avoid letting it become a second source of truth.

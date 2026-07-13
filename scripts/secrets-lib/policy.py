@@ -166,13 +166,11 @@ def parse_host_entries(block_text):
     block_pattern = re.compile(
         r"(?ms)^    ([A-Za-z0-9_-]+) = \{\n"
         r'      recipient =\n        "([^"]+)";\n'
-        r'(?:      class = "([^"]+)";\n)?'
         r"    \};\n"
     )
     for match in block_pattern.finditer(block_text):
         entries[match.group(1)] = {
             "recipient": match.group(2),
-            "class_name": match.group(3) or "workstation",
         }
 
     return entries
@@ -184,37 +182,25 @@ def render_host_entries(entries):
             f"    {name} = {{\n"
             "      recipient =\n"
             f'        "{data["recipient"]}";\n'
-            f'      class = "{data["class_name"]}";\n'
             "    };\n"
         )
         for name, data in sorted(entries.items())
     )
 
 
-def replace_policy_host(policy_path, host, recipient, create, class_name):
+def replace_policy_host(policy_path, host, recipient, create):
     text = pathlib.Path(policy_path).read_text(encoding="utf-8")
     host_pattern = re.compile(
         rf"(?ms)^    {re.escape(host)} = \{{\n"
         r'      recipient =\n        "([^"]+)";\n'
-        r'(?:      class = "([^"]+)";\n)?'
         r"    \};\n"
     )
     match = host_pattern.search(text)
-    if match:
-        resolved_class_name = match.group(2) or "workstation"
-    else:
-        if not create:
-            raise SystemExit(f"host {host} is missing from policy")
-        resolved_class_name = class_name or "workstation"
-
-    if class_name:
-        resolved_class_name = class_name
 
     host_block = (
         f"    {host} = {{\n"
         "      recipient =\n"
         f'        "{recipient}";\n'
-        f'      class = "{resolved_class_name}";\n'
         "    };\n"
     )
 
@@ -226,7 +212,6 @@ def replace_policy_host(policy_path, host, recipient, create, class_name):
     blocks = parse_host_entries(hosts_match.group(1))
     blocks[host] = {
         "recipient": recipient,
-        "class_name": resolved_class_name,
     }
     rendered_hosts = render_host_entries(blocks)
     updated = text[: hosts_match.start(1)] + rendered_hosts + text[hosts_match.end(1) :]
@@ -266,7 +251,6 @@ def remove_host_from_policy(policy_path, host):
     host_block_pattern = re.compile(
         rf"(?ms)^    {re.escape(host)} = \{{\n"
         r'      recipient =\n        "([^"]+)";\n'
-        r'(?:      class = "([^"]+)";\n)?'
         r"    \};\n"
     )
     if not host_block_pattern.search(text):
@@ -384,7 +368,6 @@ def main():
     parser_set_host.add_argument("--host", required=True)
     parser_set_host.add_argument("--recipient", required=True)
     parser_set_host.add_argument("--create", action="store_true")
-    parser_set_host.add_argument("--class-name")
 
     parser_set_operator = subparsers.add_parser("set-operator-recipient")
     parser_set_operator.add_argument("--policy-file", required=True)
@@ -419,7 +402,6 @@ def main():
                 args.host,
                 args.recipient,
                 args.create,
-                args.class_name,
             )
         elif args.command == "set-operator-recipient":
             replace_operator_recipients(args.policy_file, sorted(set(args.recipient)))

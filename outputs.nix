@@ -1,7 +1,9 @@
 inputs:
 
-let monitoringInventory = import ./flake/monitoring-inventory.nix;
-in inputs."flake-parts".lib.mkFlake { inherit inputs; } {
+let
+  monitoringInventory = import ./flake/monitoring-inventory.nix;
+in
+inputs."flake-parts".lib.mkFlake { inherit inputs; } {
 
   imports = [
     # To import a flake module
@@ -32,11 +34,10 @@ in inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     # "x86_64-darwin"
   ];
 
-  perSystem = _:
-    {
-      # System-specific packages could go here
-      # packages.some-tool = pkgs.callPackage ./some-tool.nix {};
-    };
+  perSystem = _: {
+    # System-specific packages could go here
+    # packages.some-tool = pkgs.callPackage ./some-tool.nix {};
+  };
 
   flake = {
     inherit monitoringInventory;
@@ -49,6 +50,9 @@ in inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     nixosModules = {
       system-base = ./modules/nixos/system/base.nix;
       system-wsl = ./modules/nixos/system/wsl.nix;
+      avahi-discovery = ./modules/nixos/services/avahi-discovery.nix;
+      bluetooth = ./modules/nixos/services/bluetooth.nix;
+      printing = ./modules/nixos/services/printing.nix;
       ssh-server = ./modules/nixos/services/ssh-server.nix;
       tailscale-client = ./modules/nixos/services/tailscale-client.nix;
       tailscale-router = ./modules/nixos/services/tailscale-router.nix;

@@ -27,7 +27,8 @@ Examples:
 - `modules/nixos/system/`: platform and baseline system behavior like
   `base.nix`, WSL support, Nix settings, shell integration, secrets plumbing
 - `modules/nixos/services/`: reusable service capabilities like SSH server,
-  Tailscale client/router, Flatpak infra, scanner, firewall, service modules
+  Tailscale client/router, Flatpak infra, scanner, firewall, audio, Bluetooth,
+  printing, service discovery, and other service modules
 - `modules/nixos/virtualisation/`: container and virtualization capabilities
   like Docker, rootless Docker, podman, quickemu
 - `modules/nixos/desktop/`: desktop environment and desktop infra modules
@@ -37,14 +38,12 @@ Examples:
 ## Composition
 
 `flake/lib.nix` provides `mkNixosSystem` as orchestration helper. It wires
-shared flake inputs, Home Manager integration, desktop selection, SOPS support,
-Nix daemon settings, default user plumbing. It does not import machine roles by
-name.
+shared flake inputs, SOPS support, Nix daemon settings, default user plumbing,
+and imports the canonical host definition. Host files now own Home Manager,
+desktop, and capability selection explicitly.
 
-Machine sets under `flake/machines/` choose concrete capabilities explicitly:
-
-- `workstations.nix` contains local workstation-style hosts
-- `servers.nix` contains server-like hosts, including VPS and WSL hosts
+Machine inventory files under `flake/machines/` register hosts for navigation
+and output exposure. They do not choose host behavior.
 
 ## Guardrails
 

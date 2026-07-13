@@ -1,5 +1,5 @@
 _: {
-  # NixOS-WSL platform configuration for server-like use under Windows.
+  # NixOS-WSL platform configuration for Windows-hosted environments.
   wsl = {
     enable = true;
     useWindowsDriver = true;

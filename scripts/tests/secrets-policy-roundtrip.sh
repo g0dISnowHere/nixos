@@ -84,9 +84,9 @@ test_nix_eval_centauri() {
   return 1
 }
 
-test_nix_eval_home_workstation() {
+test_nix_eval_home_gnome() {
   local output=""
-  if output="$(XDG_CACHE_HOME="${cache_root}" nix eval '.#homeConfigurations."djoolz@workstation".activationPackage' 2>&1)"; then
+  if output="$(XDG_CACHE_HOME="${cache_root}" nix eval '.#homeConfigurations."djoolz@gnome".activationPackage' 2>&1)"; then
     return 0
   fi
   if grep -Fq "/nix/var/nix/daemon-socket/socket" <<< "${output}"; then
@@ -148,21 +148,6 @@ test_remove_user_scope_preserves_other_sections() {
   assert_contains "${tmp}" 'fleet-test = { hosts = [ "albaldah" "alhena" "centauri" "mirach" ]; };'
 }
 
-test_set_host_recipient_preserves_class() {
-  local tmp
-  tmp="$(mktemp)"
-  cp "${policy_file}" "${tmp}"
-  python3 "${policy_tool}" \
-    set-host-recipient \
-    --policy-file "${tmp}" \
-    --host albaldah \
-    --recipient age1replacementrecipient
-
-  assert_contains "${tmp}" '    albaldah = {'
-  assert_contains "${tmp}" '        "age1replacementrecipient";'
-  assert_contains "${tmp}" '      class = "homelab";'
-}
-
 test_create_host_adds_entry() {
   local tmp
   tmp="$(mktemp)"
@@ -172,12 +157,10 @@ test_create_host_adds_entry() {
     --policy-file "${tmp}" \
     --host rigel \
     --recipient age1rigelrecipient \
-    --class-name workstation \
     --create
 
   assert_contains "${tmp}" '    rigel = {'
   assert_contains "${tmp}" '        "age1rigelrecipient";'
-  assert_contains "${tmp}" '      class = "workstation";'
 }
 
 test_remove_host_updates_all_scope_memberships() {
@@ -203,13 +186,12 @@ main() {
   run_check "validate-policy succeeds" test_validate_policy
   run_check "sync-policy --check succeeds" test_sync_policy_check
   run_check "centauri evaluates" test_nix_eval_centauri
-  run_check "home workstation evaluates" test_nix_eval_home_workstation
+  run_check "home gnome composition evaluates" test_nix_eval_home_gnome
 
   printf '\n%s\n' 'Mutation tests:'
   run_check "existing user scope updates inline hosts" test_set_existing_user_scope_hosts
   run_check "creating user scope preserves existing scopes" test_create_user_scope_preserves_existing_scopes
   run_check "removing user scope preserves other sections" test_remove_user_scope_preserves_other_sections
-  run_check "existing host recipient update preserves class" test_set_host_recipient_preserves_class
   run_check "creating host adds a new host entry" test_create_host_adds_entry
   run_check "removing host updates all shared scopes" test_remove_host_updates_all_scope_memberships
 

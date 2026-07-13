@@ -1,5 +1,4 @@
 {
-  desktopEnvironment ? null,
   pkgs,
   pkgs-unstable,
   inputs,
@@ -35,57 +34,50 @@ let
 in
 {
   environment = {
-    systemPackages =
-      with pkgs;
-      [
-        # Python
-        python3
-        python3Packages.pip
-        python3Packages.setuptools
-        python3Packages.wheel
-        python3Packages.virtualenv
-        # python3Packages.pipx
-        uvWrapped
+    systemPackages = with pkgs; [
+      # Python
+      python3
+      python3Packages.pip
+      python3Packages.setuptools
+      python3Packages.wheel
+      python3Packages.virtualenv
+      # python3Packages.pipx
+      uvWrapped
 
-        # Go
-        go
-        gopls
-        go-tools
+      # Go
+      go
+      gopls
+      go-tools
 
-        # JavaScript / Node.js
-        nodejs
-        npm-check-updates
-        yarn
-        pnpm
-        # Rust
-        rustc
-        cargo
-        rust-analyzer
-        clippy
-        rustfmt
+      # JavaScript / Node.js
+      nodejs
+      npm-check-updates
+      yarn
+      pnpm
+      # Rust
+      rustc
+      cargo
+      rust-analyzer
+      clippy
+      rustfmt
 
-        # Nix
-        inputs.nixd.packages.${pkgs.stdenv.hostPlatform.system}.nixd
-        # Native build tooling
-        pkgconf
-        gcc
-        gnumake
-        cmake
+      # Nix
+      inputs.nixd.packages.${pkgs.stdenv.hostPlatform.system}.nixd
+      # Native build tooling
+      pkgconf
+      gcc
+      gnumake
+      cmake
 
-        # Developer-focused newer packages
-        jujutsu
-        lazygit
-        pkgs-unstable.devenv
-        pkgs-unstable.gh
-        inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
-        inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
+      # Developer-focused newer packages
+      jujutsu
+      lazygit
+      pkgs-unstable.devenv
+      pkgs-unstable.gh
+      inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
 
-      ]
-      ++ pkgs.lib.optionals (desktopEnvironment != null) [
-        pkgs-unstable.vscode
-        pkgs-unstable.antigravity
-        pkgs-unstable.t3code
-      ];
+    ];
 
     localBinInPath = true;
 

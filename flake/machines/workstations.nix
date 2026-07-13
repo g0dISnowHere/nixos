@@ -1,23 +1,12 @@
 { self, ... }: {
   flake.nixosConfigurations = {
-    # Centauri - Primary laptop/workstation
+    # Centauri - Primary laptop
     # Lenovo ThinkPad laptop used for development
     centauri = self.lib.mkNixosSystem {
       system = "x86_64-linux";
       hostname = "centauri";
-      desktopEnvironment = "gnome";
-      enableHomeManager = true;
-      modules = [
-        ../../modules/nixos/system/base.nix
-        ../../modules/nixos/system/powermanagement.nix
-        ../../modules/nixos/services/mosh.nix
-        ../../modules/nixos/services/tailscale-client.nix
-        # ../../modules/nixos/virtualisation/docker_rootless.nix
-        ../../modules/nixos/virtualisation/docker.nix
-        { networking.networkmanager.enable = true; }
-      ];
     };
 
-    # Add more workstations here as needed
+    # Add more hosts here as needed
   };
 }
