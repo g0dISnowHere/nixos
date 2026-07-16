@@ -3,30 +3,45 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = inputs:
+  outputs =
+    inputs:
 
     let
-      supportedSystems =
-        [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f:
-        inputs.nixpkgs.lib.genAttrs supportedSystems (system:
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forEachSupportedSystem =
+        f:
+        inputs.nixpkgs.lib.genAttrs supportedSystems (
+          system:
           f {
             pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [ inputs.self.overlays.default ];
             };
-          });
-    in {
+          }
+        );
+    in
+    {
       overlays.default = final: _: rec {
         rEnv = final.rWrapper.override {
           packages = with final.rPackages; [ knitr ];
         };
       };
 
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShellNoCC {
-          packages = with pkgs; [ rEnv pandoc texlive.combined.scheme-full ];
-        };
-      });
+      devShells = forEachSupportedSystem (
+        { pkgs }: {
+          default = pkgs.mkShellNoCC {
+            packages = with pkgs; [
+              rEnv
+              pandoc
+              texlive.combined.scheme-full
+            ];
+          };
+        }
+      );
     };
 }

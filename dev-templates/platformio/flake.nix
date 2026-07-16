@@ -3,37 +3,48 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = inputs:
+  outputs =
+    inputs:
 
     let
-      supportedSystems =
-        [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f:
-        inputs.nixpkgs.lib.genAttrs supportedSystems
-        (system: f { pkgs = import inputs.nixpkgs { inherit system; }; });
-    in {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShellNoCC {
-          packages = with pkgs;
-            [
-              clang-tools
-              cmake
-              codespell
-              conan
-              cppcheck
-              doxygen
-              gtest
-              lcov
-              platformio
-              vcpkg
-              vcpkg-tool
-            ] ++ pkgs.lib.optionals
-            (stdenv.hostPlatform.system != "aarch64-darwin") [ gdb ];
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forEachSupportedSystem =
+        f:
+        inputs.nixpkgs.lib.genAttrs supportedSystems (
+          system: f { pkgs = import inputs.nixpkgs { inherit system; }; }
+        );
+    in
+    {
+      devShells = forEachSupportedSystem (
+        { pkgs }: {
+          default = pkgs.mkShellNoCC {
+            packages =
+              with pkgs;
+              [
+                clang-tools
+                cmake
+                codespell
+                conan
+                cppcheck
+                doxygen
+                gtest
+                lcov
+                platformio
+                vcpkg
+                vcpkg-tool
+              ]
+              ++ pkgs.lib.optionals (stdenv.hostPlatform.system != "aarch64-darwin") [ gdb ];
 
-          shellHook = ''
-            export PLATFORMIO_CORE_DIR=$PWD/.platformio
-          '';
-        };
-      });
+            shellHook = ''
+              export PLATFORMIO_CORE_DIR=$PWD/.platformio
+            '';
+          };
+        }
+      );
     };
 }

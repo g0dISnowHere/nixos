@@ -1,14 +1,16 @@
 { pkgs, ... }:
 let
   version = "3.13";
-  concatMajorMinor = v:
+  concatMajorMinor =
+    v:
     pkgs.lib.pipe v [
       pkgs.lib.versions.splitVersion
       (pkgs.lib.sublist 0 2)
       pkgs.lib.concatStrings
     ];
   python = pkgs."python${concatMajorMinor version}";
-in {
+in
+{
   env = {
     UV_CACHE_DIR = "$HOME/.cache/uv";
     UV_PYTHON_DOWNLOADS = "never";

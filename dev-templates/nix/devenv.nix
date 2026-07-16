@@ -1,15 +1,20 @@
 { pkgs, lib, ... }:
 let
   nixLdLibraryPath = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc ];
-  flakeLinterPkg =
-    if builtins.hasAttr "flake-linter" pkgs then pkgs."flake-linter" else null;
-  nixFastBuildPkg = if builtins.hasAttr "nix-fast-build" pkgs then
-    pkgs."nix-fast-build"
-  else
-    null;
-in {
-  packages = with pkgs;
-    [ python3 nixpkgs-fmt statix deadnix markdownlint-cli shellcheck ]
+  flakeLinterPkg = if builtins.hasAttr "flake-linter" pkgs then pkgs."flake-linter" else null;
+  nixFastBuildPkg = if builtins.hasAttr "nix-fast-build" pkgs then pkgs."nix-fast-build" else null;
+in
+{
+  packages =
+    with pkgs;
+    [
+      python3
+      nixpkgs-fmt
+      statix
+      deadnix
+      markdownlint-cli
+      shellcheck
+    ]
     ++ lib.optional (flakeLinterPkg != null) flakeLinterPkg
     ++ lib.optional (nixFastBuildPkg != null) nixFastBuildPkg;
 

@@ -1,5 +1,6 @@
 { pkgs, lib, ... }: {
-  packages = with pkgs;
+  packages =
+    with pkgs;
     [
       clang-tools
       cmake
@@ -12,7 +13,10 @@
       platformio
       vcpkg
       vcpkg-tool
-    ] ++ lib.optionals (stdenv.hostPlatform.system != "aarch64-darwin") [ gdb ];
+    ]
+    ++ lib.optionals (stdenv.hostPlatform.system != "aarch64-darwin") [ gdb ];
 
-  env = { PLATFORMIO_CORE_DIR = "$PWD/.platformio"; };
+  env = {
+    PLATFORMIO_CORE_DIR = "$PWD/.platformio";
+  };
 }

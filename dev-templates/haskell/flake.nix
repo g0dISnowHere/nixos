@@ -3,19 +3,33 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = inputs:
+  outputs =
+    inputs:
 
     let
-      supportedSystems =
-        [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f:
-        inputs.nixpkgs.lib.genAttrs supportedSystems
-        (system: f { pkgs = import inputs.nixpkgs { inherit system; }; });
-    in {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShellNoCC {
-          packages = with pkgs; [ cabal-install ghc haskell-language-server ];
-        };
-      });
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forEachSupportedSystem =
+        f:
+        inputs.nixpkgs.lib.genAttrs supportedSystems (
+          system: f { pkgs = import inputs.nixpkgs { inherit system; }; }
+        );
+    in
+    {
+      devShells = forEachSupportedSystem (
+        { pkgs }: {
+          default = pkgs.mkShellNoCC {
+            packages = with pkgs; [
+              cabal-install
+              ghc
+              haskell-language-server
+            ];
+          };
+        }
+      );
     };
 }

@@ -3,20 +3,29 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
-  outputs = inputs:
+  outputs =
+    inputs:
 
     let
-      supportedSystems =
-        [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f:
-        inputs.nixpkgs.lib.genAttrs supportedSystems (system:
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forEachSupportedSystem =
+        f:
+        inputs.nixpkgs.lib.genAttrs supportedSystems (
+          system:
           f {
             pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [ inputs.self.overlays.default ];
             };
-          });
-    in {
+          }
+        );
+    in
+    {
       overlays.default = final: _: rec {
         # documentation
         # https://nixos.org/manual/nixpkgs/stable/#sec-beam
@@ -55,26 +64,36 @@
         # };
       };
 
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShellNoCC {
-          packages = with pkgs;
-            [
-              # use the Elixr/OTP versions defined above; will also install OTP, mix, hex, rebar3
-              elixir
+      devShells = forEachSupportedSystem (
+        { pkgs }: {
+          default = pkgs.mkShellNoCC {
+            packages =
+              with pkgs;
+              [
+                # use the Elixr/OTP versions defined above; will also install OTP, mix, hex, rebar3
+                elixir
 
-              # mix needs it for downloading dependencies
-              git
+                # mix needs it for downloading dependencies
+                git
 
-              # probably needed for your Phoenix assets
-              nodejs_20
-            ] ++
-            # Linux only
-            pkgs.lib.optionals pkgs.stdenv.isLinux
-            (with pkgs; [ gigalixir inotify-tools libnotify ]) ++
-            # macOS only
-            pkgs.lib.optionals pkgs.stdenv.isDarwin
-            (with pkgs; [ terminal-notifier ]);
-        };
-      });
+                # probably needed for your Phoenix assets
+                nodejs_20
+              ]
+              ++
+                # Linux only
+                pkgs.lib.optionals pkgs.stdenv.isLinux (
+                  with pkgs;
+                  [
+                    gigalixir
+                    inotify-tools
+                    libnotify
+                  ]
+                )
+              ++
+                # macOS only
+                pkgs.lib.optionals pkgs.stdenv.isDarwin (with pkgs; [ terminal-notifier ]);
+          };
+        }
+      );
     };
 }

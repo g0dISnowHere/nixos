@@ -1,12 +1,12 @@
 {
-  description =
-    "An empty flake template that you can adapt to your own environment";
+  description = "An empty flake template that you can adapt to your own environment";
 
   # Flake inputs
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11"; # unstable Nixpkgs
 
   # Flake outputs
-  outputs = inputs:
+  outputs =
+    inputs:
 
     let
       # The systems supported for this flake
@@ -18,22 +18,27 @@
       ];
 
       # Helper to provide system-specific attributes
-      forEachSupportedSystem = f:
-        inputs.nixpkgs.lib.genAttrs supportedSystems
-        (system: f { pkgs = import inputs.nixpkgs { inherit system; }; });
-    in {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShellNoCC {
-          # The Nix packages provided in the environment
-          # Add any you need here
-          packages = with pkgs; [ ];
+      forEachSupportedSystem =
+        f:
+        inputs.nixpkgs.lib.genAttrs supportedSystems (
+          system: f { pkgs = import inputs.nixpkgs { inherit system; }; }
+        );
+    in
+    {
+      devShells = forEachSupportedSystem (
+        { pkgs }: {
+          default = pkgs.mkShellNoCC {
+            # The Nix packages provided in the environment
+            # Add any you need here
+            packages = with pkgs; [ ];
 
-          # Set any environment variables for your dev shell
-          env = { };
+            # Set any environment variables for your dev shell
+            env = { };
 
-          # Add any shell logic you want executed any time the environment is activated
-          shellHook = "";
-        };
-      });
+            # Add any shell logic you want executed any time the environment is activated
+            shellHook = "";
+          };
+        }
+      );
     };
 }
