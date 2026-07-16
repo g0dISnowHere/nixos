@@ -8,6 +8,5 @@
     mode = "0400";
   };
 
-  users.users.djoolz.hashedPasswordFile =
-    config.sops.secrets."djoolz-password".path;
+  users.users.djoolz.hashedPasswordFile = config.sops.secrets."djoolz-password".path;
 }

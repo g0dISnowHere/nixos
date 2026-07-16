@@ -1,11 +1,17 @@
-{ inputs, lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   niriLockScript = "%h/.config/niri/swaylock-noctalia.sh";
   fallbackLockCommand = "${pkgs.swaylock}/bin/swaylock -f";
   lockCommand = ''
     ${pkgs.bash}/bin/bash -lc 'if [ -x "${niriLockScript}" ]; then exec "${niriLockScript}"; else exec ${fallbackLockCommand}; fi'
   '';
-in {
+in
+{
   # Niri Desktop Environment — Self-Contained
   # Imports shared desktop infrastructure from common.nix
   # Provides: Niri compositor + Wayland tooling + shared desktop stack
@@ -72,7 +78,11 @@ in {
     udiskie = {
       description = "Udiskie automount";
       wantedBy = [ "niri.service" ];
-      after = [ "niri.service" "graphical-session.target" "dbus.service" ];
+      after = [
+        "niri.service"
+        "graphical-session.target"
+        "dbus.service"
+      ];
       serviceConfig = {
         ExecStart = "${pkgs.udiskie}/bin/udiskie --no-tray";
         Restart = "on-failure";
@@ -88,12 +98,14 @@ in {
         Environment = [
           "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
         ];
-        ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
+        ExecStart =
+          "${pkgs.swayidle}/bin/swayidle -w "
           + "timeout 300 '${lockCommand}' "
           + "timeout 330 '${pkgs.wlopm}/bin/wlopm --off' "
           + "resume '${pkgs.wlopm}/bin/wlopm --on' "
           + "timeout 1800 '${pkgs.systemd}/bin/systemctl suspend' "
-          + "before-sleep '${lockCommand}' " + "lock '${lockCommand}'";
+          + "before-sleep '${lockCommand}' "
+          + "lock '${lockCommand}'";
         Restart = "on-failure";
       };
     };

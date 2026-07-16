@@ -1,5 +1,8 @@
 { lib, pkgs, ... }: {
-  imports = [ ./disko.nix ./hardware-configuration.nix ];
+  imports = [
+    ./disko.nix
+    ./hardware-configuration.nix
+  ];
 
   networking = {
     hostName = "strato-vps";
@@ -33,7 +36,13 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIItFDRkSHQOn8MlPIjHx/kSPDYSpElw+SozdUIjMMDGe djoolz@mirach"
   ];
 
-  environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
+  environment.systemPackages = with pkgs; [
+    git
+    curl
+    htop
+    tmux
+    vim
+  ];
 
   # Do not change casually. See ../../../architecture/state-version-reasons.md.
   system.stateVersion = "25.11";

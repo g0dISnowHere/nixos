@@ -6,11 +6,11 @@ let
     HIBERNATE_SECONDS = "10";
     HIBERNATE_LOCK = "/var/run/autohibernate.lock";
   };
-in {
+in
+{
 
   systemd.services."awake-after-suspend-for-a-time" = {
-    description =
-      "Sets up the suspend so that it'll wake for hibernation only if not on AC power";
+    description = "Sets up the suspend so that it'll wake for hibernation only if not on AC power";
     wantedBy = [ "suspend.target" ];
     before = [ "systemd-suspend.service" ];
     environment = hibernateEnvironment;

@@ -3,7 +3,8 @@ let
   bridgeInterface = "br0";
   physicalInterface = "enp0s25";
   bridgeMacAddress = "3c:97:0e:5b:2d:c2";
-in {
+in
+{
   virtualisation = {
     spiceUSBRedirection.enable = true;
     libvirtd = {
@@ -26,7 +27,10 @@ in {
       options kvm_intel nested=1
       options e1000e SmartPowerDownEnable=0
     '';
-    kernelModules = [ "bridge" "br_netfilter" ];
+    kernelModules = [
+      "bridge"
+      "br_netfilter"
+    ];
     kernel.sysctl = {
       "net.ipv4.ip_forward" = 1;
       "net.bridge.bridge-nf-call-iptables" = 0;
@@ -35,7 +39,11 @@ in {
     };
   };
 
-  environment.systemPackages = with pkgs; [ virt-manager virt-viewer OVMF ];
+  environment.systemPackages = with pkgs; [
+    virt-manager
+    virt-viewer
+    OVMF
+  ];
 
   services.spice-vdagentd.enable = true;
 
@@ -43,8 +51,13 @@ in {
     # Keep NetworkManager available for Wi-Fi, but leave the bridged Ethernet path
     # to the static host config so VM networking does not get re-managed.
     useDHCP = lib.mkForce false;
-    networkmanager.unmanaged = [ physicalInterface bridgeInterface ];
-    bridges = { "${bridgeInterface}".interfaces = [ physicalInterface ]; };
+    networkmanager.unmanaged = [
+      physicalInterface
+      bridgeInterface
+    ];
+    bridges = {
+      "${bridgeInterface}".interfaces = [ physicalInterface ];
+    };
     interfaces = {
       "${bridgeInterface}".useDHCP = true;
       "${physicalInterface}".useDHCP = false;
@@ -59,8 +72,10 @@ in {
     description = "Tune Intel Ethernet link power settings";
     after = [ "sys-subsystem-net-devices-${physicalInterface}.device" ];
     bindsTo = [ "sys-subsystem-net-devices-${physicalInterface}.device" ];
-    before =
-      [ "network-addresses-${bridgeInterface}.service" "dhcpcd.service" ];
+    before = [
+      "network-addresses-${bridgeInterface}.service"
+      "dhcpcd.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
@@ -77,7 +92,10 @@ in {
 
   systemd.services.libvirt-bridge-network = {
     description = "Create libvirt bridge network";
-    after = [ "libvirtd.service" "network.target" ];
+    after = [
+      "libvirtd.service"
+      "network.target"
+    ];
     wants = [ "libvirtd.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {

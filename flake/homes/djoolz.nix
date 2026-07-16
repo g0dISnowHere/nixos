@@ -10,7 +10,7 @@
       dotfilesRoot = "${repoRoot}/dotfiles";
     in
     {
-      # Standalone Home Manager config for the GNOME composition
+      # Standalone Home Manager config for GUI user environment.
       # Usage: home-manager switch --flake .#djoolz@gnome
       "djoolz@gnome" = inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = import inputs.nixpkgs {
@@ -29,7 +29,10 @@
 
         modules = [
           ./users/djoolz/base.nix
-          ./profiles/gui.nix
+          ./users/djoolz/gui-apps.nix
+          ../../modules/home/packages/system-utils.nix
+          ../../modules/home/packages/nix-tools.nix
+          ../../modules/home/programs/shell.nix
           ../../modules/home/programs/developer-tools.nix
           ../../modules/home/packages/ai-tools.nix
           {
@@ -41,7 +44,6 @@
             };
           }
         ];
-
       };
     };
 }

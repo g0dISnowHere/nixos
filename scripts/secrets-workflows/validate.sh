@@ -67,7 +67,7 @@ if [[ "${full_test}" -eq 1 ]]; then
   export SECRETS_ALLOW_SUDO_PROMPT=1
 fi
 
-secrets_inspect_state "${host_name}"
+secrets_inspect_state "${host_name}" "${actor}"
 
 secrets_ui_section "Secrets Access Validation"
 secrets_ui_kv "Host alias" "${SECRETS_HOST_NAME}"

@@ -9,17 +9,20 @@
   # Enable KDE Connect (backend for GSConnect)
   programs.kdeconnect = {
     enable = true;
-    package =
-      pkgs.kdePackages.kdeconnect-kde; # Use the correct KDE Connect package
+    package = pkgs.kdePackages.kdeconnect-kde; # Use the correct KDE Connect package
   };
 
   # Firewall rules for KDE Connect communication
-  networking.firewall.allowedTCPPortRanges = [{
-    from = 1714;
-    to = 1764;
-  }];
-  networking.firewall.allowedUDPPortRanges = [{
-    from = 1714;
-    to = 1764;
-  }];
+  networking.firewall.allowedTCPPortRanges = [
+    {
+      from = 1714;
+      to = 1764;
+    }
+  ];
+  networking.firewall.allowedUDPPortRanges = [
+    {
+      from = 1714;
+      to = 1764;
+    }
+  ];
 }

@@ -1,20 +1,58 @@
-{ lib, stdenvNoCC, fetchurl, autoPatchelfHook, copyDesktopItems, makeDesktopItem
-, makeWrapper, alsa-lib, atk, cairo, cups, dbus, expat, fontconfig, freetype
-, gdk-pixbuf, glib, gtk3, libX11, libXcomposite, libXcursor, libXdamage, libXext
-, libXfixes, libXi, libXinerama, libXrandr, libXrender, libXtst, libdrm
-, libglvnd, libxkbcommon, libxxf86vm, mesa, nspr, nss, pango, zlib, }:
+{
+  lib,
+  stdenvNoCC,
+  fetchurl,
+  autoPatchelfHook,
+  copyDesktopItems,
+  makeDesktopItem,
+  makeWrapper,
+  alsa-lib,
+  atk,
+  cairo,
+  cups,
+  dbus,
+  expat,
+  fontconfig,
+  freetype,
+  gdk-pixbuf,
+  glib,
+  gtk3,
+  libX11,
+  libXcomposite,
+  libXcursor,
+  libXdamage,
+  libXext,
+  libXfixes,
+  libXi,
+  libXinerama,
+  libXrandr,
+  libXrender,
+  libXtst,
+  libdrm,
+  libglvnd,
+  libxkbcommon,
+  libxxf86vm,
+  mesa,
+  nspr,
+  nss,
+  pango,
+  zlib,
+}:
 
 stdenvNoCC.mkDerivation rec {
   pname = "jjazzlab";
   version = "5.1";
 
   src = fetchurl {
-    url =
-      "https://github.com/jjazzboss/JJazzLab/releases/download/${version}/JJazzLab-${version}-linux-x64.tar.xz";
+    url = "https://github.com/jjazzboss/JJazzLab/releases/download/${version}/JJazzLab-${version}-linux-x64.tar.xz";
     hash = "sha256-/XDmmu7oI0yO9Gkwb32k30/iyJqjPSuKps5Agfn2iIY=";
   };
 
-  nativeBuildInputs = [ autoPatchelfHook copyDesktopItems makeWrapper ];
+  nativeBuildInputs = [
+    autoPatchelfHook
+    copyDesktopItems
+    makeWrapper
+  ];
 
   buildInputs = [
     alsa-lib
@@ -59,7 +97,12 @@ stdenvNoCC.mkDerivation rec {
       comment = "Chord-based accompaniment and practice tool";
       exec = "jjazzlab %F";
       icon = "jjazzlab";
-      categories = [ "AudioVideo" "Audio" "Midi" "Music" ];
+      categories = [
+        "AudioVideo"
+        "Audio"
+        "Midi"
+        "Music"
+      ];
       startupWMClass = "jjazzlab";
       terminal = false;
     })

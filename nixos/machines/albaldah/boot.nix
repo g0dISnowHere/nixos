@@ -9,11 +9,17 @@ _: {
     '';
   };
 
-  swapDevices = [{
-    device = "/var/lib/swapfile";
-    size = 8 * 1024;
-  }];
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 8 * 1024;
+    }
+  ];
 
   # Keep provider recovery consoles usable through both boot and login.
-  boot.kernelParams = [ "console=tty1" "console=ttyS0" "systemd.ssh_auto=no" ];
+  boot.kernelParams = [
+    "console=tty1"
+    "console=ttyS0"
+    "systemd.ssh_auto=no"
+  ];
 }

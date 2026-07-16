@@ -1,10 +1,12 @@
 _: {
-  perSystem = { pkgs, inputs', ... }:
+  perSystem =
+    { pkgs, inputs', ... }:
     let
-      flakeLinterPkg = if builtins.hasAttr "flake-linter" pkgs then
-        pkgs."flake-linter"
-      else
-        inputs'.flake-linter.packages.default;
+      flakeLinterPkg =
+        if builtins.hasAttr "flake-linter" pkgs then
+          pkgs."flake-linter"
+        else
+          inputs'.flake-linter.packages.default;
       markdownlintConfig = pkgs.writeText "markdownlint.jsonc" ''
         {
           "default": true,
@@ -26,7 +28,10 @@ _: {
 
       markdownlint = pkgs.writeShellApplication {
         name = "markdownlint-repo";
-        runtimeInputs = [ pkgs.git pkgs.markdownlint-cli ];
+        runtimeInputs = [
+          pkgs.git
+          pkgs.markdownlint-cli
+        ];
         text = ''
           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
           cd "$repo_root"
@@ -50,6 +55,10 @@ _: {
                 ;;
             esac
 
+            if [[ ! -f "$path" ]]; then
+              continue
+            fi
+
             markdown_files+=("$path")
           done < <(git ls-files -z -- "*.md")
 
@@ -64,13 +73,20 @@ _: {
 
       shellcheck = pkgs.writeShellApplication {
         name = "shellcheck-repo";
-        runtimeInputs = [ pkgs.git pkgs.shellcheck ];
+        runtimeInputs = [
+          pkgs.git
+          pkgs.shellcheck
+        ];
         text = ''
           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
           cd "$repo_root"
 
           shell_files=()
           while IFS= read -r -d "" path; do
+            if [[ ! -f "$path" ]]; then
+              continue
+            fi
+
             shell_files+=("$path")
           done < <(
             git ls-files -z -- \
@@ -92,7 +108,11 @@ _: {
 
       nixlint = pkgs.writeShellApplication {
         name = "nixlint-repo";
-        runtimeInputs = [ pkgs.git pkgs.statix pkgs.deadnix ];
+        runtimeInputs = [
+          pkgs.git
+          pkgs.statix
+          pkgs.deadnix
+        ];
         text = ''
           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
           cd "$repo_root"
@@ -104,6 +124,10 @@ _: {
                 continue
                 ;;
             esac
+
+            if [[ ! -f "$path" ]]; then
+              continue
+            fi
 
             nix_files+=("$path")
           done < <(git ls-files -z -- "*.nix")
@@ -122,7 +146,10 @@ _: {
 
       flakelint = pkgs.writeShellApplication {
         name = "flakelint-repo";
-        runtimeInputs = [ pkgs.git flakeLinterPkg ];
+        runtimeInputs = [
+          pkgs.git
+          flakeLinterPkg
+        ];
         text = ''
           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
           cd "$repo_root"
@@ -130,7 +157,8 @@ _: {
           flake-linter .
         '';
       };
-    in {
+    in
+    {
       packages = {
         markdownlintRepo = markdownlint;
         shellcheckRepo = shellcheck;
@@ -139,117 +167,144 @@ _: {
       };
 
       checks = {
-        markdownlint = pkgs.runCommand "markdownlint-check" {
-          nativeBuildInputs = [ pkgs.findutils pkgs.markdownlint-cli ];
-        } ''
-          cd ${../.}
+        markdownlint =
+          pkgs.runCommand "markdownlint-check"
+            {
+              nativeBuildInputs = [
+                pkgs.findutils
+                pkgs.markdownlint-cli
+              ];
+            }
+            ''
+              cd ${../.}
 
-          markdown_files=()
-          while IFS= read -r -d "" path; do
-            case "$path" in
-              ./\.claude/*|./\.gemini/*|./\.github/copilot-instructions.md|./CLAUDE.md|./GEMINI.md|./dotfiles/basic\ niri.md|./nixos/machines/centauri/trackpad.md)
-                continue
-                ;;
-            esac
+              markdown_files=()
+              while IFS= read -r -d "" path; do
+                case "$path" in
+                  ./\.claude/*|./\.gemini/*|./\.github/copilot-instructions.md|./CLAUDE.md|./GEMINI.md|./dotfiles/basic\ niri.md|./nixos/machines/centauri/trackpad.md)
+                    continue
+                    ;;
+                esac
 
-            markdown_files+=("''${path#./}")
-          done < <(find . -type f -name "*.md" -print0)
+                markdown_files+=("''${path#./}")
+              done < <(find . -type f -name "*.md" -print0)
 
-          if [[ "''${#markdown_files[@]}" -eq 0 ]]; then
-            echo "No markdown files to lint."
-            touch "$out"
-            exit 0
-          fi
+              if [[ "''${#markdown_files[@]}" -eq 0 ]]; then
+                echo "No markdown files to lint."
+                touch "$out"
+                exit 0
+              fi
 
-          markdownlint --config "${markdownlintConfig}" "''${markdown_files[@]}"
-          touch "$out"
-        '';
+              markdownlint --config "${markdownlintConfig}" "''${markdown_files[@]}"
+              touch "$out"
+            '';
 
-        shellcheck = pkgs.runCommand "shellcheck-check" {
-          nativeBuildInputs = [ pkgs.findutils pkgs.shellcheck ];
-        } ''
-          cd ${../.}
+        shellcheck =
+          pkgs.runCommand "shellcheck-check"
+            {
+              nativeBuildInputs = [
+                pkgs.findutils
+                pkgs.shellcheck
+              ];
+            }
+            ''
+              cd ${../.}
 
-          shell_files=()
-          while IFS= read -r -d "" path; do
-            shell_files+=("''${path#./}")
-          done < <(
-            find . \
-              \( -path "./scripts" -o -path "./scripts/*" \) \
-              \( -type f -name "*.sh" -o -path "./scripts/secrets" \) \
-              -print0
-            find . -path "./.githooks/pre-commit" -print0
-          )
+              shell_files=()
+              while IFS= read -r -d "" path; do
+                shell_files+=("''${path#./}")
+              done < <(
+                find . \
+                  \( -path "./scripts" -o -path "./scripts/*" \) \
+                  \( -type f -name "*.sh" -o -path "./scripts/secrets" \) \
+                  -print0
+                find . -path "./.githooks/pre-commit" -print0
+              )
 
-          if [[ "''${#shell_files[@]}" -eq 0 ]]; then
-            echo "No shell scripts to lint."
-            touch "$out"
-            exit 0
-          fi
+              if [[ "''${#shell_files[@]}" -eq 0 ]]; then
+                echo "No shell scripts to lint."
+                touch "$out"
+                exit 0
+              fi
 
-          shellcheck -x -e SC1091 -s bash "''${shell_files[@]}"
-          touch "$out"
-        '';
+              shellcheck -x -e SC1091 -s bash "''${shell_files[@]}"
+              touch "$out"
+            '';
 
-        statix = pkgs.runCommand "statix-check" {
-          nativeBuildInputs = [ pkgs.findutils pkgs.statix ];
-        } ''
-          cd ${../.}
+        statix =
+          pkgs.runCommand "statix-check"
+            {
+              nativeBuildInputs = [
+                pkgs.findutils
+                pkgs.statix
+              ];
+            }
+            ''
+              cd ${../.}
 
-          nix_files=()
-          while IFS= read -r -d "" path; do
-            case "$path" in
-              ./modules/home/dconf/dconf.nix)
-                continue
-                ;;
-            esac
+              nix_files=()
+              while IFS= read -r -d "" path; do
+                case "$path" in
+                  ./modules/home/dconf/dconf.nix)
+                    continue
+                    ;;
+                esac
 
-            nix_files+=("''${path#./}")
-          done < <(find . -type f -name "*.nix" -print0)
+                nix_files+=("''${path#./}")
+              done < <(find . -type f -name "*.nix" -print0)
 
-          if [[ "''${#nix_files[@]}" -eq 0 ]]; then
-            echo "No Nix files to lint."
-            exit 0
-          fi
+              if [[ "''${#nix_files[@]}" -eq 0 ]]; then
+                echo "No Nix files to lint."
+                exit 0
+              fi
 
-          for path in "''${nix_files[@]}"; do
-            statix check "$path"
-          done
-          touch "$out"
-        '';
+              for path in "''${nix_files[@]}"; do
+                statix check "$path"
+              done
+              touch "$out"
+            '';
 
-        deadnix = pkgs.runCommand "deadnix-check" {
-          nativeBuildInputs = [ pkgs.findutils pkgs.deadnix ];
-        } ''
-          cd ${../.}
+        deadnix =
+          pkgs.runCommand "deadnix-check"
+            {
+              nativeBuildInputs = [
+                pkgs.findutils
+                pkgs.deadnix
+              ];
+            }
+            ''
+              cd ${../.}
 
-          nix_files=()
-          while IFS= read -r -d "" path; do
-            case "$path" in
-              ./modules/home/dconf/dconf.nix)
-                continue
-                ;;
-            esac
+              nix_files=()
+              while IFS= read -r -d "" path; do
+                case "$path" in
+                  ./modules/home/dconf/dconf.nix)
+                    continue
+                    ;;
+                esac
 
-            nix_files+=("''${path#./}")
-          done < <(find . -type f -name "*.nix" -print0)
+                nix_files+=("''${path#./}")
+              done < <(find . -type f -name "*.nix" -print0)
 
-          if [[ "''${#nix_files[@]}" -eq 0 ]]; then
-            echo "No Nix files to lint."
-            exit 0
-          fi
+              if [[ "''${#nix_files[@]}" -eq 0 ]]; then
+                echo "No Nix files to lint."
+                exit 0
+              fi
 
-          deadnix --fail "''${nix_files[@]}"
-          touch "$out"
-        '';
+              deadnix --fail "''${nix_files[@]}"
+              touch "$out"
+            '';
 
-        flake-linter = pkgs.runCommand "flake-linter-check" {
-          nativeBuildInputs = [ flakeLinterPkg ];
-        } ''
-          cd ${../.}
-          flake-linter .
-          touch "$out"
-        '';
+        flake-linter =
+          pkgs.runCommand "flake-linter-check"
+            {
+              nativeBuildInputs = [ flakeLinterPkg ];
+            }
+            ''
+              cd ${../.}
+              flake-linter .
+              touch "$out"
+            '';
       };
     };
 }

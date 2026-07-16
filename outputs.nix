@@ -18,10 +18,9 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     ./parts/checks.nix
     ./parts/templates.nix
 
-    # Library functions and machine definitions
+    # Library functions and host registry
     ./flake/lib.nix
-    ./flake/machines/workstations.nix
-    ./flake/machines/servers.nix
+    ./flake/machines/default.nix
 
     # Standalone home-manager configurations
     ./flake/homes/djoolz.nix
@@ -43,8 +42,8 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     inherit monitoringInventory;
     monitoringInventoryJson = builtins.toJSON monitoringInventory;
 
-    # `nixosConfigurations` are defined by importing flake/machines/*.nix
-    # which use self.lib.mkNixosSystem plus explicit capability modules.
+    # `nixosConfigurations` are defined by flake/machines/default.nix,
+    # which registers canonical host definitions under nixos/machines/.
 
     # Reusable NixOS capability modules for this or other flakes.
     nixosModules = {

@@ -1,5 +1,8 @@
 { pkgs, ... }: {
-  services.udev.packages = with pkgs; [ platformio-core.udev openocd ];
+  services.udev.packages = with pkgs; [
+    platformio-core.udev
+    openocd
+  ];
 
   services.udev.extraRules = ''
     # Allow the active local user session to access common USB serial devices.

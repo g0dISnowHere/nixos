@@ -1,0 +1,1892 @@
+diff --git a/docs/vps/strato-vps/flake.nix b/docs/vps/strato-vps/flake.nix
+index 8c26101..3790528 100644
+--- a/docs/vps/strato-vps/flake.nix
++++ b/docs/vps/strato-vps/flake.nix
+@@ -9,16 +9,20 @@
+     nixos-anywhere.inputs.nixpkgs.follows = "nixpkgs";
+   };
+ 
+-  outputs = inputs@{ nixpkgs, disko, ... }:
++  outputs =
++    inputs@{ nixpkgs, disko, ... }:
+     let
+       system = "x86_64-linux";
+       inherit (nixpkgs) lib;
+-    in {
++    in
++    {
+       nixosConfigurations.strato-vps = lib.nixosSystem {
+         inherit system;
+         specialArgs = { inherit inputs; };
+-        modules =
+-          [ disko.nixosModules.disko ./hosts/strato-vps/configuration.nix ];
++        modules = [
++          disko.nixosModules.disko
++          ./hosts/strato-vps/configuration.nix
++        ];
+       };
+     };
+ }
+diff --git a/docs/vps/strato-vps/hosts/strato-vps/configuration.nix b/docs/vps/strato-vps/hosts/strato-vps/configuration.nix
+index 05c7266..944ef7d 100644
+--- a/docs/vps/strato-vps/hosts/strato-vps/configuration.nix
++++ b/docs/vps/strato-vps/hosts/strato-vps/configuration.nix
+@@ -1,5 +1,8 @@
+ { lib, pkgs, ... }: {
+-  imports = [ ./disko.nix ./hardware-configuration.nix ];
++  imports = [
++    ./disko.nix
++    ./hardware-configuration.nix
++  ];
+ 
+   networking = {
+     hostName = "strato-vps";
+@@ -33,7 +36,13 @@
+     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIItFDRkSHQOn8MlPIjHx/kSPDYSpElw+SozdUIjMMDGe djoolz@mirach"
+   ];
+ 
+-  environment.systemPackages = with pkgs; [ git curl htop tmux vim ];
++  environment.systemPackages = with pkgs; [
++    git
++    curl
++    htop
++    tmux
++    vim
++  ];
+ 
+   # Do not change casually. See ../../../architecture/state-version-reasons.md.
+   system.stateVersion = "25.11";
+diff --git a/docs/vps/strato-vps/hosts/strato-vps/hardware-configuration.nix b/docs/vps/strato-vps/hosts/strato-vps/hardware-configuration.nix
+index 3f41a8d..ad1566a 100644
+--- a/docs/vps/strato-vps/hosts/strato-vps/hardware-configuration.nix
++++ b/docs/vps/strato-vps/hosts/strato-vps/hardware-configuration.nix
+@@ -1,5 +1,4 @@
+-_:
+-{
++_: {
+   # Replace this file with nixos-generate-config output during install:
+   # nixos-anywhere --generate-hardware-config nixos-generate-config ./hosts/strato-vps/hardware-configuration.nix
+ }
+diff --git a/modules/home/desktop/niri.nix b/modules/home/desktop/niri.nix
+index 5cd25c1..a863389 100644
+--- a/modules/home/desktop/niri.nix
++++ b/modules/home/desktop/niri.nix
+@@ -1,28 +1,29 @@
+-{ config, dotfilesRoot, lib, ... }:
++{
++  config,
++  dotfilesRoot,
++  lib,
++  ...
++}:
+ let
+   noctaliaRoot = "${dotfilesRoot}/modules/ui/noctalia";
+   noctaliaConfigHome = "${config.xdg.configHome}/noctalia";
+-in {
++in
++{
+   xdg.configFile = {
+-    "niri/config.kdl".source = config.lib.file.mkOutOfStoreSymlink
+-      "${dotfilesRoot}/modules/compositor/niri/config.kdl";
+-    "niri/swaylock-noctalia.sh".source = config.lib.file.mkOutOfStoreSymlink
+-      "${dotfilesRoot}/modules/compositor/niri/swaylock-noctalia.sh";
+-    "nirinit".source = config.lib.file.mkOutOfStoreSymlink
+-      "${dotfilesRoot}/modules/compositor/nirinit";
+-    "waybar".source =
+-      config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/ui/waybar";
+-    "mako".source =
+-      config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/ui/mako";
+-    "fuzzel".source = config.lib.file.mkOutOfStoreSymlink
+-      "${dotfilesRoot}/modules/launcher/fuzzel";
++    "niri/config.kdl".source =
++      config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/compositor/niri/config.kdl";
++    "niri/swaylock-noctalia.sh".source =
++      config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/compositor/niri/swaylock-noctalia.sh";
++    "nirinit".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/compositor/nirinit";
++    "waybar".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/ui/waybar";
++    "mako".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/ui/mako";
++    "fuzzel".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/launcher/fuzzel";
+   };
+ 
+   # Noctalia writes plugin downloads and runtime state under ~/.config/noctalia.
+   # Keep the directory writable and create direct symlinks into the working tree
+   # so Noctalia can update files without going through an immutable store copy.
+-  home.activation.noctaliaWritableConfig =
+-    lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
++  home.activation.noctaliaWritableConfig = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+     target="${noctaliaConfigHome}"
+ 
+     if [ -L "$target" ]; then
+diff --git a/modules/home/packages/maker-tools.nix b/modules/home/packages/maker-tools.nix
+index 6dedd4e..1461a36 100644
+--- a/modules/home/packages/maker-tools.nix
++++ b/modules/home/packages/maker-tools.nix
+@@ -1,3 +1,8 @@
+ { pkgs, ... }: {
+-  home.packages = with pkgs; [ parted esptool rpi-imager orca-slicer ];
++  home.packages = with pkgs; [
++    parted
++    esptool
++    rpi-imager
++    orca-slicer
++  ];
+ }
+diff --git a/modules/home/packages/nautilus.nix b/modules/home/packages/nautilus.nix
+index a5c63e6..493b6ec 100644
+--- a/modules/home/packages/nautilus.nix
++++ b/modules/home/packages/nautilus.nix
+@@ -1,4 +1,9 @@
+-{ config, dotfilesRoot, pkgs, ... }:
++{
++  config,
++  dotfilesRoot,
++  pkgs,
++  ...
++}:
+ 
+ {
+   home = {
+@@ -20,11 +25,9 @@
+     ];
+ 
+     file.".local/share/nautilus/scripts".source =
+-      config.lib.file.mkOutOfStoreSymlink
+-      "${dotfilesRoot}/modules/nautilus/scripts";
++      config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/nautilus/scripts";
+     file.".local/share/nautilus-python/extensions".source =
+-      config.lib.file.mkOutOfStoreSymlink
+-      "${dotfilesRoot}/modules/nautilus/extensions";
++      config.lib.file.mkOutOfStoreSymlink "${dotfilesRoot}/modules/nautilus/extensions";
+   };
+ 
+   xdg.mimeApps = {
+diff --git a/modules/home/programs/shell.nix b/modules/home/programs/shell.nix
+index adbc564..550b4df 100644
+--- a/modules/home/programs/shell.nix
++++ b/modules/home/programs/shell.nix
+@@ -1,3 +1,13 @@
+ { pkgs, ... }: {
+-  home.packages = with pkgs; [ bat eza fd fzf ripgrep tmux tree which zoxide ];
++  home.packages = with pkgs; [
++    bat
++    eza
++    fd
++    fzf
++    ripgrep
++    tmux
++    tree
++    which
++    zoxide
++  ];
+ }
+diff --git a/modules/home/services/keyring-backup.nix b/modules/home/services/keyring-backup.nix
+index c541a29..c9609d7 100644
+--- a/modules/home/services/keyring-backup.nix
++++ b/modules/home/services/keyring-backup.nix
+@@ -7,7 +7,8 @@
+ 
+     Service = {
+       Type = "oneshot";
+-      ExecStart = let
++      ExecStart =
++        let
+           backupScript = pkgs.writeShellScript "keyring-backup" ''
+             set -eu
+ 
+@@ -41,7 +42,8 @@
+                   rm -f "$backup_dir/$old_backup"
+                 done
+           '';
+-      in "${backupScript}";
++        in
++        "${backupScript}";
+     };
+ 
+     Install.WantedBy = [ "default.target" ];
+diff --git a/modules/nixos/desktop/gsconnect.nix b/modules/nixos/desktop/gsconnect.nix
+index a0367ae..22913e4 100644
+--- a/modules/nixos/desktop/gsconnect.nix
++++ b/modules/nixos/desktop/gsconnect.nix
+@@ -9,17 +9,20 @@
+   # Enable KDE Connect (backend for GSConnect)
+   programs.kdeconnect = {
+     enable = true;
+-    package =
+-      pkgs.kdePackages.kdeconnect-kde; # Use the correct KDE Connect package
++    package = pkgs.kdePackages.kdeconnect-kde; # Use the correct KDE Connect package
+   };
+ 
+   # Firewall rules for KDE Connect communication
+-  networking.firewall.allowedTCPPortRanges = [{
++  networking.firewall.allowedTCPPortRanges = [
++    {
+       from = 1714;
+       to = 1764;
+-  }];
+-  networking.firewall.allowedUDPPortRanges = [{
++    }
++  ];
++  networking.firewall.allowedUDPPortRanges = [
++    {
+       from = 1714;
+       to = 1764;
+-  }];
++    }
++  ];
+ }
+diff --git a/modules/nixos/desktop/niri.nix b/modules/nixos/desktop/niri.nix
+index 813a752..d9f002c 100644
+--- a/modules/nixos/desktop/niri.nix
++++ b/modules/nixos/desktop/niri.nix
+@@ -1,11 +1,17 @@
+-{ inputs, lib, pkgs, ... }:
++{
++  inputs,
++  lib,
++  pkgs,
++  ...
++}:
+ let
+   niriLockScript = "%h/.config/niri/swaylock-noctalia.sh";
+   fallbackLockCommand = "${pkgs.swaylock}/bin/swaylock -f";
+   lockCommand = ''
+     ${pkgs.bash}/bin/bash -lc 'if [ -x "${niriLockScript}" ]; then exec "${niriLockScript}"; else exec ${fallbackLockCommand}; fi'
+   '';
+-in {
++in
++{
+   # Niri Desktop Environment — Self-Contained
+   # Imports shared desktop infrastructure from common.nix
+   # Provides: Niri compositor + Wayland tooling + shared desktop stack
+@@ -72,7 +78,11 @@ in {
+     udiskie = {
+       description = "Udiskie automount";
+       wantedBy = [ "niri.service" ];
+-      after = [ "niri.service" "graphical-session.target" "dbus.service" ];
++      after = [
++        "niri.service"
++        "graphical-session.target"
++        "dbus.service"
++      ];
+       serviceConfig = {
+         ExecStart = "${pkgs.udiskie}/bin/udiskie --no-tray";
+         Restart = "on-failure";
+@@ -88,12 +98,14 @@ in {
+         Environment = [
+           "PATH=%h/.nix-profile/bin:/etc/profiles/per-user/%u/bin:/run/current-system/sw/bin:/var/lib/flatpak/exports/bin:%h/.local/share/flatpak/exports/bin"
+         ];
+-        ExecStart = "${pkgs.swayidle}/bin/swayidle -w "
++        ExecStart =
++          "${pkgs.swayidle}/bin/swayidle -w "
+           + "timeout 300 '${lockCommand}' "
+           + "timeout 330 '${pkgs.wlopm}/bin/wlopm --off' "
+           + "resume '${pkgs.wlopm}/bin/wlopm --on' "
+           + "timeout 1800 '${pkgs.systemd}/bin/systemctl suspend' "
+-          + "before-sleep '${lockCommand}' " + "lock '${lockCommand}'";
++          + "before-sleep '${lockCommand}' "
++          + "lock '${lockCommand}'";
+         Restart = "on-failure";
+       };
+     };
+diff --git a/modules/nixos/flatpak/browsers.nix b/modules/nixos/flatpak/browsers.nix
+index 01d63c2..1a8fc86 100644
+--- a/modules/nixos/flatpak/browsers.nix
++++ b/modules/nixos/flatpak/browsers.nix
+@@ -1,3 +1,6 @@
+ _: {
+-  services.flatpak.packages = [ "org.mozilla.firefox" "com.vivaldi.Vivaldi" ];
++  services.flatpak.packages = [
++    "org.mozilla.firefox"
++    "com.vivaldi.Vivaldi"
++  ];
+ }
+diff --git a/modules/nixos/flatpak/messaging.nix b/modules/nixos/flatpak/messaging.nix
+index 992dbed..7a115f7 100644
+--- a/modules/nixos/flatpak/messaging.nix
++++ b/modules/nixos/flatpak/messaging.nix
+@@ -1,3 +1,6 @@
+ _: {
+-  services.flatpak.packages = [ "org.mozilla.Thunderbird" "org.signal.Signal" ];
++  services.flatpak.packages = [
++    "org.mozilla.Thunderbird"
++    "org.signal.Signal"
++  ];
+ }
+diff --git a/modules/nixos/services/audio.nix b/modules/nixos/services/audio.nix
+index af25f23..65dbfbe 100644
+--- a/modules/nixos/services/audio.nix
++++ b/modules/nixos/services/audio.nix
+@@ -4,7 +4,8 @@ let
+   lv2Path = "/run/current-system/sw/lib/lv2";
+   vst3Path = "/run/current-system/sw/lib/vst3";
+   ladspaPath = "/run/current-system/sw/lib/ladspa";
+-in {
++in
++{
+   # Low-latency audio stack for music applications such as JJazzLab with EWI USB.
+   security.rtkit.enable = true;
+ 
+diff --git a/modules/nixos/services/crowdsec.nix b/modules/nixos/services/crowdsec.nix
+index 60137d0..7c28d97 100644
+--- a/modules/nixos/services/crowdsec.nix
++++ b/modules/nixos/services/crowdsec.nix
+@@ -1,4 +1,10 @@
+-{ config, lib, pkgs, pkgs-unstable, ... }:
++{
++  config,
++  lib,
++  pkgs,
++  pkgs-unstable,
++  ...
++}:
+ let
+   format = pkgs.formats.yaml { };
+   # CrowdSec has 3 separate remote auth domains here:
+@@ -6,29 +12,25 @@ let
+   # 2. CTI API key: threat-intel enrichment API key
+   # 3. CAPI runtime credentials: generated or imported machine credentials for
+   #    the Central API
+-  consoleTokenSecretFile =
+-    ../../../secrets/services/crowdsec/console-enrollment-token.yaml;
++  consoleTokenSecretFile = ../../../secrets/services/crowdsec/console-enrollment-token.yaml;
+   ctiApiKeySecretFile = ../../../secrets/services/crowdsec/cti-api-key.yaml;
+-  importedCapiCredentialsSecretFile =
+-    ../../../secrets/services/crowdsec/online-api-credentials.yaml;
++  importedCapiCredentialsSecretFile = ../../../secrets/services/crowdsec/online-api-credentials.yaml;
+ 
+   hasConsoleToken = builtins.pathExists consoleTokenSecretFile;
+   hasCtiApiKey = builtins.pathExists ctiApiKeySecretFile;
+-  hasImportedCapiCredentials =
+-    builtins.pathExists importedCapiCredentialsSecretFile;
++  hasImportedCapiCredentials = builtins.pathExists importedCapiCredentialsSecretFile;
+ 
+   crowdsecStateDir = "/var/lib/crowdsec";
+   crowdsecHubStateDir = "${crowdsecStateDir}/state/hub";
+   localApiCredentialsPath = "${crowdsecStateDir}/local_api_credentials.yaml";
+-  onlineApiCredentialsPath = if hasImportedCapiCredentials then
++  onlineApiCredentialsPath =
++    if hasImportedCapiCredentials then
+       config.sops.secrets."crowdsec-online-api-credentials".path
+     else
+       "${crowdsecStateDir}/online_api_credentials.yaml";
+   consoleConfigPath = "${crowdsecStateDir}/console.yaml";
+-  consoleEnrollTokenPath = if hasConsoleToken then
+-    config.sops.secrets."crowdsec-console-enrollment-token".path
+-  else
+-    null;
++  consoleEnrollTokenPath =
++    if hasConsoleToken then config.sops.secrets."crowdsec-console-enrollment-token".path else null;
+ 
+   consoleDefaultConfig = pkgs.writeText "crowdsec-console.yaml" ''
+     share_manual_decisions: false
+@@ -36,9 +38,9 @@ let
+     share_tainted: false
+     share_context: false
+   '';
+-  crowdsecConfigWithCti = format.generate "crowdsec-with-cti.yaml"
+-    (lib.recursiveUpdate config.services.crowdsec.settings.general
+-      (lib.optionalAttrs hasCtiApiKey {
++  crowdsecConfigWithCti = format.generate "crowdsec-with-cti.yaml" (
++    lib.recursiveUpdate config.services.crowdsec.settings.general (
++      lib.optionalAttrs hasCtiApiKey {
+         api.cti = {
+           enabled = true;
+           key = config.sops.placeholder."crowdsec-cti-api-key";
+@@ -46,22 +48,29 @@ let
+           cache_size = 50;
+           log_level = "info";
+         };
+-      }));
++      }
++    )
++  );
+ 
+   cscliBasePath = lib.getExe' config.services.crowdsec.package "cscli";
+-  cscliConfigArgs = lib.optionalString hasCtiApiKey
+-    " -c ${config.sops.templates."crowdsec-config.yaml".path}";
+-  cscliPath =
+-    "${config.security.wrapperDir}/sudo -u ${config.services.crowdsec.user} ${cscliBasePath}${cscliConfigArgs}";
++  cscliConfigArgs = lib.optionalString hasCtiApiKey " -c ${
++     config.sops.templates."crowdsec-config.yaml".path
++   }";
++  cscliPath = "${config.security.wrapperDir}/sudo -u ${config.services.crowdsec.user} ${cscliBasePath}${cscliConfigArgs}";
+   cscliRegisterPath = "${cscliBasePath}${cscliConfigArgs}";
+-  dockerIngressCidrs =
+-    [ "172.17.0.0/16" "172.30.0.0/16" "172.31.0.0/16" "172.32.0.0/16" ];
+-  dockerIngressInterfaces = [ "docker0" "br-*" ];
++  dockerIngressCidrs = [
++    "172.17.0.0/16"
++    "172.30.0.0/16"
++    "172.31.0.0/16"
++    "172.32.0.0/16"
++  ];
++  dockerIngressInterfaces = [
++    "docker0"
++    "br-*"
++  ];
+   traefikAccessLogPath = "/var/log/traefik/access.log";
+-  firewallBouncerApiKeyPath =
+-    "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
+-  reRegisterFirewallBouncer =
+-    pkgs.writeShellScript "crowdsec-firewall-bouncer-register-local" ''
++  firewallBouncerApiKeyPath = "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
++  reRegisterFirewallBouncer = pkgs.writeShellScript "crowdsec-firewall-bouncer-register-local" ''
+     set -euo pipefail
+ 
+     cscli=${lib.escapeShellArg cscliRegisterPath}
+@@ -69,32 +78,23 @@ let
+     tmp_key="$(mktemp)"
+     trap 'rm -f "$tmp_key"' EXIT
+ 
+-      if $cscli bouncers list --output json | ${
+-        lib.getExe pkgs.jq
+-      } -e -- "any(.[]; .name == \"$bouncer_name\")" >/dev/null; then
++    if $cscli bouncers list --output json | ${lib.getExe pkgs.jq} -e -- "any(.[]; .name == \"$bouncer_name\")" >/dev/null; then
+       if [ ! -s ${lib.escapeShellArg firewallBouncerApiKeyPath} ]; then
+         $cscli bouncers delete "$bouncer_name" || true
+         rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
+         $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
+         test -s "$tmp_key"
+-          install -D -m 0600 -o ${
+-            lib.escapeShellArg config.services.crowdsec.user
+-          } -g ${
+-            lib.escapeShellArg config.services.crowdsec.group
+-          } "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
++        install -D -m 0600 -o ${lib.escapeShellArg config.services.crowdsec.user} -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
+       fi
+     else
+       rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
+       $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
+       test -s "$tmp_key"
+-        install -D -m 0600 -o ${
+-          lib.escapeShellArg config.services.crowdsec.user
+-        } -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${
+-          lib.escapeShellArg firewallBouncerApiKeyPath
+-        }
++      install -D -m 0600 -o ${lib.escapeShellArg config.services.crowdsec.user} -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
+     fi
+   '';
+-in {
++in
++{
+   sops.secrets = lib.mkMerge [
+     (lib.mkIf hasConsoleToken {
+       "crowdsec-console-enrollment-token" = {
+@@ -197,7 +197,10 @@ in {
+   services = {
+     crowdsec-firewall-bouncer = {
+       enable = true;
+-      settings.iptables_chains = [ "INPUT" "DOCKER-USER" ];
++      settings.iptables_chains = [
++        "INPUT"
++        "DOCKER-USER"
++      ];
+     };
+   };
+ 
+@@ -207,12 +210,9 @@ in {
+ 
+   networking.firewall = {
+     extraInputRules = ''
+-      ip saddr { ${
+-        lib.concatStringsSep ", " dockerIngressCidrs
+-      } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker stacks to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
++      ip saddr { ${lib.concatStringsSep ", " dockerIngressCidrs} } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker stacks to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
+       iifname { ${
+-        lib.concatStringsSep ", "
+-        (map (iface: ''"${iface}"'') dockerIngressInterfaces)
++        lib.concatStringsSep ", " (map (iface: ''"${iface}"'') dockerIngressInterfaces)
+       } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
+     '';
+ 
+@@ -221,12 +221,14 @@ in {
+   systemd.services = {
+     crowdsec = {
+       serviceConfig = {
+-        ExecStart = lib.mkIf hasCtiApiKey (lib.mkForce [
++        ExecStart = lib.mkIf hasCtiApiKey (
++          lib.mkForce [
+             " "
+             "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
+               config.sops.templates."crowdsec-config.yaml".path
+             } -info"
+-        ]);
++          ]
++        );
+         DynamicUser = lib.mkForce false;
+         # CrowdSec's journalctl datasource exits immediately inside the service's
+         # user namespace even when the runtime user is in systemd-journal.
+@@ -271,16 +273,9 @@ in {
+             ${lib.escapeShellArg "${crowdsecStateDir}/state"} \
+             ${lib.escapeShellArg "${crowdsecStateDir}/state/hub"} \
+             ${lib.escapeShellArg "${crowdsecStateDir}/state/trace"}
+-          ${lib.getExe' pkgs.coreutils "chown"} -R ${
+-            lib.escapeShellArg
+-            "${config.services.crowdsec.user}:${config.services.crowdsec.group}"
+-          } ${lib.escapeShellArg crowdsecStateDir}
++          ${lib.getExe' pkgs.coreutils "chown"} -R ${lib.escapeShellArg "${config.services.crowdsec.user}:${config.services.crowdsec.group}"} ${lib.escapeShellArg crowdsecStateDir}
+           if [ ! -s ${lib.escapeShellArg consoleConfigPath} ]; then
+-            ${lib.getExe' pkgs.coreutils "install"} -D -m 0600 -o ${
+-              lib.escapeShellArg config.services.crowdsec.user
+-            } -g ${lib.escapeShellArg config.services.crowdsec.group} ${
+-              lib.escapeShellArg consoleDefaultConfig
+-            } ${lib.escapeShellArg consoleConfigPath}
++            ${lib.getExe' pkgs.coreutils "install"} -D -m 0600 -o ${lib.escapeShellArg config.services.crowdsec.user} -g ${lib.escapeShellArg config.services.crowdsec.group} ${lib.escapeShellArg consoleDefaultConfig} ${lib.escapeShellArg consoleConfigPath}
+           fi
+         '';
+       };
+@@ -289,8 +284,14 @@ in {
+     crowdsec-capi-register = lib.mkIf (!hasImportedCapiCredentials) {
+       description = "Register CrowdSec Central API runtime credentials";
+       wantedBy = [ "multi-user.target" ];
+-      after = [ "crowdsec.service" "network-online.target" ];
+-      wants = [ "crowdsec.service" "network-online.target" ];
++      after = [
++        "crowdsec.service"
++        "network-online.target"
++      ];
++      wants = [
++        "crowdsec.service"
++        "network-online.target"
++      ];
+       serviceConfig = {
+         Type = "oneshot";
+         User = "root";
+@@ -298,9 +299,7 @@ in {
+         ExecStart = pkgs.writeShellScript "crowdsec-capi-register" ''
+           set -euo pipefail
+ 
+-          if [ -s ${lib.escapeShellArg onlineApiCredentialsPath} ] && ${
+-            lib.getExe pkgs.gnugrep
+-          } -q '^password:' ${lib.escapeShellArg onlineApiCredentialsPath}; then
++          if [ -s ${lib.escapeShellArg onlineApiCredentialsPath} ] && ${lib.getExe pkgs.gnugrep} -q '^password:' ${lib.escapeShellArg onlineApiCredentialsPath}; then
+             exit 0
+           fi
+ 
+@@ -312,8 +311,14 @@ in {
+     crowdsec-console-enroll = lib.mkIf hasConsoleToken {
+       description = "Enroll CrowdSec instance into CrowdSec Console";
+       wantedBy = [ "multi-user.target" ];
+-      after = [ "crowdsec.service" "network-online.target" ];
+-      wants = [ "crowdsec.service" "network-online.target" ];
++      after = [
++        "crowdsec.service"
++        "network-online.target"
++      ];
++      wants = [
++        "crowdsec.service"
++        "network-online.target"
++      ];
+       serviceConfig = {
+         Type = "oneshot";
+         User = "root";
+@@ -323,20 +328,13 @@ in {
+ 
+           ${lib.getExe' pkgs.coreutils "mkdir"} -p \
+             ${lib.escapeShellArg crowdsecHubStateDir}
+-          ${lib.getExe' pkgs.coreutils "chown"} -R ${
+-            lib.escapeShellArg
+-            "${config.services.crowdsec.user}:${config.services.crowdsec.group}"
+-          } ${lib.escapeShellArg crowdsecStateDir}
+-
+-          if [ ! -r ${
+-            lib.escapeShellArg "${crowdsecHubStateDir}/.index.json"
+-          } ]; then
++          ${lib.getExe' pkgs.coreutils "chown"} -R ${lib.escapeShellArg "${config.services.crowdsec.user}:${config.services.crowdsec.group}"} ${lib.escapeShellArg crowdsecStateDir}
++
++          if [ ! -r ${lib.escapeShellArg "${crowdsecHubStateDir}/.index.json"} ]; then
+             ${cscliPath} hub update
+           fi
+ 
+-          if ${lib.getExe pkgs.gnugrep} -q '^enroll_key:' ${
+-            lib.escapeShellArg consoleConfigPath
+-          }; then
++          if ${lib.getExe pkgs.gnugrep} -q '^enroll_key:' ${lib.escapeShellArg consoleConfigPath}; then
+             exit 0
+           fi
+ 
+@@ -344,9 +342,7 @@ in {
+           tmp_output="$(mktemp)"
+           trap 'rm -f "$tmp_output"' EXIT
+ 
+-          if ${cscliPath} console enroll "$token" --name ${
+-            lib.escapeShellArg config.networking.hostName
+-          } >"$tmp_output" 2>&1; then
++          if ${cscliPath} console enroll "$token" --name ${lib.escapeShellArg config.networking.hostName} >"$tmp_output" 2>&1; then
+             cat "$tmp_output"
+             exit 0
+           fi
+@@ -355,9 +351,7 @@ in {
+ 
+           # Enrollment tokens are single-use / revocable in the Console. A
+           # stale token should not block an otherwise healthy system switch.
+-          if ${
+-            lib.getExe pkgs.gnugrep
+-          } -q 'API error: Forbidden' "$tmp_output"; then
++          if ${lib.getExe pkgs.gnugrep} -q 'API error: Forbidden' "$tmp_output"; then
+             echo "crowdsec-console-enroll: stale or revoked enrollment token, leaving Console enrollment unchanged" >&2
+             exit 0
+           fi
+@@ -368,10 +362,8 @@ in {
+     };
+ 
+     crowdsec-firewall-bouncer-register = {
+-      after = lib.mkIf (!hasImportedCapiCredentials)
+-        [ "crowdsec-capi-register.service" ];
+-      requires = lib.mkIf (!hasImportedCapiCredentials)
+-        [ "crowdsec-capi-register.service" ];
++      after = lib.mkIf (!hasImportedCapiCredentials) [ "crowdsec-capi-register.service" ];
++      requires = lib.mkIf (!hasImportedCapiCredentials) [ "crowdsec-capi-register.service" ];
+       script = lib.mkForce (builtins.readFile reRegisterFirewallBouncer);
+     };
+   };
+diff --git a/modules/nixos/services/fingerprint-06cb-009a-python-validity.nix b/modules/nixos/services/fingerprint-06cb-009a-python-validity.nix
+index d813bb1..8db2351 100644
+--- a/modules/nixos/services/fingerprint-06cb-009a-python-validity.nix
++++ b/modules/nixos/services/fingerprint-06cb-009a-python-validity.nix
+@@ -2,9 +2,16 @@
+ let
+   inherit (pkgs) fetchFromGitHub lib wrapGAppsNoGuiHook;
+   inherit (pkgs.python3Packages)
+-    buildPythonPackage cryptography dbus-python pyusb pyyaml pygobject3
+-    setuptools;
+-in buildPythonPackage rec {
++    buildPythonPackage
++    cryptography
++    dbus-python
++    pyusb
++    pyyaml
++    pygobject3
++    setuptools
++    ;
++in
++buildPythonPackage rec {
+   pname = "python-validity";
+   version = "0.14";
+ 
+@@ -42,7 +49,13 @@ in buildPythonPackage rec {
+ 
+   nativeBuildInputs = [ wrapGAppsNoGuiHook ];
+ 
+-  propagatedBuildInputs = [ cryptography pyusb pyyaml dbus-python pygobject3 ];
++  propagatedBuildInputs = [
++    cryptography
++    pyusb
++    pyyaml
++    dbus-python
++    pygobject3
++  ];
+ 
+   postInstall = ''
+     install -D -m 644 debian/python3-validity.service \
+diff --git a/modules/nixos/services/platformio.nix b/modules/nixos/services/platformio.nix
+index 9fddf49..0d30bf8 100644
+--- a/modules/nixos/services/platformio.nix
++++ b/modules/nixos/services/platformio.nix
+@@ -1,5 +1,8 @@
+ { pkgs, ... }: {
+-  services.udev.packages = with pkgs; [ platformio-core.udev openocd ];
++  services.udev.packages = with pkgs; [
++    platformio-core.udev
++    openocd
++  ];
+ 
+   services.udev.extraRules = ''
+     # Allow the active local user session to access common USB serial devices.
+diff --git a/modules/nixos/services/scanner.nix b/modules/nixos/services/scanner.nix
+index 663b870..548cc57 100644
+--- a/modules/nixos/services/scanner.nix
++++ b/modules/nixos/services/scanner.nix
+@@ -22,8 +22,7 @@
+   };
+ 
+   # Scanner packages
+-  environment.systemPackages = with pkgs;
+-    [
++  environment.systemPackages = with pkgs; [
+     xsane # GUI for scanning
+     # sane-backends # CLI for scanning (already included via hardware.sane)
+   ];
+diff --git a/modules/nixos/services/ssh-server.nix b/modules/nixos/services/ssh-server.nix
+index 86e366b..bf21f50 100644
+--- a/modules/nixos/services/ssh-server.nix
++++ b/modules/nixos/services/ssh-server.nix
+@@ -1,5 +1,9 @@
+ _: {
+-  imports = [ ./mosh.nix ./ssh.nix ./vscode-remote.nix ];
++  imports = [
++    ./mosh.nix
++    ./ssh.nix
++    ./vscode-remote.nix
++  ];
+ 
+   networking.firewall.enable = true;
+ }
+diff --git a/modules/nixos/services/zigbee2mqtt.nix b/modules/nixos/services/zigbee2mqtt.nix
+index 072fadb..f26a4f8 100644
+--- a/modules/nixos/services/zigbee2mqtt.nix
++++ b/modules/nixos/services/zigbee2mqtt.nix
+@@ -4,8 +4,7 @@
+     after = [ "network.target" ];
+     wantedBy = [ "multi-user.target" ];
+     serviceConfig = {
+-      ExecStart =
+-        "${pkgs.zigbee2mqtt_2}/bin/zigbee2mqtt --data /home/djoolz/.z2m";
++      ExecStart = "${pkgs.zigbee2mqtt_2}/bin/zigbee2mqtt --data /home/djoolz/.z2m";
+       User = "djoolz";
+       SupplementaryGroups = [ "dialout" ];
+       Restart = "on-failure";
+diff --git a/modules/nixos/system/autoupgrade.nix b/modules/nixos/system/autoupgrade.nix
+index f4f6dd5..b11e165 100755
+--- a/modules/nixos/system/autoupgrade.nix
++++ b/modules/nixos/system/autoupgrade.nix
+@@ -1,11 +1,15 @@
+-{ config, lib, pkgs, repoRoot ? null, ... }:
++{
++  config,
++  lib,
++  pkgs,
++  repoRoot ? null,
++  ...
++}:
+ 
+ let
+   cfg = config.my.autoUpdate;
+   username = "djoolz";
+-  homeDir =
+-    lib.attrByPath [ "users" "users" username "home" ] "/home/${username}"
+-    config;
++  homeDir = lib.attrByPath [ "users" "users" username "home" ] "/home/${username}" config;
+   updateScript = pkgs.writeShellApplication {
+     name = "update-system";
+     runtimeInputs = with pkgs; [
+@@ -28,20 +32,23 @@ let
+     ];
+     text = builtins.readFile ../../../scripts/update-system.sh;
+   };
+-  defaultRepoPath = if repoRoot != null then
+-    "${homeDir}/nixos-deploy"
+-  else
+-    "${homeDir}/nixos-deploy";
+-  validationModeType = lib.types.enum [ "none" "eval" ];
+-in {
++  defaultRepoPath = if repoRoot != null then "${homeDir}/nixos-deploy" else "${homeDir}/nixos-deploy";
++  validationModeType = lib.types.enum [
++    "none"
++    "eval"
++  ];
++in
++{
+   options.my.autoUpdate = {
+     enable = lib.mkEnableOption "scheduled branch-safe flake updates";
+ 
+     mode = lib.mkOption {
+-      type = lib.types.enum [ "updater" "consumer" ];
++      type = lib.types.enum [
++        "updater"
++        "consumer"
++      ];
+       default = "consumer";
+-      description =
+-        "Whether this host owns flake.lock updates or only consumes origin/main.";
++      description = "Whether this host owns flake.lock updates or only consumes origin/main.";
+     };
+ 
+     repoPath = lib.mkOption {
+@@ -53,8 +60,7 @@ in {
+     repoUser = lib.mkOption {
+       type = lib.types.str;
+       default = username;
+-      description =
+-        "User account that owns git credentials for repo operations.";
++      description = "User account that owns git credentials for repo operations.";
+     };
+ 
+     remote = lib.mkOption {
+@@ -66,8 +72,7 @@ in {
+     repoUrl = lib.mkOption {
+       type = lib.types.str;
+       default = "git@github.com:g0dISnowHere/nixos.git";
+-      description =
+-        "Git URL used to bootstrap the deployment checkout when absent.";
++      description = "Git URL used to bootstrap the deployment checkout when absent.";
+     };
+ 
+     branch = lib.mkOption {
+@@ -123,8 +128,14 @@ in {
+ 
+         auto-update-system = {
+           description = "Branch-safe scheduled NixOS update";
+-          after = [ "network-online.target" "auto-update-bootstrap.service" ];
+-          wants = [ "network-online.target" "auto-update-bootstrap.service" ];
++          after = [
++            "network-online.target"
++            "auto-update-bootstrap.service"
++          ];
++          wants = [
++            "network-online.target"
++            "auto-update-bootstrap.service"
++          ];
+           serviceConfig = {
+             Type = "oneshot";
+             User = "root";
+@@ -156,8 +167,7 @@ in {
+       };
+     };
+ 
+-    system.activationScripts.autoUpdateBootstrap =
+-      lib.stringAfter [ "users" ] ''
++    system.activationScripts.autoUpdateBootstrap = lib.stringAfter [ "users" ] ''
+       if [ ! -e ${lib.escapeShellArg "${cfg.repoPath}/.git"} ]; then
+         ${pkgs.systemd}/bin/systemd-run \
+           --unit=auto-update-bootstrap-activation \
+@@ -184,6 +194,8 @@ in {
+     };
+ 
+     # Enable automatic nix-store optimisation.
+-    nix.optimise = { automatic = true; };
++    nix.optimise = {
++      automatic = true;
++    };
+   };
+ }
+diff --git a/modules/nixos/system/disko-install-test-compat.nix b/modules/nixos/system/disko-install-test-compat.nix
+index 750eff7..8675f22 100644
+--- a/modules/nixos/system/disko-install-test-compat.nix
++++ b/modules/nixos/system/disko-install-test-compat.nix
+@@ -1,4 +1,12 @@
+-{ config, extendModules, inputs, lib, modulesPath, pkgs, ... }:
++{
++  config,
++  extendModules,
++  inputs,
++  lib,
++  modulesPath,
++  pkgs,
++  ...
++}:
+ let
+   # Disko still calls qemu-common with { lib, stdenv }, but nixpkgs 25.11 now
+   # expects { lib, pkgs }. Adapt the old call shape just for installTest.
+@@ -7,14 +15,17 @@ let
+     inherit (config.disko) rootMountPoint;
+     makeTest = import "${modulesPath}/../tests/make-test-python.nix";
+     eval-config = import "${modulesPath}/../lib/eval-config.nix";
+-    qemu-common = { lib, stdenv, ... }:
++    qemu-common =
++      { lib, stdenv, ... }:
+       import "${modulesPath}/../lib/qemu-common.nix" {
+         inherit lib;
+         pkgs = { inherit stdenv; };
+       };
+   };
+-in {
+-  system.build.installTest = lib.mkForce (diskoLibCompat.testLib.makeDiskoTest {
++in
++{
++  system.build.installTest = lib.mkForce (
++    diskoLibCompat.testLib.makeDiskoTest {
+       inherit extendModules pkgs;
+       name = "${config.networking.hostName}-disko";
+       disko-config = builtins.removeAttrs config [ "_module" ];
+@@ -22,11 +33,12 @@ in {
+       bootCommands = lib.attrByPath [ "bootCommands" ] [ ] config.disko.tests;
+       efi = lib.attrByPath [ "efi" ] false config.disko.tests;
+       enableOCR = lib.attrByPath [ "enableOCR" ] false config.disko.tests;
+-    extraSystemConfig = lib.attrByPath [ "extraSystemConfig" ]
+-      (lib.attrByPath [ "extraConfig" ] { } config.disko.tests)
+-      config.disko.tests;
+-    extraTestScript = lib.attrByPath [ "extraTestScript" ]
+-      (lib.attrByPath [ "extraChecks" ] "" config.disko.tests)
+-      config.disko.tests;
+-  });
++      extraSystemConfig = lib.attrByPath [ "extraSystemConfig" ] (lib.attrByPath [
++        "extraConfig"
++      ] { } config.disko.tests) config.disko.tests;
++      extraTestScript = lib.attrByPath [ "extraTestScript" ] (lib.attrByPath [
++        "extraChecks"
++      ] "" config.disko.tests) config.disko.tests;
++    }
++  );
+ }
+diff --git a/modules/nixos/system/secrets.nix b/modules/nixos/system/secrets.nix
+index c7b378f..50f7a45 100644
+--- a/modules/nixos/system/secrets.nix
++++ b/modules/nixos/system/secrets.nix
+@@ -1,6 +1,8 @@
+ _:
+-let ageKeyFile = "/var/lib/sops-nix/key.txt";
+-in {
++let
++  ageKeyFile = "/var/lib/sops-nix/key.txt";
++in
++{
+   sops = {
+     defaultSopsFormat = "yaml";
+ 
+diff --git a/modules/nixos/system/suspend-then-hibernate.nix b/modules/nixos/system/suspend-then-hibernate.nix
+index 8f1eb0c..2842fe7 100755
+--- a/modules/nixos/system/suspend-then-hibernate.nix
++++ b/modules/nixos/system/suspend-then-hibernate.nix
+@@ -6,11 +6,11 @@ let
+     HIBERNATE_SECONDS = "10";
+     HIBERNATE_LOCK = "/var/run/autohibernate.lock";
+   };
+-in {
++in
++{
+ 
+   systemd.services."awake-after-suspend-for-a-time" = {
+-    description =
+-      "Sets up the suspend so that it'll wake for hibernation only if not on AC power";
++    description = "Sets up the suspend so that it'll wake for hibernation only if not on AC power";
+     wantedBy = [ "suspend.target" ];
+     before = [ "systemd-suspend.service" ];
+     environment = hibernateEnvironment;
+diff --git a/modules/nixos/users/djoolz/password.nix b/modules/nixos/users/djoolz/password.nix
+index ed81d67..d457b81 100644
+--- a/modules/nixos/users/djoolz/password.nix
++++ b/modules/nixos/users/djoolz/password.nix
+@@ -8,6 +8,5 @@
+     mode = "0400";
+   };
+ 
+-  users.users.djoolz.hashedPasswordFile =
+-    config.sops.secrets."djoolz-password".path;
++  users.users.djoolz.hashedPasswordFile = config.sops.secrets."djoolz-password".path;
+ }
+diff --git a/modules/nixos/virtualisation/docker-options.nix b/modules/nixos/virtualisation/docker-options.nix
+index 4b0bea9..f43c9b8 100644
+--- a/modules/nixos/virtualisation/docker-options.nix
++++ b/modules/nixos/virtualisation/docker-options.nix
+@@ -1,6 +1,8 @@
+ { config, lib, ... }:
+-let cfg = config.my.virtualisation.docker;
+-in {
++let
++  cfg = config.my.virtualisation.docker;
++in
++{
+   options.my.virtualisation.docker = {
+     rootful = lib.mkOption {
+       type = lib.types.bool;
+@@ -13,14 +15,14 @@ in {
+       type = lib.types.bool;
+       default = false;
+       internal = true;
+-      description =
+-        "Internal marker for the rootless Docker capability module.";
++      description = "Internal marker for the rootless Docker capability module.";
+     };
+   };
+ 
+-  config.assertions = [{
++  config.assertions = [
++    {
+       assertion = !(cfg.rootful && cfg.rootless);
+-    message =
+-      "Import either modules/nixos/virtualisation/docker.nix or docker_rootless.nix, not both.";
+-  }];
++      message = "Import either modules/nixos/virtualisation/docker.nix or docker_rootless.nix, not both.";
++    }
++  ];
+ }
+diff --git a/modules/nixos/virtualisation/docker.nix b/modules/nixos/virtualisation/docker.nix
+index 3f4e0b4..67e7989 100755
+--- a/modules/nixos/virtualisation/docker.nix
++++ b/modules/nixos/virtualisation/docker.nix
+@@ -1,6 +1,9 @@
+ # https://nixos.wiki/wiki/Docker
+ _: {
+-  imports = [ ./docker-options.nix ./monitoring-docker-scrape-access.nix ];
++  imports = [
++    ./docker-options.nix
++    ./monitoring-docker-scrape-access.nix
++  ];
+ 
+   my.virtualisation.docker.rootful = true;
+ 
+diff --git a/nixos/machines/albaldah/boot.nix b/nixos/machines/albaldah/boot.nix
+index feb9649..aeb9eb9 100644
+--- a/nixos/machines/albaldah/boot.nix
++++ b/nixos/machines/albaldah/boot.nix
+@@ -9,11 +9,17 @@ _: {
+     '';
+   };
+ 
+-  swapDevices = [{
++  swapDevices = [
++    {
+       device = "/var/lib/swapfile";
+       size = 8 * 1024;
+-  }];
++    }
++  ];
+ 
+   # Keep provider recovery consoles usable through both boot and login.
+-  boot.kernelParams = [ "console=tty1" "console=ttyS0" "systemd.ssh_auto=no" ];
++  boot.kernelParams = [
++    "console=tty1"
++    "console=ttyS0"
++    "systemd.ssh_auto=no"
++  ];
+ }
+diff --git a/nixos/machines/albaldah/docker-compose-secrets.nix b/nixos/machines/albaldah/docker-compose-secrets.nix
+index b63707f..9e391f9 100644
+--- a/nixos/machines/albaldah/docker-compose-secrets.nix
++++ b/nixos/machines/albaldah/docker-compose-secrets.nix
+@@ -2,23 +2,17 @@
+ let
+   dockerUser = "djoolz";
+ 
+-  traefikCloudflareSecretFile =
+-    ../../../secrets/services/traefik/cloudflare-dns-token.yaml;
+-  traefikCrowdsecLapiKeySecretFile =
+-    ../../../secrets/services/traefik/crowdsec-lapi-key.yaml;
+-  monitoringGrafanaAdminPasswordSecretFile =
+-    ../../../secrets/services/monitoring/grafana-admin-password.yaml;
+-  monitoringAlertmanagerSmtpPasswordSecretFile =
+-    ../../../secrets/services/monitoring/alertmanager-smtp-password.yaml;
++  traefikCloudflareSecretFile = ../../../secrets/services/traefik/cloudflare-dns-token.yaml;
++  traefikCrowdsecLapiKeySecretFile = ../../../secrets/services/traefik/crowdsec-lapi-key.yaml;
++  monitoringGrafanaAdminPasswordSecretFile = ../../../secrets/services/monitoring/grafana-admin-password.yaml;
++  monitoringAlertmanagerSmtpPasswordSecretFile = ../../../secrets/services/monitoring/alertmanager-smtp-password.yaml;
+ 
+   hasTraefikCloudflareSecret = builtins.pathExists traefikCloudflareSecretFile;
+-  hasTraefikCrowdsecLapiKeySecret =
+-    builtins.pathExists traefikCrowdsecLapiKeySecretFile;
+-  hasMonitoringGrafanaAdminPasswordSecret =
+-    builtins.pathExists monitoringGrafanaAdminPasswordSecretFile;
+-  hasMonitoringAlertmanagerSmtpPasswordSecret =
+-    builtins.pathExists monitoringAlertmanagerSmtpPasswordSecretFile;
+-in {
++  hasTraefikCrowdsecLapiKeySecret = builtins.pathExists traefikCrowdsecLapiKeySecretFile;
++  hasMonitoringGrafanaAdminPasswordSecret = builtins.pathExists monitoringGrafanaAdminPasswordSecretFile;
++  hasMonitoringAlertmanagerSmtpPasswordSecret = builtins.pathExists monitoringAlertmanagerSmtpPasswordSecretFile;
++in
++{
+   sops.secrets = lib.mkMerge [
+     (lib.mkIf hasTraefikCloudflareSecret {
+       "traefik-cloudflare-dns-token" = {
+@@ -65,9 +59,7 @@ in {
+       mode = "0400";
+       content = lib.concatStrings [
+         (lib.optionalString hasTraefikCloudflareSecret ''
+-          CF_DNS_API_TOKEN=${
+-            config.sops.placeholder."traefik-cloudflare-dns-token"
+-          }
++          CF_DNS_API_TOKEN=${config.sops.placeholder."traefik-cloudflare-dns-token"}
+         '')
+       ];
+     };
+@@ -78,9 +70,7 @@ in {
+       mode = "0400";
+       content = lib.concatStrings [
+         (lib.optionalString hasTraefikCrowdsecLapiKeySecret ''
+-          CROWDSEC_LAPI_KEY=${
+-            config.sops.placeholder."traefik-crowdsec-lapi-key"
+-          }
++          CROWDSEC_LAPI_KEY=${config.sops.placeholder."traefik-crowdsec-lapi-key"}
+         '')
+       ];
+     };
+@@ -98,14 +88,10 @@ in {
+       mode = "0400";
+       content = lib.concatStrings [
+         (lib.optionalString hasMonitoringGrafanaAdminPasswordSecret ''
+-          GF_SECURITY_ADMIN_PASSWORD=${
+-            config.sops.placeholder."monitoring-grafana-admin-password"
+-          }
++          GF_SECURITY_ADMIN_PASSWORD=${config.sops.placeholder."monitoring-grafana-admin-password"}
+         '')
+         (lib.optionalString hasMonitoringAlertmanagerSmtpPasswordSecret ''
+-          ALERTMANAGER_SMTP_PASSWORD=${
+-            config.sops.placeholder."monitoring-alertmanager-smtp-password"
+-          }
++          ALERTMANAGER_SMTP_PASSWORD=${config.sops.placeholder."monitoring-alertmanager-smtp-password"}
+         '')
+       ];
+     };
+diff --git a/nixos/machines/albaldah/firewall.nix b/nixos/machines/albaldah/firewall.nix
+index 332dcbc..73a83e2 100644
+--- a/nixos/machines/albaldah/firewall.nix
++++ b/nixos/machines/albaldah/firewall.nix
+@@ -3,10 +3,16 @@ _: {
+ 
+   networking.firewall = {
+     # Public HTTPS ingress for reverse proxy
+-    allowedTCPPorts = [ 80 443 ];
++    allowedTCPPorts = [
++      80
++      443
++    ];
+ 
+     # Prometheus node exporter
+-    interfaces.tailscale0.allowedTCPPorts = [ 9100 9558 ];
++    interfaces.tailscale0.allowedTCPPorts = [
++      9100
++      9558
++    ];
+ 
+     # Allow Docker-origin Prometheus scrape to host exporters.
+     # host.docker.internal resolves via docker0 on this host (172.17.0.1).
+diff --git a/nixos/machines/albaldah/hardware-configuration.nix b/nixos/machines/albaldah/hardware-configuration.nix
+index ea61f3c..fb68bfd 100644
+--- a/nixos/machines/albaldah/hardware-configuration.nix
++++ b/nixos/machines/albaldah/hardware-configuration.nix
+@@ -2,8 +2,14 @@
+   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
+ 
+   boot = {
+-    initrd.availableKernelModules =
+-      [ "ata_piix" "sd_mod" "sr_mod" "uhci_hcd" "virtio_pci" "virtio_scsi" ];
++    initrd.availableKernelModules = [
++      "ata_piix"
++      "sd_mod"
++      "sr_mod"
++      "uhci_hcd"
++      "virtio_pci"
++      "virtio_scsi"
++    ];
+     initrd.kernelModules = [ ];
+     kernelModules = [ ];
+     extraModulePackages = [ ];
+diff --git a/nixos/machines/alhena/firewall.nix b/nixos/machines/alhena/firewall.nix
+index 40c7766..073599c 100644
+--- a/nixos/machines/alhena/firewall.nix
++++ b/nixos/machines/alhena/firewall.nix
+@@ -1,7 +1,10 @@
+ _: {
+   networking.firewall = {
+     # Prometheus node exporter
+-    interfaces.tailscale0.allowedTCPPorts = [ 9100 9558 ];
++    interfaces.tailscale0.allowedTCPPorts = [
++      9100
++      9558
++    ];
+ 
+     # Allow Docker bridge Prometheus scrape to host exporters
+     extraInputRules = ''
+diff --git a/nixos/machines/centauri/firewall.nix b/nixos/machines/centauri/firewall.nix
+index 40c7766..073599c 100644
+--- a/nixos/machines/centauri/firewall.nix
++++ b/nixos/machines/centauri/firewall.nix
+@@ -1,7 +1,10 @@
+ _: {
+   networking.firewall = {
+     # Prometheus node exporter
+-    interfaces.tailscale0.allowedTCPPorts = [ 9100 9558 ];
++    interfaces.tailscale0.allowedTCPPorts = [
++      9100
++      9558
++    ];
+ 
+     # Allow Docker bridge Prometheus scrape to host exporters
+     extraInputRules = ''
+diff --git a/nixos/machines/centauri/graphics.nix b/nixos/machines/centauri/graphics.nix
+index 99b5d3d..f3de8d0 100644
+--- a/nixos/machines/centauri/graphics.nix
++++ b/nixos/machines/centauri/graphics.nix
+@@ -1,13 +1,14 @@
+ { pkgs, ... }: {
+   hardware.graphics = {
+     enable = true;
+-    extraPackages = with pkgs;
+-      [
++    extraPackages = with pkgs; [
+       intel-media-driver
+       # intel-vaapi-driver # LIBVA_DRIVER_NAME=i965
+       # libvdpau-va-gl
+     ];
+   };
+ 
+-  environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
++  environment.sessionVariables = {
++    LIBVA_DRIVER_NAME = "iHD";
++  };
+ }
+diff --git a/nixos/machines/centauri/hardware-configuration.nix b/nixos/machines/centauri/hardware-configuration.nix
+index 85d9de8..4799145 100644
+--- a/nixos/machines/centauri/hardware-configuration.nix
++++ b/nixos/machines/centauri/hardware-configuration.nix
+@@ -1,14 +1,23 @@
+ # Do not modify this file!  It was generated by ‘nixos-generate-config’
+ # and may be overwritten by future invocations.  Please make changes
+ # to /etc/nixos/configuration.nix instead.
+-{ config, lib, modulesPath, ... }:
++{
++  config,
++  lib,
++  modulesPath,
++  ...
++}:
+ 
+ {
+   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+ 
+   boot = {
+-    initrd.availableKernelModules =
+-      [ "xhci_pci" "nvme" "usb_storage" "sd_mod" ];
++    initrd.availableKernelModules = [
++      "xhci_pci"
++      "nvme"
++      "usb_storage"
++      "sd_mod"
++    ];
+     initrd.kernelModules = [ ];
+     extraModulePackages = [ ];
+   };
+@@ -21,11 +30,13 @@
+   fileSystems."/boot" = {
+     device = "/dev/disk/by-uuid/DCC7-415A";
+     fsType = "vfat";
+-    options = [ "fmask=0077" "dmask=0077" ];
++    options = [
++      "fmask=0077"
++      "dmask=0077"
++    ];
+   };
+ 
+-  swapDevices =
+-    [{ device = "/dev/disk/by-uuid/323f67a4-e7b8-4153-a1a8-cf6fbb374674"; }];
++  swapDevices = [ { device = "/dev/disk/by-uuid/323f67a4-e7b8-4153-a1a8-cf6fbb374674"; } ];
+ 
+   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+   # (the default) this is the recommended approach. When using systemd-networkd it's
+@@ -37,6 +48,5 @@
+   # networking.interfaces.wwp0s20f0u6.useDHCP = lib.mkDefault true;
+ 
+   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+-  hardware.cpu.intel.updateMicrocode =
+-    lib.mkDefault config.hardware.enableRedistributableFirmware;
++  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+ }
+diff --git a/nixos/machines/centauri/input.nix b/nixos/machines/centauri/input.nix
+index ca22b26..de77c05 100644
+--- a/nixos/machines/centauri/input.nix
++++ b/nixos/machines/centauri/input.nix
+@@ -10,11 +10,17 @@
+     };
+   };
+ 
+-  environment.systemPackages = with pkgs; [ piper libratbag libinput ];
++  environment.systemPackages = with pkgs; [
++    piper
++    libratbag
++    libinput
++  ];
+ 
+   services.libinput = {
+     enable = true;
+-    mouse = { accelProfile = "flat"; };
++    mouse = {
++      accelProfile = "flat";
++    };
+     touchpad = {
+       accelProfile = "flat";
+       tapping = true;
+diff --git a/nixos/machines/mirach/ethernet-diagnostics.nix b/nixos/machines/mirach/ethernet-diagnostics.nix
+index f086907..786b3b9 100644
+--- a/nixos/machines/mirach/ethernet-diagnostics.nix
++++ b/nixos/machines/mirach/ethernet-diagnostics.nix
+@@ -25,20 +25,14 @@ let
+     esac
+ 
+     # Keep a rolling window of periodic snapshots only; preserve hang-trigger captures.
+-    find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin +${
+-      toString periodicRetentionMinutes
+-    } -delete || true
++    find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin +${toString periodicRetentionMinutes} -delete || true
+ 
+     # On hang-trigger, preserve the preceding periodic window once per incident window.
+     if [ "$event" = "hang-trigger" ]; then
+-      if ! find ${logDir} -maxdepth 1 -type d -name 'hang-context-*' -mmin -${
+-        toString incidentContextCooldownMinutes
+-      } -print -quit | rg -q .; then
++      if ! find ${logDir} -maxdepth 1 -type d -name 'hang-context-*' -mmin -${toString incidentContextCooldownMinutes} -print -quit | rg -q .; then
+         context_dir="${logDir}/hang-context-''${safe_ts}"
+         mkdir -p "$context_dir"
+-        find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin -${
+-          toString periodicRetentionMinutes
+-        } \
++        find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin -${toString periodicRetentionMinutes} \
+           -exec cp -n -t "$context_dir" {} + || true
+       fi
+     fi
+@@ -151,7 +145,8 @@ let
+       journalctl -k -n 120 --no-pager | rg -i "${physicalInterface}|${bridgeInterface}|e1000e|NETDEV|hang|link|carrier" || true
+     } >> "$out"
+   '';
+-in {
++in
++{
+   environment.systemPackages = with pkgs; [ ethtool ];
+ 
+   systemd = {
+@@ -160,9 +155,10 @@ in {
+     # Periodic snapshots for drift-over-time analysis.
+     services = {
+       enp0s25-diag-snapshot = {
+-        description =
+-          "Capture periodic Ethernet diagnostics for ${physicalInterface}";
+-        serviceConfig = { Type = "oneshot"; };
++        description = "Capture periodic Ethernet diagnostics for ${physicalInterface}";
++        serviceConfig = {
++          Type = "oneshot";
++        };
+         path = with pkgs; [
+           coreutils
+           ethtool
+@@ -181,8 +177,7 @@ in {
+ 
+       # Poll every 10 seconds to keep near-real-time snapshots during incidents.
+       enp0s25-diag-poller = {
+-        description =
+-          "Continuously collect Ethernet diagnostics for ${physicalInterface}";
++        description = "Continuously collect Ethernet diagnostics for ${physicalInterface}";
+         wantedBy = [ "multi-user.target" ];
+         after = [ "network-online.target" ];
+         wants = [ "network-online.target" ];
+@@ -212,8 +207,7 @@ in {
+ 
+       # Triggered capture: when the kernel emits a hardware hang, grab state immediately.
+       enp0s25-hang-capture = {
+-        description =
+-          "Capture immediate diagnostics when e1000e hardware hangs are logged";
++        description = "Capture immediate diagnostics when e1000e hardware hangs are logged";
+         wantedBy = [ "multi-user.target" ];
+         after = [ "multi-user.target" ];
+         serviceConfig = {
+@@ -237,9 +231,7 @@ in {
+           journalctl -kf -n0 --no-pager | while IFS= read -r line; do
+             if printf '%s\n' "$line" | rg -q "${physicalInterface}: (Detected Hardware Unit Hang|NIC Link is Down)"; then
+               now="$(date +%s)"
+-              if [ "$((now - last_capture))" -ge ${
+-                toString triggerCaptureCooldownSeconds
+-              } ]; then
++              if [ "$((now - last_capture))" -ge ${toString triggerCaptureCooldownSeconds} ]; then
+                 ${snapshotScript} hang-trigger
+                 last_capture="$now"
+               fi
+@@ -250,9 +242,7 @@ in {
+ 
+       # Triggered capture: if the local router is unreachable for 60s, snapshot immediately.
+       enp0s25-router-ping-watchdog = {
+-        description = "Capture diagnostics when router ping fails for ${
+-            toString pingFailureSeconds
+-          }s";
++        description = "Capture diagnostics when router ping fails for ${toString pingFailureSeconds}s";
+         wantedBy = [ "multi-user.target" ];
+         after = [ "network-online.target" ];
+         wants = [ "network-online.target" ];
+@@ -282,9 +272,7 @@ in {
+             fi
+ 
+             if [ "$failures" -ge ${toString pingFailureSeconds} ]; then
+-              printf '%s\n' "router ping failed for ${
+-                toString pingFailureSeconds
+-              }s: ${routerIp}" \
++              printf '%s\n' "router ping failed for ${toString pingFailureSeconds}s: ${routerIp}" \
+                 | systemd-cat -t enp0s25-router-ping-watchdog -p warning
+               ${snapshotScript} hang-trigger
+               failures=0
+diff --git a/nixos/machines/mirach/firewall.nix b/nixos/machines/mirach/firewall.nix
+index 40c7766..073599c 100644
+--- a/nixos/machines/mirach/firewall.nix
++++ b/nixos/machines/mirach/firewall.nix
+@@ -1,7 +1,10 @@
+ _: {
+   networking.firewall = {
+     # Prometheus node exporter
+-    interfaces.tailscale0.allowedTCPPorts = [ 9100 9558 ];
++    interfaces.tailscale0.allowedTCPPorts = [
++      9100
++      9558
++    ];
+ 
+     # Allow Docker bridge Prometheus scrape to host exporters
+     extraInputRules = ''
+diff --git a/nixos/machines/mirach/hardware-configuration.nix b/nixos/machines/mirach/hardware-configuration.nix
+index 9c6eb71..41f2b72 100755
+--- a/nixos/machines/mirach/hardware-configuration.nix
++++ b/nixos/machines/mirach/hardware-configuration.nix
+@@ -1,15 +1,26 @@
+ # Do not modify this file!  It was generated by ‘nixos-generate-config’
+ # and may be overwritten by future invocations.  Please make changes
+ # to /etc/nixos/configuration.nix instead.
+-{ config, lib, modulesPath, ... }:
++{
++  config,
++  lib,
++  modulesPath,
++  ...
++}:
+ 
+ {
+   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+ 
+   boot = {
+     initrd = {
+-      availableKernelModules =
+-        [ "xhci_pci" "ehci_pci" "ahci" "usb_storage" "sd_mod" "sdhci_pci" ];
++      availableKernelModules = [
++        "xhci_pci"
++        "ehci_pci"
++        "ahci"
++        "usb_storage"
++        "sd_mod"
++        "sdhci_pci"
++      ];
+       kernelModules = [ ];
+     };
+     kernelModules = [ "kvm-intel" ];
+@@ -36,6 +47,5 @@
+   # networking.interfaces.wlp3s0.useDHCP = lib.mkDefault true;
+ 
+   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+-  hardware.cpu.intel.updateMicrocode =
+-    lib.mkDefault config.hardware.enableRedistributableFirmware;
++  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+ }
+diff --git a/nixos/machines/mirach/libvirtd.nix b/nixos/machines/mirach/libvirtd.nix
+index 1a7d55b..a41ada6 100644
+--- a/nixos/machines/mirach/libvirtd.nix
++++ b/nixos/machines/mirach/libvirtd.nix
+@@ -3,7 +3,8 @@ let
+   bridgeInterface = "br0";
+   physicalInterface = "enp0s25";
+   bridgeMacAddress = "3c:97:0e:5b:2d:c2";
+-in {
++in
++{
+   virtualisation = {
+     spiceUSBRedirection.enable = true;
+     libvirtd = {
+@@ -26,7 +27,10 @@ in {
+       options kvm_intel nested=1
+       options e1000e SmartPowerDownEnable=0
+     '';
+-    kernelModules = [ "bridge" "br_netfilter" ];
++    kernelModules = [
++      "bridge"
++      "br_netfilter"
++    ];
+     kernel.sysctl = {
+       "net.ipv4.ip_forward" = 1;
+       "net.bridge.bridge-nf-call-iptables" = 0;
+@@ -35,7 +39,11 @@ in {
+     };
+   };
+ 
+-  environment.systemPackages = with pkgs; [ virt-manager virt-viewer OVMF ];
++  environment.systemPackages = with pkgs; [
++    virt-manager
++    virt-viewer
++    OVMF
++  ];
+ 
+   services.spice-vdagentd.enable = true;
+ 
+@@ -43,8 +51,13 @@ in {
+     # Keep NetworkManager available for Wi-Fi, but leave the bridged Ethernet path
+     # to the static host config so VM networking does not get re-managed.
+     useDHCP = lib.mkForce false;
+-    networkmanager.unmanaged = [ physicalInterface bridgeInterface ];
+-    bridges = { "${bridgeInterface}".interfaces = [ physicalInterface ]; };
++    networkmanager.unmanaged = [
++      physicalInterface
++      bridgeInterface
++    ];
++    bridges = {
++      "${bridgeInterface}".interfaces = [ physicalInterface ];
++    };
+     interfaces = {
+       "${bridgeInterface}".useDHCP = true;
+       "${physicalInterface}".useDHCP = false;
+@@ -59,8 +72,10 @@ in {
+     description = "Tune Intel Ethernet link power settings";
+     after = [ "sys-subsystem-net-devices-${physicalInterface}.device" ];
+     bindsTo = [ "sys-subsystem-net-devices-${physicalInterface}.device" ];
+-    before =
+-      [ "network-addresses-${bridgeInterface}.service" "dhcpcd.service" ];
++    before = [
++      "network-addresses-${bridgeInterface}.service"
++      "dhcpcd.service"
++    ];
+     wantedBy = [ "multi-user.target" ];
+     serviceConfig = {
+       Type = "oneshot";
+@@ -77,7 +92,10 @@ in {
+ 
+   systemd.services.libvirt-bridge-network = {
+     description = "Create libvirt bridge network";
+-    after = [ "libvirtd.service" "network.target" ];
++    after = [
++      "libvirtd.service"
++      "network.target"
++    ];
+     wants = [ "libvirtd.service" ];
+     wantedBy = [ "multi-user.target" ];
+     serviceConfig = {
+diff --git a/parts/checks.nix b/parts/checks.nix
+index 7399df9..84314de 100644
+--- a/parts/checks.nix
++++ b/parts/checks.nix
+@@ -1,7 +1,9 @@
+ _: {
+-  perSystem = { pkgs, inputs', ... }:
++  perSystem =
++    { pkgs, inputs', ... }:
+     let
+-      flakeLinterPkg = if builtins.hasAttr "flake-linter" pkgs then
++      flakeLinterPkg =
++        if builtins.hasAttr "flake-linter" pkgs then
+           pkgs."flake-linter"
+         else
+           inputs'.flake-linter.packages.default;
+@@ -26,7 +28,10 @@ _: {
+ 
+       markdownlint = pkgs.writeShellApplication {
+         name = "markdownlint-repo";
+-        runtimeInputs = [ pkgs.git pkgs.markdownlint-cli ];
++        runtimeInputs = [
++          pkgs.git
++          pkgs.markdownlint-cli
++        ];
+         text = ''
+           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
+           cd "$repo_root"
+@@ -64,7 +69,10 @@ _: {
+ 
+       shellcheck = pkgs.writeShellApplication {
+         name = "shellcheck-repo";
+-        runtimeInputs = [ pkgs.git pkgs.shellcheck ];
++        runtimeInputs = [
++          pkgs.git
++          pkgs.shellcheck
++        ];
+         text = ''
+           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
+           cd "$repo_root"
+@@ -92,7 +100,11 @@ _: {
+ 
+       nixlint = pkgs.writeShellApplication {
+         name = "nixlint-repo";
+-        runtimeInputs = [ pkgs.git pkgs.statix pkgs.deadnix ];
++        runtimeInputs = [
++          pkgs.git
++          pkgs.statix
++          pkgs.deadnix
++        ];
+         text = ''
+           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
+           cd "$repo_root"
+@@ -122,7 +134,10 @@ _: {
+ 
+       flakelint = pkgs.writeShellApplication {
+         name = "flakelint-repo";
+-        runtimeInputs = [ pkgs.git flakeLinterPkg ];
++        runtimeInputs = [
++          pkgs.git
++          flakeLinterPkg
++        ];
+         text = ''
+           repo_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || pwd)"
+           cd "$repo_root"
+@@ -130,7 +145,8 @@ _: {
+           flake-linter .
+         '';
+       };
+-    in {
++    in
++    {
+       packages = {
+         markdownlintRepo = markdownlint;
+         shellcheckRepo = shellcheck;
+@@ -139,9 +155,15 @@ _: {
+       };
+ 
+       checks = {
+-        markdownlint = pkgs.runCommand "markdownlint-check" {
+-          nativeBuildInputs = [ pkgs.findutils pkgs.markdownlint-cli ];
+-        } ''
++        markdownlint =
++          pkgs.runCommand "markdownlint-check"
++            {
++              nativeBuildInputs = [
++                pkgs.findutils
++                pkgs.markdownlint-cli
++              ];
++            }
++            ''
+               cd ${../.}
+ 
+               markdown_files=()
+@@ -165,9 +187,15 @@ _: {
+               touch "$out"
+             '';
+ 
+-        shellcheck = pkgs.runCommand "shellcheck-check" {
+-          nativeBuildInputs = [ pkgs.findutils pkgs.shellcheck ];
+-        } ''
++        shellcheck =
++          pkgs.runCommand "shellcheck-check"
++            {
++              nativeBuildInputs = [
++                pkgs.findutils
++                pkgs.shellcheck
++              ];
++            }
++            ''
+               cd ${../.}
+ 
+               shell_files=()
+@@ -191,9 +219,15 @@ _: {
+               touch "$out"
+             '';
+ 
+-        statix = pkgs.runCommand "statix-check" {
+-          nativeBuildInputs = [ pkgs.findutils pkgs.statix ];
+-        } ''
++        statix =
++          pkgs.runCommand "statix-check"
++            {
++              nativeBuildInputs = [
++                pkgs.findutils
++                pkgs.statix
++              ];
++            }
++            ''
+               cd ${../.}
+ 
+               nix_files=()
+@@ -218,9 +252,15 @@ _: {
+               touch "$out"
+             '';
+ 
+-        deadnix = pkgs.runCommand "deadnix-check" {
+-          nativeBuildInputs = [ pkgs.findutils pkgs.deadnix ];
+-        } ''
++        deadnix =
++          pkgs.runCommand "deadnix-check"
++            {
++              nativeBuildInputs = [
++                pkgs.findutils
++                pkgs.deadnix
++              ];
++            }
++            ''
+               cd ${../.}
+ 
+               nix_files=()
+@@ -243,9 +283,12 @@ _: {
+               touch "$out"
+             '';
+ 
+-        flake-linter = pkgs.runCommand "flake-linter-check" {
++        flake-linter =
++          pkgs.runCommand "flake-linter-check"
++            {
+               nativeBuildInputs = [ flakeLinterPkg ];
+-        } ''
++            }
++            ''
+               cd ${../.}
+               flake-linter .
+               touch "$out"
+diff --git a/pkgs/jjazzlab/default.nix b/pkgs/jjazzlab/default.nix
+index 86513d5..726364d 100644
+--- a/pkgs/jjazzlab/default.nix
++++ b/pkgs/jjazzlab/default.nix
+@@ -1,20 +1,58 @@
+-{ lib, stdenvNoCC, fetchurl, autoPatchelfHook, copyDesktopItems, makeDesktopItem
+-, makeWrapper, alsa-lib, atk, cairo, cups, dbus, expat, fontconfig, freetype
+-, gdk-pixbuf, glib, gtk3, libX11, libXcomposite, libXcursor, libXdamage, libXext
+-, libXfixes, libXi, libXinerama, libXrandr, libXrender, libXtst, libdrm
+-, libglvnd, libxkbcommon, libxxf86vm, mesa, nspr, nss, pango, zlib, }:
++{
++  lib,
++  stdenvNoCC,
++  fetchurl,
++  autoPatchelfHook,
++  copyDesktopItems,
++  makeDesktopItem,
++  makeWrapper,
++  alsa-lib,
++  atk,
++  cairo,
++  cups,
++  dbus,
++  expat,
++  fontconfig,
++  freetype,
++  gdk-pixbuf,
++  glib,
++  gtk3,
++  libX11,
++  libXcomposite,
++  libXcursor,
++  libXdamage,
++  libXext,
++  libXfixes,
++  libXi,
++  libXinerama,
++  libXrandr,
++  libXrender,
++  libXtst,
++  libdrm,
++  libglvnd,
++  libxkbcommon,
++  libxxf86vm,
++  mesa,
++  nspr,
++  nss,
++  pango,
++  zlib,
++}:
+ 
+ stdenvNoCC.mkDerivation rec {
+   pname = "jjazzlab";
+   version = "5.1";
+ 
+   src = fetchurl {
+-    url =
+-      "https://github.com/jjazzboss/JJazzLab/releases/download/${version}/JJazzLab-${version}-linux-x64.tar.xz";
++    url = "https://github.com/jjazzboss/JJazzLab/releases/download/${version}/JJazzLab-${version}-linux-x64.tar.xz";
+     hash = "sha256-/XDmmu7oI0yO9Gkwb32k30/iyJqjPSuKps5Agfn2iIY=";
+   };
+ 
+-  nativeBuildInputs = [ autoPatchelfHook copyDesktopItems makeWrapper ];
++  nativeBuildInputs = [
++    autoPatchelfHook
++    copyDesktopItems
++    makeWrapper
++  ];
+ 
+   buildInputs = [
+     alsa-lib
+@@ -59,7 +97,12 @@ stdenvNoCC.mkDerivation rec {
+       comment = "Chord-based accompaniment and practice tool";
+       exec = "jjazzlab %F";
+       icon = "jjazzlab";
+-      categories = [ "AudioVideo" "Audio" "Midi" "Music" ];
++      categories = [
++        "AudioVideo"
++        "Audio"
++        "Midi"
++        "Music"
++      ];
+       startupWMClass = "jjazzlab";
+       terminal = false;
+     })
+diff --git a/scripts/secrets-lib/render-sops-config.nix b/scripts/secrets-lib/render-sops-config.nix
+index ad914b0..0594f19 100644
+--- a/scripts/secrets-lib/render-sops-config.nix
++++ b/scripts/secrets-lib/render-sops-config.nix
+@@ -1,18 +1,16 @@
+ let
+   policy = import ../../flake/secrets-policy.nix;
+   sort = builtins.sort builtins.lessThan;
+-  operatorRecipientAliases = let
++  operatorRecipientAliases =
++    let
+       inherit (policy.operator) recipients;
+       count = builtins.length recipients;
+-    mkAlias = index:
+-      if index == 0 then
+-        policy.operator.alias
+-      else
+-        "${policy.operator.alias}_${toString index}";
+-  in map mkAlias (builtins.genList (index: index) count);
+-  renderAgeList = aliases:
+-    builtins.concatStringsSep "\n"
+-    (map (alias: "          - *${alias}") aliases);
++      mkAlias =
++        index: if index == 0 then policy.operator.alias else "${policy.operator.alias}_${toString index}";
++    in
++    map mkAlias (builtins.genList (index: index) count);
++  renderAgeList =
++    aliases: builtins.concatStringsSep "\n" (map (alias: "          - *${alias}") aliases);
+   renderKeyLine = alias: recipient: "  - &${alias} ${recipient}";
+   renderRule = pathRegex: aliases: ''
+       - path_regex: ${pathRegex}
+@@ -20,30 +18,48 @@ let
+           - age:
+     ${renderAgeList aliases}
+   '';
+-  renderScopedRules = scopeName: extensionPattern: scopes:
+-    let names = sort (builtins.attrNames scopes);
+-    in builtins.concatStringsSep "\n" (map (name:
+-      let hosts = sort scopes.${name}.hosts;
+-      in renderRule "^secrets/${scopeName}/${name}/.*\\.${extensionPattern}$"
+-      (operatorRecipientAliases ++ hosts)) names);
+-  renderMachineRules = builtins.concatStringsSep "\n" (map (host:
+-    renderRule "^secrets/machines/${host}/.*\\.(yaml|yml|json|env|ini)$"
+-    (operatorRecipientAliases ++ [ host ]))
+-    (sort (builtins.attrNames policy.hosts)));
+-  operatorKeys = builtins.genList (index:
+-    renderKeyLine (builtins.elemAt operatorRecipientAliases index)
+-    (builtins.elemAt policy.operator.recipients index))
+-    (builtins.length policy.operator.recipients);
+-  keys = operatorKeys
+-    ++ map (host: renderKeyLine host policy.hosts.${host}.recipient)
+-    (sort (builtins.attrNames policy.hosts));
+-in builtins.concatStringsSep "\n" [
++  renderScopedRules =
++    scopeName: extensionPattern: scopes:
++    let
++      names = sort (builtins.attrNames scopes);
++    in
++    builtins.concatStringsSep "\n" (
++      map (
++        name:
++        let
++          hosts = sort scopes.${name}.hosts;
++        in
++        renderRule "^secrets/${scopeName}/${name}/.*\\.${extensionPattern}$" (
++          operatorRecipientAliases ++ hosts
++        )
++      ) names
++    );
++  renderMachineRules = builtins.concatStringsSep "\n" (
++    map (
++      host:
++      renderRule "^secrets/machines/${host}/.*\\.(yaml|yml|json|env|ini)$" (
++        operatorRecipientAliases ++ [ host ]
++      )
++    ) (sort (builtins.attrNames policy.hosts))
++  );
++  operatorKeys = builtins.genList (
++    index:
++    renderKeyLine (builtins.elemAt operatorRecipientAliases index) (
++      builtins.elemAt policy.operator.recipients index
++    )
++  ) (builtins.length policy.operator.recipients);
++  keys =
++    operatorKeys
++    ++ map (host: renderKeyLine host policy.hosts.${host}.recipient) (
++      sort (builtins.attrNames policy.hosts)
++    );
++in
++builtins.concatStringsSep "\n" [
+   "keys:"
+   (builtins.concatStringsSep "\n" keys)
+   "creation_rules:"
+   (renderScopedRules "users" "(yaml|yml)" policy.scopes.users)
+-  (renderScopedRules "services" "(yaml|yml|json|env|ini)"
+-    policy.scopes.services)
++  (renderScopedRules "services" "(yaml|yml|json|env|ini)" policy.scopes.services)
+   renderMachineRules
+   ""
+ ]
+diff --git a/shell.nix b/shell.nix
+index b5485af..95aa175 100644
+--- a/shell.nix
++++ b/shell.nix
+@@ -1,4 +1,5 @@
+ let
+   flake = builtins.getFlake (toString ./.);
+   system = builtins.currentSystem;
+-in flake.devShells.${system}.default
++in
++flake.devShells.${system}.default

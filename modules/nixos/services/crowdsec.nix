@@ -1,4 +1,10 @@
-{ config, lib, pkgs, pkgs-unstable, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  pkgs-unstable,
+  ...
+}:
 let
   format = pkgs.formats.yaml { };
   # CrowdSec has 3 separate remote auth domains here:
@@ -6,29 +12,25 @@ let
   # 2. CTI API key: threat-intel enrichment API key
   # 3. CAPI runtime credentials: generated or imported machine credentials for
   #    the Central API
-  consoleTokenSecretFile =
-    ../../../secrets/services/crowdsec/console-enrollment-token.yaml;
+  consoleTokenSecretFile = ../../../secrets/services/crowdsec/console-enrollment-token.yaml;
   ctiApiKeySecretFile = ../../../secrets/services/crowdsec/cti-api-key.yaml;
-  importedCapiCredentialsSecretFile =
-    ../../../secrets/services/crowdsec/online-api-credentials.yaml;
+  importedCapiCredentialsSecretFile = ../../../secrets/services/crowdsec/online-api-credentials.yaml;
 
   hasConsoleToken = builtins.pathExists consoleTokenSecretFile;
   hasCtiApiKey = builtins.pathExists ctiApiKeySecretFile;
-  hasImportedCapiCredentials =
-    builtins.pathExists importedCapiCredentialsSecretFile;
+  hasImportedCapiCredentials = builtins.pathExists importedCapiCredentialsSecretFile;
 
   crowdsecStateDir = "/var/lib/crowdsec";
   crowdsecHubStateDir = "${crowdsecStateDir}/state/hub";
   localApiCredentialsPath = "${crowdsecStateDir}/local_api_credentials.yaml";
-  onlineApiCredentialsPath = if hasImportedCapiCredentials then
-    config.sops.secrets."crowdsec-online-api-credentials".path
-  else
-    "${crowdsecStateDir}/online_api_credentials.yaml";
+  onlineApiCredentialsPath =
+    if hasImportedCapiCredentials then
+      config.sops.secrets."crowdsec-online-api-credentials".path
+    else
+      "${crowdsecStateDir}/online_api_credentials.yaml";
   consoleConfigPath = "${crowdsecStateDir}/console.yaml";
-  consoleEnrollTokenPath = if hasConsoleToken then
-    config.sops.secrets."crowdsec-console-enrollment-token".path
-  else
-    null;
+  consoleEnrollTokenPath =
+    if hasConsoleToken then config.sops.secrets."crowdsec-console-enrollment-token".path else null;
 
   consoleDefaultConfig = pkgs.writeText "crowdsec-console.yaml" ''
     share_manual_decisions: false
@@ -36,9 +38,9 @@ let
     share_tainted: false
     share_context: false
   '';
-  crowdsecConfigWithCti = format.generate "crowdsec-with-cti.yaml"
-    (lib.recursiveUpdate config.services.crowdsec.settings.general
-      (lib.optionalAttrs hasCtiApiKey {
+  crowdsecConfigWithCti = format.generate "crowdsec-with-cti.yaml" (
+    lib.recursiveUpdate config.services.crowdsec.settings.general (
+      lib.optionalAttrs hasCtiApiKey {
         api.cti = {
           enabled = true;
           key = config.sops.placeholder."crowdsec-cti-api-key";
@@ -46,55 +48,53 @@ let
           cache_size = 50;
           log_level = "info";
         };
-      }));
+      }
+    )
+  );
 
   cscliBasePath = lib.getExe' config.services.crowdsec.package "cscli";
-  cscliConfigArgs = lib.optionalString hasCtiApiKey
-    " -c ${config.sops.templates."crowdsec-config.yaml".path}";
-  cscliPath =
-    "${config.security.wrapperDir}/sudo -u ${config.services.crowdsec.user} ${cscliBasePath}${cscliConfigArgs}";
+  cscliConfigArgs = lib.optionalString hasCtiApiKey " -c ${
+     config.sops.templates."crowdsec-config.yaml".path
+   }";
+  cscliPath = "${config.security.wrapperDir}/sudo -u ${config.services.crowdsec.user} ${cscliBasePath}${cscliConfigArgs}";
   cscliRegisterPath = "${cscliBasePath}${cscliConfigArgs}";
-  dockerIngressCidrs =
-    [ "172.17.0.0/16" "172.30.0.0/16" "172.31.0.0/16" "172.32.0.0/16" ];
-  dockerIngressInterfaces = [ "docker0" "br-*" ];
+  dockerIngressCidrs = [
+    "172.17.0.0/16"
+    "172.30.0.0/16"
+    "172.31.0.0/16"
+    "172.32.0.0/16"
+  ];
+  dockerIngressInterfaces = [
+    "docker0"
+    "br-*"
+  ];
   traefikAccessLogPath = "/var/log/traefik/access.log";
-  firewallBouncerApiKeyPath =
-    "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
-  reRegisterFirewallBouncer =
-    pkgs.writeShellScript "crowdsec-firewall-bouncer-register-local" ''
-      set -euo pipefail
+  firewallBouncerApiKeyPath = "/var/lib/crowdsec-firewall-bouncer-register/api-key.cred";
+  reRegisterFirewallBouncer = pkgs.writeShellScript "crowdsec-firewall-bouncer-register-local" ''
+    set -euo pipefail
 
-      cscli=${lib.escapeShellArg cscliRegisterPath}
-      bouncer_name=crowdsec-firewall-bouncer
-      tmp_key="$(mktemp)"
-      trap 'rm -f "$tmp_key"' EXIT
+    cscli=${lib.escapeShellArg cscliRegisterPath}
+    bouncer_name=crowdsec-firewall-bouncer
+    tmp_key="$(mktemp)"
+    trap 'rm -f "$tmp_key"' EXIT
 
-      if $cscli bouncers list --output json | ${
-        lib.getExe pkgs.jq
-      } -e -- "any(.[]; .name == \"$bouncer_name\")" >/dev/null; then
-        if [ ! -s ${lib.escapeShellArg firewallBouncerApiKeyPath} ]; then
-          $cscli bouncers delete "$bouncer_name" || true
-          rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
-          $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
-          test -s "$tmp_key"
-          install -D -m 0600 -o ${
-            lib.escapeShellArg config.services.crowdsec.user
-          } -g ${
-            lib.escapeShellArg config.services.crowdsec.group
-          } "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
-        fi
-      else
+    if $cscli bouncers list --output json | ${lib.getExe pkgs.jq} -e -- "any(.[]; .name == \"$bouncer_name\")" >/dev/null; then
+      if [ ! -s ${lib.escapeShellArg firewallBouncerApiKeyPath} ]; then
+        $cscli bouncers delete "$bouncer_name" || true
         rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
         $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
         test -s "$tmp_key"
-        install -D -m 0600 -o ${
-          lib.escapeShellArg config.services.crowdsec.user
-        } -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${
-          lib.escapeShellArg firewallBouncerApiKeyPath
-        }
+        install -D -m 0600 -o ${lib.escapeShellArg config.services.crowdsec.user} -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
       fi
-    '';
-in {
+    else
+      rm -f ${lib.escapeShellArg firewallBouncerApiKeyPath}
+      $cscli bouncers add --output raw "$bouncer_name" >"$tmp_key"
+      test -s "$tmp_key"
+      install -D -m 0600 -o ${lib.escapeShellArg config.services.crowdsec.user} -g ${lib.escapeShellArg config.services.crowdsec.group} "$tmp_key" ${lib.escapeShellArg firewallBouncerApiKeyPath}
+    fi
+  '';
+in
+{
   sops.secrets = lib.mkMerge [
     (lib.mkIf hasConsoleToken {
       "crowdsec-console-enrollment-token" = {
@@ -197,7 +197,10 @@ in {
   services = {
     crowdsec-firewall-bouncer = {
       enable = true;
-      settings.iptables_chains = [ "INPUT" "DOCKER-USER" ];
+      settings.iptables_chains = [
+        "INPUT"
+        "DOCKER-USER"
+      ];
     };
   };
 
@@ -207,12 +210,9 @@ in {
 
   networking.firewall = {
     extraInputRules = ''
-      ip saddr { ${
-        lib.concatStringsSep ", " dockerIngressCidrs
-      } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker stacks to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
+      ip saddr { ${lib.concatStringsSep ", " dockerIngressCidrs} } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker stacks to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
       iifname { ${
-        lib.concatStringsSep ", "
-        (map (iface: ''"${iface}"'') dockerIngressInterfaces)
+        lib.concatStringsSep ", " (map (iface: ''"${iface}"'') dockerIngressInterfaces)
       } } tcp dport { 6060, 8080, 8082, 7422 } accept comment "allow Docker bridge interfaces to reach CrowdSec metrics, Traefik metrics, LAPI, and AppSec"
     '';
 
@@ -221,12 +221,14 @@ in {
   systemd.services = {
     crowdsec = {
       serviceConfig = {
-        ExecStart = lib.mkIf hasCtiApiKey (lib.mkForce [
-          " "
-          "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
-            config.sops.templates."crowdsec-config.yaml".path
-          } -info"
-        ]);
+        ExecStart = lib.mkIf hasCtiApiKey (
+          lib.mkForce [
+            " "
+            "${lib.getExe' config.services.crowdsec.package "crowdsec"} -c ${
+              config.sops.templates."crowdsec-config.yaml".path
+            } -info"
+          ]
+        );
         DynamicUser = lib.mkForce false;
         # CrowdSec's journalctl datasource exits immediately inside the service's
         # user namespace even when the runtime user is in systemd-journal.
@@ -271,16 +273,9 @@ in {
             ${lib.escapeShellArg "${crowdsecStateDir}/state"} \
             ${lib.escapeShellArg "${crowdsecStateDir}/state/hub"} \
             ${lib.escapeShellArg "${crowdsecStateDir}/state/trace"}
-          ${lib.getExe' pkgs.coreutils "chown"} -R ${
-            lib.escapeShellArg
-            "${config.services.crowdsec.user}:${config.services.crowdsec.group}"
-          } ${lib.escapeShellArg crowdsecStateDir}
+          ${lib.getExe' pkgs.coreutils "chown"} -R ${lib.escapeShellArg "${config.services.crowdsec.user}:${config.services.crowdsec.group}"} ${lib.escapeShellArg crowdsecStateDir}
           if [ ! -s ${lib.escapeShellArg consoleConfigPath} ]; then
-            ${lib.getExe' pkgs.coreutils "install"} -D -m 0600 -o ${
-              lib.escapeShellArg config.services.crowdsec.user
-            } -g ${lib.escapeShellArg config.services.crowdsec.group} ${
-              lib.escapeShellArg consoleDefaultConfig
-            } ${lib.escapeShellArg consoleConfigPath}
+            ${lib.getExe' pkgs.coreutils "install"} -D -m 0600 -o ${lib.escapeShellArg config.services.crowdsec.user} -g ${lib.escapeShellArg config.services.crowdsec.group} ${lib.escapeShellArg consoleDefaultConfig} ${lib.escapeShellArg consoleConfigPath}
           fi
         '';
       };
@@ -289,8 +284,14 @@ in {
     crowdsec-capi-register = lib.mkIf (!hasImportedCapiCredentials) {
       description = "Register CrowdSec Central API runtime credentials";
       wantedBy = [ "multi-user.target" ];
-      after = [ "crowdsec.service" "network-online.target" ];
-      wants = [ "crowdsec.service" "network-online.target" ];
+      after = [
+        "crowdsec.service"
+        "network-online.target"
+      ];
+      wants = [
+        "crowdsec.service"
+        "network-online.target"
+      ];
       serviceConfig = {
         Type = "oneshot";
         User = "root";
@@ -298,9 +299,7 @@ in {
         ExecStart = pkgs.writeShellScript "crowdsec-capi-register" ''
           set -euo pipefail
 
-          if [ -s ${lib.escapeShellArg onlineApiCredentialsPath} ] && ${
-            lib.getExe pkgs.gnugrep
-          } -q '^password:' ${lib.escapeShellArg onlineApiCredentialsPath}; then
+          if [ -s ${lib.escapeShellArg onlineApiCredentialsPath} ] && ${lib.getExe pkgs.gnugrep} -q '^password:' ${lib.escapeShellArg onlineApiCredentialsPath}; then
             exit 0
           fi
 
@@ -312,8 +311,14 @@ in {
     crowdsec-console-enroll = lib.mkIf hasConsoleToken {
       description = "Enroll CrowdSec instance into CrowdSec Console";
       wantedBy = [ "multi-user.target" ];
-      after = [ "crowdsec.service" "network-online.target" ];
-      wants = [ "crowdsec.service" "network-online.target" ];
+      after = [
+        "crowdsec.service"
+        "network-online.target"
+      ];
+      wants = [
+        "crowdsec.service"
+        "network-online.target"
+      ];
       serviceConfig = {
         Type = "oneshot";
         User = "root";
@@ -323,20 +328,13 @@ in {
 
           ${lib.getExe' pkgs.coreutils "mkdir"} -p \
             ${lib.escapeShellArg crowdsecHubStateDir}
-          ${lib.getExe' pkgs.coreutils "chown"} -R ${
-            lib.escapeShellArg
-            "${config.services.crowdsec.user}:${config.services.crowdsec.group}"
-          } ${lib.escapeShellArg crowdsecStateDir}
+          ${lib.getExe' pkgs.coreutils "chown"} -R ${lib.escapeShellArg "${config.services.crowdsec.user}:${config.services.crowdsec.group}"} ${lib.escapeShellArg crowdsecStateDir}
 
-          if [ ! -r ${
-            lib.escapeShellArg "${crowdsecHubStateDir}/.index.json"
-          } ]; then
+          if [ ! -r ${lib.escapeShellArg "${crowdsecHubStateDir}/.index.json"} ]; then
             ${cscliPath} hub update
           fi
 
-          if ${lib.getExe pkgs.gnugrep} -q '^enroll_key:' ${
-            lib.escapeShellArg consoleConfigPath
-          }; then
+          if ${lib.getExe pkgs.gnugrep} -q '^enroll_key:' ${lib.escapeShellArg consoleConfigPath}; then
             exit 0
           fi
 
@@ -344,9 +342,7 @@ in {
           tmp_output="$(mktemp)"
           trap 'rm -f "$tmp_output"' EXIT
 
-          if ${cscliPath} console enroll "$token" --name ${
-            lib.escapeShellArg config.networking.hostName
-          } >"$tmp_output" 2>&1; then
+          if ${cscliPath} console enroll "$token" --name ${lib.escapeShellArg config.networking.hostName} >"$tmp_output" 2>&1; then
             cat "$tmp_output"
             exit 0
           fi
@@ -355,9 +351,7 @@ in {
 
           # Enrollment tokens are single-use / revocable in the Console. A
           # stale token should not block an otherwise healthy system switch.
-          if ${
-            lib.getExe pkgs.gnugrep
-          } -q 'API error: Forbidden' "$tmp_output"; then
+          if ${lib.getExe pkgs.gnugrep} -q 'API error: Forbidden' "$tmp_output"; then
             echo "crowdsec-console-enroll: stale or revoked enrollment token, leaving Console enrollment unchanged" >&2
             exit 0
           fi
@@ -368,10 +362,8 @@ in {
     };
 
     crowdsec-firewall-bouncer-register = {
-      after = lib.mkIf (!hasImportedCapiCredentials)
-        [ "crowdsec-capi-register.service" ];
-      requires = lib.mkIf (!hasImportedCapiCredentials)
-        [ "crowdsec-capi-register.service" ];
+      after = lib.mkIf (!hasImportedCapiCredentials) [ "crowdsec-capi-register.service" ];
+      requires = lib.mkIf (!hasImportedCapiCredentials) [ "crowdsec-capi-register.service" ];
       script = lib.mkForce (builtins.readFile reRegisterFirewallBouncer);
     };
   };

@@ -25,20 +25,14 @@ let
     esac
 
     # Keep a rolling window of periodic snapshots only; preserve hang-trigger captures.
-    find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin +${
-      toString periodicRetentionMinutes
-    } -delete || true
+    find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin +${toString periodicRetentionMinutes} -delete || true
 
     # On hang-trigger, preserve the preceding periodic window once per incident window.
     if [ "$event" = "hang-trigger" ]; then
-      if ! find ${logDir} -maxdepth 1 -type d -name 'hang-context-*' -mmin -${
-        toString incidentContextCooldownMinutes
-      } -print -quit | rg -q .; then
+      if ! find ${logDir} -maxdepth 1 -type d -name 'hang-context-*' -mmin -${toString incidentContextCooldownMinutes} -print -quit | rg -q .; then
         context_dir="${logDir}/hang-context-''${safe_ts}"
         mkdir -p "$context_dir"
-        find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin -${
-          toString periodicRetentionMinutes
-        } \
+        find ${logDir} -maxdepth 1 -type f -name 'snapshot-*.log' -mmin -${toString periodicRetentionMinutes} \
           -exec cp -n -t "$context_dir" {} + || true
       fi
     fi
@@ -151,7 +145,8 @@ let
       journalctl -k -n 120 --no-pager | rg -i "${physicalInterface}|${bridgeInterface}|e1000e|NETDEV|hang|link|carrier" || true
     } >> "$out"
   '';
-in {
+in
+{
   environment.systemPackages = with pkgs; [ ethtool ];
 
   systemd = {
@@ -160,9 +155,10 @@ in {
     # Periodic snapshots for drift-over-time analysis.
     services = {
       enp0s25-diag-snapshot = {
-        description =
-          "Capture periodic Ethernet diagnostics for ${physicalInterface}";
-        serviceConfig = { Type = "oneshot"; };
+        description = "Capture periodic Ethernet diagnostics for ${physicalInterface}";
+        serviceConfig = {
+          Type = "oneshot";
+        };
         path = with pkgs; [
           coreutils
           ethtool
@@ -181,8 +177,7 @@ in {
 
       # Poll every 10 seconds to keep near-real-time snapshots during incidents.
       enp0s25-diag-poller = {
-        description =
-          "Continuously collect Ethernet diagnostics for ${physicalInterface}";
+        description = "Continuously collect Ethernet diagnostics for ${physicalInterface}";
         wantedBy = [ "multi-user.target" ];
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
@@ -212,8 +207,7 @@ in {
 
       # Triggered capture: when the kernel emits a hardware hang, grab state immediately.
       enp0s25-hang-capture = {
-        description =
-          "Capture immediate diagnostics when e1000e hardware hangs are logged";
+        description = "Capture immediate diagnostics when e1000e hardware hangs are logged";
         wantedBy = [ "multi-user.target" ];
         after = [ "multi-user.target" ];
         serviceConfig = {
@@ -237,9 +231,7 @@ in {
           journalctl -kf -n0 --no-pager | while IFS= read -r line; do
             if printf '%s\n' "$line" | rg -q "${physicalInterface}: (Detected Hardware Unit Hang|NIC Link is Down)"; then
               now="$(date +%s)"
-              if [ "$((now - last_capture))" -ge ${
-                toString triggerCaptureCooldownSeconds
-              } ]; then
+              if [ "$((now - last_capture))" -ge ${toString triggerCaptureCooldownSeconds} ]; then
                 ${snapshotScript} hang-trigger
                 last_capture="$now"
               fi
@@ -250,9 +242,7 @@ in {
 
       # Triggered capture: if the local router is unreachable for 60s, snapshot immediately.
       enp0s25-router-ping-watchdog = {
-        description = "Capture diagnostics when router ping fails for ${
-            toString pingFailureSeconds
-          }s";
+        description = "Capture diagnostics when router ping fails for ${toString pingFailureSeconds}s";
         wantedBy = [ "multi-user.target" ];
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
@@ -282,9 +272,7 @@ in {
             fi
 
             if [ "$failures" -ge ${toString pingFailureSeconds} ]; then
-              printf '%s\n' "router ping failed for ${
-                toString pingFailureSeconds
-              }s: ${routerIp}" \
+              printf '%s\n' "router ping failed for ${toString pingFailureSeconds}s: ${routerIp}" \
                 | systemd-cat -t enp0s25-router-ping-watchdog -p warning
               ${snapshotScript} hang-trigger
               failures=0

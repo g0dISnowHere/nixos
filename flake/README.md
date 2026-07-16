@@ -1,32 +1,32 @@
 # Flake Layer
 
-The `flake/` directory is the composition layer of the repo. It is where the
-main outputs are assembled from reusable modules and host definitions.
+The `flake/` directory is composition layer of repo. It is where main outputs are
+assembled from reusable modules and canonical host definitions.
 
 ## Role
 
 This layer should stay focused on orchestration:
 
-- defining machine sets
+- registering concrete host setups
 - defining standalone Home Manager outputs
 - carrying small helpers used to compose those outputs
 
-It should describe how the system is assembled, not hide large amounts of
-policy or implementation detail.
+It should describe how system is assembled, not hide large amounts of policy or
+implementation detail.
 
 ## Main Areas
 
 - `machines/`
-  - groups concrete machine definitions by fleet area
+  - registers concrete host setups for flake outputs
 - `homes/`
-  - standalone Home Manager outputs and user-level profile composition
+  - standalone Home Manager outputs and user-environment composition
 - `lib.nix`
-  - helper functions used to wire machines and homes together
+  - helper functions used to wire hosts and homes together
 
 ## Design Intent
 
-Keep this layer readable. A person looking at `flake/` should be able to tell
-how the repo is composed without chasing hidden behavior through opaque helper
-logic. Machine behavior should come from explicit capability module imports.
+Keep this layer readable. Person looking at `flake/` should be able to tell how
+repo is composed without chasing hidden behavior through opaque helper logic.
+Machine behavior should come from explicit capability module imports.
 Repo-wide architecture guidance belongs in `docs/`; this README should stay
-focused on the role of `flake/` itself.
+focused on role of `flake/` itself.

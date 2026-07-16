@@ -2,9 +2,16 @@
 let
   inherit (pkgs) fetchFromGitHub lib wrapGAppsNoGuiHook;
   inherit (pkgs.python3Packages)
-    buildPythonPackage cryptography dbus-python pyusb pyyaml pygobject3
-    setuptools;
-in buildPythonPackage rec {
+    buildPythonPackage
+    cryptography
+    dbus-python
+    pyusb
+    pyyaml
+    pygobject3
+    setuptools
+    ;
+in
+buildPythonPackage rec {
   pname = "python-validity";
   version = "0.14";
 
@@ -42,7 +49,13 @@ in buildPythonPackage rec {
 
   nativeBuildInputs = [ wrapGAppsNoGuiHook ];
 
-  propagatedBuildInputs = [ cryptography pyusb pyyaml dbus-python pygobject3 ];
+  propagatedBuildInputs = [
+    cryptography
+    pyusb
+    pyyaml
+    dbus-python
+    pygobject3
+  ];
 
   postInstall = ''
     install -D -m 644 debian/python3-validity.service \

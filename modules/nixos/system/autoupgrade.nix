@@ -1,11 +1,15 @@
-{ config, lib, pkgs, repoRoot ? null, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  repoRoot ? null,
+  ...
+}:
 
 let
   cfg = config.my.autoUpdate;
   username = "djoolz";
-  homeDir =
-    lib.attrByPath [ "users" "users" username "home" ] "/home/${username}"
-    config;
+  homeDir = lib.attrByPath [ "users" "users" username "home" ] "/home/${username}" config;
   updateScript = pkgs.writeShellApplication {
     name = "update-system";
     runtimeInputs = with pkgs; [
@@ -28,20 +32,23 @@ let
     ];
     text = builtins.readFile ../../../scripts/update-system.sh;
   };
-  defaultRepoPath = if repoRoot != null then
-    "${homeDir}/nixos-deploy"
-  else
-    "${homeDir}/nixos-deploy";
-  validationModeType = lib.types.enum [ "none" "eval" ];
-in {
+  defaultRepoPath = if repoRoot != null then "${homeDir}/nixos-deploy" else "${homeDir}/nixos-deploy";
+  validationModeType = lib.types.enum [
+    "none"
+    "eval"
+  ];
+in
+{
   options.my.autoUpdate = {
     enable = lib.mkEnableOption "scheduled branch-safe flake updates";
 
     mode = lib.mkOption {
-      type = lib.types.enum [ "updater" "consumer" ];
+      type = lib.types.enum [
+        "updater"
+        "consumer"
+      ];
       default = "consumer";
-      description =
-        "Whether this host owns flake.lock updates or only consumes origin/main.";
+      description = "Whether this host owns flake.lock updates or only consumes origin/main.";
     };
 
     repoPath = lib.mkOption {
@@ -53,8 +60,7 @@ in {
     repoUser = lib.mkOption {
       type = lib.types.str;
       default = username;
-      description =
-        "User account that owns git credentials for repo operations.";
+      description = "User account that owns git credentials for repo operations.";
     };
 
     remote = lib.mkOption {
@@ -66,8 +72,7 @@ in {
     repoUrl = lib.mkOption {
       type = lib.types.str;
       default = "git@github.com:g0dISnowHere/nixos.git";
-      description =
-        "Git URL used to bootstrap the deployment checkout when absent.";
+      description = "Git URL used to bootstrap the deployment checkout when absent.";
     };
 
     branch = lib.mkOption {
@@ -123,8 +128,14 @@ in {
 
         auto-update-system = {
           description = "Branch-safe scheduled NixOS update";
-          after = [ "network-online.target" "auto-update-bootstrap.service" ];
-          wants = [ "network-online.target" "auto-update-bootstrap.service" ];
+          after = [
+            "network-online.target"
+            "auto-update-bootstrap.service"
+          ];
+          wants = [
+            "network-online.target"
+            "auto-update-bootstrap.service"
+          ];
           serviceConfig = {
             Type = "oneshot";
             User = "root";
@@ -156,25 +167,24 @@ in {
       };
     };
 
-    system.activationScripts.autoUpdateBootstrap =
-      lib.stringAfter [ "users" ] ''
-        if [ ! -e ${lib.escapeShellArg "${cfg.repoPath}/.git"} ]; then
-          ${pkgs.systemd}/bin/systemd-run \
-            --unit=auto-update-bootstrap-activation \
-            --description="Bootstrap deployment checkout for scheduled updates" \
-            --collect \
-            ${updateScript}/bin/update-system \
-            --mode bootstrap \
-            --host ${config.networking.hostName} \
-            --repo ${lib.escapeShellArg cfg.repoPath} \
-            --repo-user ${lib.escapeShellArg cfg.repoUser} \
-            --remote ${lib.escapeShellArg cfg.remote} \
-            --repo-url ${lib.escapeShellArg cfg.repoUrl} \
-            --branch ${lib.escapeShellArg cfg.branch} \
-            --validation-mode ${lib.escapeShellArg cfg.validationMode} \
-            >/dev/null 2>&1 || true
-        fi
-      '';
+    system.activationScripts.autoUpdateBootstrap = lib.stringAfter [ "users" ] ''
+      if [ ! -e ${lib.escapeShellArg "${cfg.repoPath}/.git"} ]; then
+        ${pkgs.systemd}/bin/systemd-run \
+          --unit=auto-update-bootstrap-activation \
+          --description="Bootstrap deployment checkout for scheduled updates" \
+          --collect \
+          ${updateScript}/bin/update-system \
+          --mode bootstrap \
+          --host ${config.networking.hostName} \
+          --repo ${lib.escapeShellArg cfg.repoPath} \
+          --repo-user ${lib.escapeShellArg cfg.repoUser} \
+          --remote ${lib.escapeShellArg cfg.remote} \
+          --repo-url ${lib.escapeShellArg cfg.repoUrl} \
+          --branch ${lib.escapeShellArg cfg.branch} \
+          --validation-mode ${lib.escapeShellArg cfg.validationMode} \
+          >/dev/null 2>&1 || true
+      fi
+    '';
 
     # Also enable garbage collection of old generations.
     nix.gc = {
@@ -184,6 +194,8 @@ in {
     };
 
     # Enable automatic nix-store optimisation.
-    nix.optimise = { automatic = true; };
+    nix.optimise = {
+      automatic = true;
+    };
   };
 }

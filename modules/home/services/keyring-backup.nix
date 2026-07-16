@@ -7,41 +7,43 @@
 
     Service = {
       Type = "oneshot";
-      ExecStart = let
-        backupScript = pkgs.writeShellScript "keyring-backup" ''
-          set -eu
+      ExecStart =
+        let
+          backupScript = pkgs.writeShellScript "keyring-backup" ''
+            set -eu
 
-          keyring="$HOME/.local/share/keyrings/login.keyring"
-          backup_dir="$HOME/.local/share/keyrings/backups"
-          latest_link="$backup_dir/login.keyring.latest"
+            keyring="$HOME/.local/share/keyrings/login.keyring"
+            backup_dir="$HOME/.local/share/keyrings/backups"
+            latest_link="$backup_dir/login.keyring.latest"
 
-          if [ ! -f "$keyring" ]; then
-            exit 0
-          fi
-
-          mkdir -p "$backup_dir"
-
-          if [ -L "$latest_link" ]; then
-            latest_target="$(readlink -f "$latest_link")"
-            if [ -n "$latest_target" ] && [ -f "$latest_target" ] && cmp -s "$keyring" "$latest_target"; then
+            if [ ! -f "$keyring" ]; then
               exit 0
             fi
-          fi
 
-          timestamp="$(date +%Y%m%d-%H%M%S-%N)"
-          destination="$backup_dir/login.keyring.$timestamp"
+            mkdir -p "$backup_dir"
 
-          install -m 600 "$keyring" "$destination"
-          ln -sfn "$(basename "$destination")" "$latest_link"
+            if [ -L "$latest_link" ]; then
+              latest_target="$(readlink -f "$latest_link")"
+              if [ -n "$latest_target" ] && [ -f "$latest_target" ] && cmp -s "$keyring" "$latest_target"; then
+                exit 0
+              fi
+            fi
 
-          find "$backup_dir" -maxdepth 1 -type f -name 'login.keyring.*' -printf '%f\n' \
-            | sort -r \
-            | tail -n +11 \
-            | while IFS= read -r old_backup; do
-                rm -f "$backup_dir/$old_backup"
-              done
-        '';
-      in "${backupScript}";
+            timestamp="$(date +%Y%m%d-%H%M%S-%N)"
+            destination="$backup_dir/login.keyring.$timestamp"
+
+            install -m 600 "$keyring" "$destination"
+            ln -sfn "$(basename "$destination")" "$latest_link"
+
+            find "$backup_dir" -maxdepth 1 -type f -name 'login.keyring.*' -printf '%f\n' \
+              | sort -r \
+              | tail -n +11 \
+              | while IFS= read -r old_backup; do
+                  rm -f "$backup_dir/$old_backup"
+                done
+          '';
+        in
+        "${backupScript}";
     };
 
     Install.WantedBy = [ "default.target" ];

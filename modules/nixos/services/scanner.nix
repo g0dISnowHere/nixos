@@ -22,11 +22,10 @@
   };
 
   # Scanner packages
-  environment.systemPackages = with pkgs;
-    [
-      xsane # GUI for scanning
-      # sane-backends # CLI for scanning (already included via hardware.sane)
-    ];
+  environment.systemPackages = with pkgs; [
+    xsane # GUI for scanning
+    # sane-backends # CLI for scanning (already included via hardware.sane)
+  ];
 
   # Note: Add 'scanner' and 'lp' to user's extraGroups in machine config:
   # users.users.djoolz.extraGroups = [ ... "scanner" "lp" ];

@@ -1,6 +1,8 @@
 _:
-let ageKeyFile = "/var/lib/sops-nix/key.txt";
-in {
+let
+  ageKeyFile = "/var/lib/sops-nix/key.txt";
+in
+{
   sops = {
     defaultSopsFormat = "yaml";
 

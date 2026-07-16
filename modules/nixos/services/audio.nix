@@ -4,7 +4,8 @@ let
   lv2Path = "/run/current-system/sw/lib/lv2";
   vst3Path = "/run/current-system/sw/lib/vst3";
   ladspaPath = "/run/current-system/sw/lib/ladspa";
-in {
+in
+{
   # Low-latency audio stack for music applications such as JJazzLab with EWI USB.
   security.rtkit.enable = true;
 

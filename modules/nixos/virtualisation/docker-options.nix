@@ -1,6 +1,8 @@
 { config, lib, ... }:
-let cfg = config.my.virtualisation.docker;
-in {
+let
+  cfg = config.my.virtualisation.docker;
+in
+{
   options.my.virtualisation.docker = {
     rootful = lib.mkOption {
       type = lib.types.bool;
@@ -13,14 +15,14 @@ in {
       type = lib.types.bool;
       default = false;
       internal = true;
-      description =
-        "Internal marker for the rootless Docker capability module.";
+      description = "Internal marker for the rootless Docker capability module.";
     };
   };
 
-  config.assertions = [{
-    assertion = !(cfg.rootful && cfg.rootless);
-    message =
-      "Import either modules/nixos/virtualisation/docker.nix or docker_rootless.nix, not both.";
-  }];
+  config.assertions = [
+    {
+      assertion = !(cfg.rootful && cfg.rootless);
+      message = "Import either modules/nixos/virtualisation/docker.nix or docker_rootless.nix, not both.";
+    }
+  ];
 }

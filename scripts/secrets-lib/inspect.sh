@@ -224,10 +224,30 @@ secrets_remove_user_scope() {
 
 secrets_inspect_state() {
   local host_name="$1"
-  local operator_failures=()
-  local host_failures=()
+  local inspect_actor="${2:-all}"
+  local inspect_operator=0
+  local inspect_host=0
   local secret_file=""
   local policy_validation_json=""
+  case "${inspect_actor}" in
+    operator)
+      inspect_operator=1
+      ;;
+    host)
+      inspect_host=1
+      ;;
+    all)
+      inspect_operator=1
+      inspect_host=1
+      ;;
+    *)
+      printf 'Unknown inspect actor: %s\n' "${inspect_actor}" >&2
+      return 1
+      ;;
+  esac
+
+  local operator_failures=()
+  local host_failures=()
 
   for cmd in awk find grep hostname nix python3 sops sort sudo; do
     secrets_require_command "${cmd}"
@@ -277,18 +297,20 @@ PY
   export SECRETS_OPERATOR_KEY_INSPECTION_STATUS="unavailable"
   export SECRETS_OPERATOR_KEY_STATUS="missing"
   export SECRETS_OPERATOR_PUBLIC_KEYS=""
-  if [[ -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
-    export SECRETS_OPERATOR_KEY_EXISTS=1
-    export SECRETS_OPERATOR_KEY_PRESENCE_STATUS="present"
-    export SECRETS_OPERATOR_KEY_INSPECTION_STATUS="readable"
-    export SECRETS_OPERATOR_KEY_STATUS="readable"
-    SECRETS_OPERATOR_PUBLIC_KEYS="$(secrets_read_public_keys "${SECRETS_OPERATOR_KEY_FILE}" | paste -sd ', ' -)"
-    export SECRETS_OPERATOR_PUBLIC_KEYS
-  elif [[ -f "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
-    export SECRETS_OPERATOR_KEY_EXISTS=1
-    export SECRETS_OPERATOR_KEY_PRESENCE_STATUS="present"
-    export SECRETS_OPERATOR_KEY_INSPECTION_STATUS="unreadable"
-    export SECRETS_OPERATOR_KEY_STATUS="present but unreadable"
+  if [[ "${inspect_operator}" -eq 1 ]]; then
+    if [[ -r "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
+      export SECRETS_OPERATOR_KEY_EXISTS=1
+      export SECRETS_OPERATOR_KEY_PRESENCE_STATUS="present"
+      export SECRETS_OPERATOR_KEY_INSPECTION_STATUS="readable"
+      export SECRETS_OPERATOR_KEY_STATUS="readable"
+      SECRETS_OPERATOR_PUBLIC_KEYS="$(secrets_read_public_keys "${SECRETS_OPERATOR_KEY_FILE}" | paste -sd ', ' -)"
+      export SECRETS_OPERATOR_PUBLIC_KEYS
+    elif [[ -f "${SECRETS_OPERATOR_KEY_FILE}" ]]; then
+      export SECRETS_OPERATOR_KEY_EXISTS=1
+      export SECRETS_OPERATOR_KEY_PRESENCE_STATUS="present"
+      export SECRETS_OPERATOR_KEY_INSPECTION_STATUS="unreadable"
+      export SECRETS_OPERATOR_KEY_STATUS="present but unreadable"
+    fi
   fi
 
   export SECRETS_HOST_KEY_EXISTS=0
@@ -297,7 +319,7 @@ PY
   export SECRETS_HOST_KEY_STATUS="missing"
   export SECRETS_HOST_PUBLIC_KEY=""
   export SECRETS_LAST_PUBLIC_KEY=""
-  if [[ -f "${SECRETS_HOST_KEY_FILE}" ]]; then
+  if [[ "${inspect_host}" -eq 1 && -f "${SECRETS_HOST_KEY_FILE}" ]]; then
     export SECRETS_HOST_KEY_EXISTS=1
     export SECRETS_HOST_KEY_PRESENCE_STATUS="present"
     if [[ -r "${SECRETS_HOST_KEY_FILE}" ]]; then
@@ -342,58 +364,62 @@ PY
   export SECRETS_OPERATOR_CAN_DECRYPT=0
   export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="unavailable"
   export SECRETS_OPERATOR_DECRYPT_STATUS="skipped"
-  if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -eq 1 ]]; then
-    if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
-      export SECRETS_OPERATOR_CAN_DECRYPT=1
-      export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="ok"
-      export SECRETS_OPERATOR_DECRYPT_STATUS="no relevant secrets"
-    else
-      for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
-        if ! secrets_can_decrypt_with_key "${SECRETS_OPERATOR_KEY_FILE}" "${secret_file}"; then
-          operator_failures+=("${secret_file}")
-        fi
-      done
-      if [[ "${#operator_failures[@]}" -eq 0 ]]; then
+  if [[ "${inspect_operator}" -eq 1 ]]; then
+    if [[ "${SECRETS_OPERATOR_KEY_EXISTS}" -eq 1 ]]; then
+      if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
         export SECRETS_OPERATOR_CAN_DECRYPT=1
         export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="ok"
-        export SECRETS_OPERATOR_DECRYPT_STATUS="ok"
+        export SECRETS_OPERATOR_DECRYPT_STATUS="no relevant secrets"
       else
-        export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="failed"
-        export SECRETS_OPERATOR_DECRYPT_STATUS="failed (${#operator_failures[@]})"
+        for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
+          if ! secrets_can_decrypt_with_key "${SECRETS_OPERATOR_KEY_FILE}" "${secret_file}"; then
+            operator_failures+=("${secret_file}")
+          fi
+        done
+        if [[ "${#operator_failures[@]}" -eq 0 ]]; then
+          export SECRETS_OPERATOR_CAN_DECRYPT=1
+          export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="ok"
+          export SECRETS_OPERATOR_DECRYPT_STATUS="ok"
+        else
+          export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="failed"
+          export SECRETS_OPERATOR_DECRYPT_STATUS="failed (${#operator_failures[@]})"
+        fi
       fi
+    else
+      export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="unavailable"
+      export SECRETS_OPERATOR_DECRYPT_STATUS="operator key unavailable"
     fi
-  else
-    export SECRETS_OPERATOR_KEY_DECRYPT_STATUS="unavailable"
-    export SECRETS_OPERATOR_DECRYPT_STATUS="operator key unavailable"
   fi
   SECRETS_OPERATOR_FAILED_SECRETS=("${operator_failures[@]}")
 
   export SECRETS_HOST_CAN_DECRYPT=0
   export SECRETS_HOST_KEY_DECRYPT_STATUS="unavailable"
   export SECRETS_HOST_DECRYPT_STATUS="skipped"
-  if [[ "${SECRETS_HOST_KEY_EXISTS}" -eq 1 ]]; then
-    if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
-      export SECRETS_HOST_CAN_DECRYPT=1
-      export SECRETS_HOST_KEY_DECRYPT_STATUS="ok"
-      export SECRETS_HOST_DECRYPT_STATUS="no relevant secrets"
-    else
-      for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
-        if ! secrets_can_decrypt_with_key "${SECRETS_HOST_KEY_FILE}" "${secret_file}"; then
-          host_failures+=("${secret_file}")
-        fi
-      done
-      if [[ "${#host_failures[@]}" -eq 0 ]]; then
+  if [[ "${inspect_host}" -eq 1 ]]; then
+    if [[ "${SECRETS_HOST_KEY_EXISTS}" -eq 1 ]]; then
+      if [[ "${SECRETS_RELEVANT_SECRET_COUNT}" -eq 0 ]]; then
         export SECRETS_HOST_CAN_DECRYPT=1
         export SECRETS_HOST_KEY_DECRYPT_STATUS="ok"
-        export SECRETS_HOST_DECRYPT_STATUS="ok"
+        export SECRETS_HOST_DECRYPT_STATUS="no relevant secrets"
       else
-        export SECRETS_HOST_KEY_DECRYPT_STATUS="failed"
-        export SECRETS_HOST_DECRYPT_STATUS="failed (${#host_failures[@]})"
+        for secret_file in "${SECRETS_RELEVANT_SECRETS[@]}"; do
+          if ! secrets_can_decrypt_with_key "${SECRETS_HOST_KEY_FILE}" "${secret_file}"; then
+            host_failures+=("${secret_file}")
+          fi
+        done
+        if [[ "${#host_failures[@]}" -eq 0 ]]; then
+          export SECRETS_HOST_CAN_DECRYPT=1
+          export SECRETS_HOST_KEY_DECRYPT_STATUS="ok"
+          export SECRETS_HOST_DECRYPT_STATUS="ok"
+        else
+          export SECRETS_HOST_KEY_DECRYPT_STATUS="failed"
+          export SECRETS_HOST_DECRYPT_STATUS="failed (${#host_failures[@]})"
+        fi
       fi
+    else
+      export SECRETS_HOST_KEY_DECRYPT_STATUS="unavailable"
+      export SECRETS_HOST_DECRYPT_STATUS="host key unavailable"
     fi
-  else
-    export SECRETS_HOST_KEY_DECRYPT_STATUS="unavailable"
-    export SECRETS_HOST_DECRYPT_STATUS="host key unavailable"
   fi
   SECRETS_HOST_FAILED_SECRETS=("${host_failures[@]}")
 

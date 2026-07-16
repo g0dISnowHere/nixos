@@ -46,13 +46,8 @@ REMOTE_VSCODE_HOSTS=(
   "albaldah"
   "alhena"
 )
-MONITORING_INVENTORY_JSON="$(nix eval --raw .#monitoringInventoryJson 2>/dev/null || true)"
+MONITORING_INVENTORY_JSON=""
 MONITORING_DOCKER_HOSTS=()
-if [[ -n "${MONITORING_INVENTORY_JSON}" ]]; then
-  mapfile -t MONITORING_DOCKER_HOSTS < <(
-    jq -r '.groups.docker_hosts[]' <<<"${MONITORING_INVENTORY_JSON}"
-  )
-fi
 
 run_check() {
   local description="$1"
@@ -67,6 +62,22 @@ run_check() {
   FAILED_CHECKS+=("${description}")
   return 0
 }
+run_quiet_check() {
+  local success_description="$1"
+  local failure_description="$2"
+  shift 2
+
+  if "$@"; then
+    echo "  ✓ ${success_description}"
+    return 0
+  fi
+
+  echo "  ✗ ${failure_description}"
+  FAILED=$((FAILED + 1))
+  FAILED_CHECKS+=("${failure_description}")
+  return 0
+}
+
 
 # shellcheck disable=SC2329 # Invoked indirectly through run_check below.
 validate_remote_vscode_support() {
@@ -243,6 +254,21 @@ validate_monitoring_inventory() {
   echo "  ✓ monitoring inventory export matches the current three-host fleet"
 }
 
+echo "Shell:"
+run_quiet_check "shell lint passed" "shell lint failed" \
+  bash "${script_dir}/lint-shell.sh"
+
+echo ""
+echo "Nix:"
+run_quiet_check "Nix lint passed" "Nix lint failed" \
+  bash "${script_dir}/lint-nix.sh"
+
+echo ""
+echo "Documentation:"
+run_quiet_check "markdown lint passed" "markdown lint failed" \
+  bash "${script_dir}/lint-markdown.sh"
+
+echo ""
 if [[ "${REGENERATE_DCONF}" -eq 1 ]]; then
   echo "Regenerating dconf.nix:"
   dconf_file="modules/home/dconf/dconf.nix"
@@ -286,6 +312,13 @@ fi
 
 echo ""
 echo "NixOS Configurations:"
+
+MONITORING_INVENTORY_JSON="$(nix eval --raw .#monitoringInventoryJson 2>/dev/null || true)"
+if [[ -n "${MONITORING_INVENTORY_JSON}" ]]; then
+  mapfile -t MONITORING_DOCKER_HOSTS < <(
+    jq -r '.groups.docker_hosts[]' <<<"${MONITORING_INVENTORY_JSON}"
+  )
+fi
 
 run_check "monitoring inventory export failed to evaluate" \
   validate_monitoring_inventory
@@ -386,20 +419,6 @@ else
   echo "  Local host access: skipped (${current_host} is not in flake/secrets-policy.nix)"
 fi
 
-echo ""
-echo "Shell:"
-run_check "shell lint failed" \
-  bash "${script_dir}/lint-shell.sh"
-
-echo ""
-echo "Nix:"
-run_check "Nix lint failed" \
-  bash "${script_dir}/lint-nix.sh"
-
-echo ""
-echo "Documentation:"
-run_check "markdown lint failed" \
-  bash "${script_dir}/lint-markdown.sh"
 
 echo ""
 if [[ "${FAILED}" -eq 0 ]]; then

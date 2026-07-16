@@ -10,11 +10,17 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [ piper libratbag libinput ];
+  environment.systemPackages = with pkgs; [
+    piper
+    libratbag
+    libinput
+  ];
 
   services.libinput = {
     enable = true;
-    mouse = { accelProfile = "flat"; };
+    mouse = {
+      accelProfile = "flat";
+    };
     touchpad = {
       accelProfile = "flat";
       tapping = true;
