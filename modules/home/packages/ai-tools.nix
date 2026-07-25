@@ -20,7 +20,7 @@
     # codex # installed via pnpm manifest
 
     pkgs-unstable.opencode # OpenCode CLI
-    pkgs-unstable.antigravity
+    pkgs-unstable.antigravity-ide
     pkgs-unstable.fabric-ai # Fabric prompt/automation toolkit
     # codex-latest
   ];

@@ -74,8 +74,10 @@ in
       lazygit
       pkgs-unstable.devenv
       pkgs-unstable.gh
-      inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
+      # inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
+      pkgs-unstable.herdr
+      # inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
+      pkgs-unstable.hunk
 
     ];
 
