@@ -12,6 +12,7 @@
     syncthing
     obsidian
     chromium
+    wl-clipboard
     pkgs-unstable.vscode
   ];
 }
