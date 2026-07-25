@@ -79,10 +79,10 @@ Current update helpers include:
     lockfile updates before keeping the pin
 - `scripts/sync-pnpm-globals.sh` installs locked `pnpm-globals/` dependencies
   into the current user's XDG data directory and writes managed wrappers in
-  `$HOME/.local/bin`
+  `$HOME/.local/bin`; it leaves pnpm's standard global store paths alone
 - `scripts/sync-uv-tools.sh` installs locked `uv-tools/` dependencies into the
   current user's XDG data directory and writes managed wrappers in
-  `$HOME/.local/bin`
+  `$HOME/.local/bin`; it leaves uv's standard tool store paths alone
 Current secret helpers include:
 
 - `scripts/secrets` as the operator-facing SOPS orchestrator
@@ -102,6 +102,8 @@ Current status helpers include:
 
 - `scripts/crowdsec-verify.sh` for a fast read-only CrowdSec health check on
   hosts using this repo's CrowdSec wiring
+- `scripts/audit-log-maintenance.py` for dry-run-first auditd log inventory,
+  active-log rotation, and deletion of old rotated audit logs beyond retention
 - `scripts/repair-mirach-gdm-users.sh` for diagnosing and repairing `mirach`
   GDM greeter account activation failures caused by corrupted local account
   state; it is read-only by default and requires `--apply` for mutation

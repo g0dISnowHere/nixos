@@ -5,7 +5,8 @@ are installed with uv.
 
 `scripts/sync-uv-tools.sh` copies `pyproject.toml` and `uv.lock` into
 `${XDG_DATA_HOME:-$HOME/.local/share}/mine/uv-tools`, runs
-`uv sync --frozen`, and writes managed wrappers in `$HOME/.local/bin`.
+`uv sync --frozen`, and writes managed wrappers in `$HOME/.local/bin`. It does
+not take over or clean uv's standard tool store paths.
 
 The direct tool dependencies currently come from the existing uv tool receipts:
 

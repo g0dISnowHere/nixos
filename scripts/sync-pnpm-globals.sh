@@ -143,8 +143,6 @@ sync_locked_project() {
     write_wrapper "$command"
   done
   remove_obsolete_wrappers
-
-  rm -rf "${xdg_data_home}/pnpm/global" "${xdg_data_home}/pnpm/bin"
   printf 'pnpm globals: sync complete\n'
 }
 

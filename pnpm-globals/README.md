@@ -4,7 +4,8 @@ This directory is the source of truth for repo-managed npm CLI tools.
 `scripts/sync-pnpm-globals.sh` copies these files into
 `${XDG_DATA_HOME:-$HOME/.local/share}/mine/pnpm-globals`, runs
 `pnpm install --frozen-lockfile`, and writes managed wrappers in
-`$HOME/.local/bin`.
+`$HOME/.local/bin`. It does not take over or clean pnpm's standard global
+store paths.
 
 `package.json` keeps the direct dependencies. `pnpm-lock.yaml` keeps resolved
 versions. `.npmrc` records the intended release-age policy, while
