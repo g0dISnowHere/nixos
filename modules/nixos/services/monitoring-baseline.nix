@@ -56,9 +56,8 @@ _: {
         "-w /run/docker.sock -p wa -k docker_sock"
         "-w /home/djoolz/docker/ -p wa -k docker_compose"
 
-        # Execution and syscall activity of interest.
-        "-a always,exit -F arch=b64 -S execve -F euid=0 -k root_exec"
-        "-a always,exit -F arch=b64 -S execve -F auid>=1000 -F auid!=unset -k user_exec"
+        # High-volume execve auditing is intentionally omitted here: logging
+        # every root/user command turns a baseline into unbounded log churn.
         "-a always,exit -F arch=b64 -S init_module,finit_module,delete_module -k kernel_modules"
         "-a always,exit -F arch=b64 -S openat,creat,truncate,ftruncate -F exit=-EACCES -k access_denied"
         "-a always,exit -F arch=b64 -S openat,creat,truncate,ftruncate -F exit=-EPERM -k access_denied"
@@ -67,7 +66,23 @@ _: {
       ];
     };
 
-    auditd.enable = true;
+    auditd = {
+      enable = true;
+
+      # auditd writes outside journald, so give it its own hard cap. Without an
+      # explicit cap, noisy rules can fill /var/log/audit before journald limits
+      # matter.
+      settings = {
+        max_log_file = 256;
+        num_logs = 8;
+        max_log_file_action = "rotate";
+        disk_full_action = "rotate";
+        space_left = 2048;
+        space_left_action = "syslog";
+        admin_space_left = 1024;
+        admin_space_left_action = "single";
+      };
+    };
   };
 
 }
