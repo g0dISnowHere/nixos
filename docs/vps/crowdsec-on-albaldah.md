@@ -179,6 +179,12 @@ Order constraints in the current design:
 - `crowdsec-firewall-bouncer-register.service` waits for
   `crowdsec-capi-register.service` when online credentials are auto-generated
 
+- `crowdsec-capi-register.service`, `crowdsec-console-enroll.service`, and
+  `crowdsec-firewall-bouncer-register.service` use root-owned wrapper scripts
+  - wrappers do only host-local checks and then call `cscli` against the
+    persisted `/var/lib/crowdsec` state, avoiding flaky helper-local
+    `StateDirectory=`/`DynamicUser=` transitions during rebuild
+
 ## Deploy
 
 Encrypt or edit the service secrets with `sops`, then deploy:

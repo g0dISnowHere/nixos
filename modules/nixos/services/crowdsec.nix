@@ -56,8 +56,11 @@ let
   cscliConfigArgs = lib.optionalString hasCtiApiKey " -c ${
      config.sops.templates."crowdsec-config.yaml".path
    }";
-  cscliPath = "${config.security.wrapperDir}/sudo -u ${config.services.crowdsec.user} ${cscliBasePath}${cscliConfigArgs}";
-  cscliRegisterPath = "${cscliBasePath}${cscliConfigArgs}";
+  # Repo-managed CrowdSec helpers run as root wrappers against the host-owned
+  # CrowdSec state tree. Root can access the persisted runtime files directly,
+  # which avoids fragile per-helper StateDirectory/DynamicUser transitions.
+  cscliPath = "${cscliBasePath}${cscliConfigArgs}";
+  cscliRegisterPath = cscliPath;
   dockerIngressCidrs = [
     "172.17.0.0/16"
     "172.30.0.0/16"
@@ -77,6 +80,10 @@ let
     bouncer_name=crowdsec-firewall-bouncer
     tmp_key="$(mktemp)"
     trap 'rm -f "$tmp_key"' EXIT
+
+    if [ -s ${lib.escapeShellArg firewallBouncerApiKeyPath} ]; then
+      exit 0
+    fi
 
     if $cscli bouncers list --output json | ${lib.getExe pkgs.jq} -e -- "any(.[]; .name == \"$bouncer_name\")" >/dev/null; then
       if [ ! -s ${lib.escapeShellArg firewallBouncerApiKeyPath} ]; then
@@ -129,9 +136,9 @@ in
   sops.templates = lib.mkIf hasCtiApiKey {
     "crowdsec-config.yaml" = {
       file = crowdsecConfigWithCti;
-      owner = config.services.crowdsec.user;
+      owner = "root";
       inherit (config.services.crowdsec) group;
-      mode = "0400";
+      mode = "0440";
       restartUnits = [ "crowdsec.service" ];
     };
   };
@@ -285,10 +292,12 @@ in
       description = "Register CrowdSec Central API runtime credentials";
       wantedBy = [ "multi-user.target" ];
       after = [
+        "crowdsec-console-config-init.service"
         "crowdsec.service"
         "network-online.target"
       ];
       wants = [
+        "crowdsec-console-config-init.service"
         "crowdsec.service"
         "network-online.target"
       ];
@@ -312,10 +321,12 @@ in
       description = "Enroll CrowdSec instance into CrowdSec Console";
       wantedBy = [ "multi-user.target" ];
       after = [
+        "crowdsec-console-config-init.service"
         "crowdsec.service"
         "network-online.target"
       ];
       wants = [
+        "crowdsec-console-config-init.service"
         "crowdsec.service"
         "network-online.target"
       ];
@@ -326,15 +337,11 @@ in
         ExecStart = pkgs.writeShellScript "crowdsec-console-enroll" ''
           set -euo pipefail
 
-          ${lib.getExe' pkgs.coreutils "mkdir"} -p \
-            ${lib.escapeShellArg crowdsecHubStateDir}
-          ${lib.getExe' pkgs.coreutils "chown"} -R ${lib.escapeShellArg "${config.services.crowdsec.user}:${config.services.crowdsec.group}"} ${lib.escapeShellArg crowdsecStateDir}
-
-          if [ ! -r ${lib.escapeShellArg "${crowdsecHubStateDir}/.index.json"} ]; then
-            ${cscliPath} hub update
+          if ${lib.getExe pkgs.gnugrep} -q '^enroll_key:' ${lib.escapeShellArg consoleConfigPath}; then
+            exit 0
           fi
 
-          if ${lib.getExe pkgs.gnugrep} -q '^enroll_key:' ${lib.escapeShellArg consoleConfigPath}; then
+          if ${cscliPath} console status >/dev/null 2>&1; then
             exit 0
           fi
 
@@ -364,6 +371,12 @@ in
     crowdsec-firewall-bouncer-register = {
       after = lib.mkIf (!hasImportedCapiCredentials) [ "crowdsec-capi-register.service" ];
       requires = lib.mkIf (!hasImportedCapiCredentials) [ "crowdsec-capi-register.service" ];
+      serviceConfig = {
+        DynamicUser = lib.mkForce false;
+        User = lib.mkForce "root";
+        Group = lib.mkForce config.services.crowdsec.group;
+        StateDirectory = lib.mkForce [ "crowdsec-firewall-bouncer-register" ];
+      };
       script = lib.mkForce (builtins.readFile reRegisterFirewallBouncer);
     };
   };
