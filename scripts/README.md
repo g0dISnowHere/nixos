@@ -70,10 +70,9 @@ Current update helpers include:
   - the timer/service path runs as root for `nixos-rebuild switch`
   - git operations still run as the configured repo user so existing SSH keys
     remain usable
-  - optional `--sync-pnpm-globals` support installs repo-managed npm CLI tools
-    after a successful rebuild
-  - optional `--sync-uv-tools` support installs repo-managed Python CLI tools
-    after a successful rebuild
+  - by default it syncs repo-managed `pnpm-globals/` and `uv-tools/` runtimes
+    after a successful rebuild; `--no-sync-pnpm-globals` and
+    `--no-sync-uv-tools` are explicit escape hatches
   - if a package-specific nixpkgs escape hatch is ever needed again, prefer a
     `nixpkgs-<pkg>-pinned` input name and probe the main package set during
     lockfile updates before keeping the pin
@@ -83,6 +82,21 @@ Current update helpers include:
 - `scripts/sync-uv-tools.sh` installs locked `uv-tools/` dependencies into the
   current user's XDG data directory and writes managed wrappers in
   `$HOME/.local/bin`; it leaves uv's standard tool store paths alone
+- `scripts/gc.sh` prunes the user-visible `pnpm` store and `uv` cache alongside
+  the existing Nix, Flatpak, Docker, and devenv cleanup steps
+
+## Tool Runtime Policy
+
+- Nixpkgs owns package-manager and runtime binaries shipped by this repo: `pnpm`,
+  `uv`, `bun`, `node`, Python, and similar base tools.
+- Repo-managed runtime projects such as `pnpm-globals/` and `uv-tools/` should
+  lock dependencies, not pin the package-manager binary version in manifest
+  metadata.
+- Do not add `packageManager` pins or version-manager marker files just to restate
+  the Nix-provided tool version.
+- Keep semantic runtime constraints when they describe the project contract rather
+  than the installer choice, for example Python `requires-python` ranges or lockfiles.
+
 Current secret helpers include:
 
 - `scripts/secrets` as the operator-facing SOPS orchestrator

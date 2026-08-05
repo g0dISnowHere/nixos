@@ -48,6 +48,11 @@ Look under `templates` output.
 - keep legacy `flake.nix` files alongside them as preserved reference material
 - keep templates self-contained so generated project not depend on this repo
 
+- when a template's dev shell already provides the toolchain from Nix, do not add
+  `packageManager` or similar package-manager version pins just to mirror the shell;
+  keep only constraints that describe the generated project's actual runtime contract
+  (for example `requires-python`, lockfiles, or engine compatibility when needed)
+
 ## Validation
 
 Check template export evaluates:

@@ -19,9 +19,12 @@ Options:
   --repo-url URL            Git URL used to bootstrap the checkout when absent.
   --branch BRANCH           Git branch allowed for automation. Default: main
   --validation-mode MODE    one of: eval, none. Default: eval
-  --sync-pnpm-globals       Run scripts/sync-pnpm-globals.sh after a successful
+  --sync-pnpm-globals       Explicit no-op; syncing is now on by default.
+  --no-sync-pnpm-globals    Skip scripts/sync-pnpm-globals.sh after a successful
                            rebuild.
-  --sync-uv-tools       Run scripts/sync-uv-tools.sh after a successful rebuild.
+  --sync-uv-tools           Explicit no-op; syncing is now on by default.
+  --no-sync-uv-tools        Skip scripts/sync-uv-tools.sh after a successful
+                           rebuild.
 EOF
 }
 
@@ -33,8 +36,8 @@ remote="origin"
 repo_url="git@github.com:g0dISnowHere/nixos.git"
 branch="main"
 validation_mode="eval"
-sync_pnpm_globals=0
-sync_uv_tools=0
+sync_pnpm_globals=1
+sync_uv_tools=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -72,6 +75,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --sync-pnpm-globals)
       sync_pnpm_globals=1
+      shift
+      ;;
+    --no-sync-pnpm-globals)
+      sync_pnpm_globals=0
+      shift
+      ;;
+    --no-sync-uv-tools)
+      sync_uv_tools=0
       shift
       ;;
     --sync-uv-tools)

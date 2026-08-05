@@ -13,3 +13,4 @@ enp0s25-diag/
 .gemini
 graphify-out
 .tokensave
+pnpm-globals/node_modules
