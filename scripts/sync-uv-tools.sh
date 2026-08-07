@@ -26,7 +26,6 @@ lock_root="${XDG_RUNTIME_DIR:-/tmp}"
 lock_file="${lock_root}/mine-uv-tools-$(id -u).lock"
 managed_marker="# managed-by: mine/scripts/sync-uv-tools.sh"
 wrapper_commands=(basic-memory bm graphify headroom specify)
-legacy_tool_dirs=(basic-memory graphifyy headroom-ai specify-cli)
 dry_run=0
 update_lock=0
 

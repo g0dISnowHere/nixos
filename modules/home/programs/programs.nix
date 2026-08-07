@@ -1,4 +1,7 @@
-{ lib, ... }: {
+{ lib, inputs, ... }:
+{
+  imports = [ inputs.direnv-instant.homeModules.direnv-instant ];
+
   programs = {
     # firefox.enable = true;
 
@@ -16,10 +19,14 @@
 
     direnv = {
       enable = true;
-      enableBashIntegration = true; # see note on other shells below
-      enableZshIntegration = true;
       # Let Home Manager generate direnvrc and source its managed nix-direnv hook.
       nix-direnv.enable = true;
+    };
+
+    direnv-instant = {
+      enable = true;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
     };
 
     # thunderbird = {

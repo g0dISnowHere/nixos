@@ -175,6 +175,7 @@ Broader checks:
 nix flake check | tail -n 20
 nix run .#shellcheckRepo | tail -n 20
 nix run .#markdownlintRepo | tail -n 20
+nix run .#flakelintRepo | tail -n 20
 sh scripts/validate-fast.sh | tail -n 20
 sh validate.sh | tail -n 20
 ```
@@ -196,6 +197,8 @@ sudo nixos-rebuild switch --flake .#centauri
   - human documentation index and taxonomy
 - [docs/reference/useful-commands.md](docs/reference/useful-commands.md)
   - quick command lookup
+- [docs/reference/fast-development.md](docs/reference/fast-development.md)
+  - instant direnv, local flake-input testing, and validation commands
 - [docs/reference/fingerprint-maintenance.md](docs/reference/fingerprint-maintenance.md)
   - update and validation checklist for `centauri` fingerprint support
 - [docs/dev-templates.md](docs/dev-templates.md)

@@ -25,8 +25,9 @@
   programs = {
     direnv = {
       enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
+      # Home Manager supplies the mutually exclusive direnv-instant hooks.
+      enableBashIntegration = false;
+      enableZshIntegration = false;
       nix-direnv.enable = true;
     };
 

@@ -24,11 +24,20 @@ in
     GREET = "nixos config";
     ZDOTDIR = "/etc/zsh";
   };
+  scripts.update = {
+    description = "Update flake inputs with the GitHub CLI credential.";
+    exec = ''
+      repo_root="$(git rev-parse --show-toplevel)" || exit
+      cd "$repo_root" || exit
+      token="$(gh auth token)" || exit
+      NIX_CONFIG="access-tokens = github.com=$token" nix flake update "$@"
+    '';
+  };
+
 
   enterShell = ''
     export REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
-    alias update="cd \"$REPO_ROOT\" && nix flake update"
     alias check="cd \"$REPO_ROOT\" && nix flake check"
     alias fmt="cd \"$REPO_ROOT\" && nix fmt"
     alias switch="cd \"$REPO_ROOT\" && sudo nixos-rebuild switch --flake .# 2>&1 | tee nixos-switch.log || { grep --color error nixos-switch.log && exit 1; }"

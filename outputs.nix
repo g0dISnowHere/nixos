@@ -33,10 +33,11 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     # "x86_64-darwin"
   ];
 
-  perSystem = _: {
-    # System-specific packages could go here
-    # packages.some-tool = pkgs.callPackage ./some-tool.nix {};
-  };
+  perSystem =
+    { inputs', ... }:
+    {
+      packages.fast-flake-update = inputs'.fast-flake-update.packages.default;
+    };
 
   flake = {
     inherit monitoringInventory;

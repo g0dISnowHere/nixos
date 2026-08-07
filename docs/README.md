@@ -38,7 +38,7 @@ When new thing worth keeping:
 - `agents/`: repo-specific configuration consumed by engineering skills (`issue-tracker.md`, `triage-labels.md`, `domain.md`)
 - `secrets-workflows.md`: SOPS operator guide
 - `architecture/`: design boundaries, structure decisions
-- `reference/`: quick lookup material (`ai-skills.md` covers installed skill packs, OMP repo scoping, and submodule refresh; `flake-linter.md` includes lint commands and response steps; `nix-fast-build.md` covers fast multi-target builds)
+- `reference/`: quick lookup material (`ai-skills.md` covers installed skill packs, OMP repo scoping, and submodule refresh; `fast-development.md` covers instant direnv, local flake-input testing, and validation; `flake-linter.md` includes lint commands and response steps; `nix-fast-build.md` covers fast multi-target builds)
 - `dev-templates.md`: local flake template workflow
 - `vps/`: VPS context, runbooks
 - `dotfiles/`: why `dotfiles/` exist, how fit repo

@@ -35,8 +35,12 @@ def parse_args() -> argparse.Namespace:
             "files beyond the configured retention cap."
         )
     )
-    parser.add_argument("--apply", action="store_true", help="delete planned old rotated logs")
-    parser.add_argument("--yes", action="store_true", help="do not prompt before applying changes")
+    parser.add_argument(
+        "--apply", action="store_true", help="delete planned old rotated logs"
+    )
+    parser.add_argument(
+        "--yes", action="store_true", help="do not prompt before applying changes"
+    )
     parser.add_argument(
         "--rotate",
         action="store_true",
@@ -126,14 +130,18 @@ def discover_logs(audit_dir: Path) -> list[AuditFile]:
     return sorted(logs, key=lambda item: (item.is_active, item.mtime_ns), reverse=True)
 
 
-def plan_deletions(logs: list[AuditFile], keep_files: int, keep_size_bytes: int) -> list[AuditFile]:
+def plan_deletions(
+    logs: list[AuditFile], keep_files: int, keep_size_bytes: int
+) -> list[AuditFile]:
     kept: list[AuditFile] = []
     delete: list[AuditFile] = []
     kept_size = 0
 
     # Keep active audit.log if present. It is still owned by auditd, so this script
     # never deletes it; use --rotate to turn it into a rotated file first.
-    for log in sorted(logs, key=lambda item: (item.is_active, item.mtime_ns), reverse=True):
+    for log in sorted(
+        logs, key=lambda item: (item.is_active, item.mtime_ns), reverse=True
+    ):
         if log.is_active:
             kept.append(log)
             kept_size += log.size
@@ -229,8 +237,12 @@ def confirm_apply(
     print()
     print("This will:")
     if rotate_needed:
-        reason = "oversized active audit.log" if not args.rotate else "requested --rotate"
-        print(f"  - send SIGUSR1 to auditd.service to rotate active audit.log ({reason})")
+        reason = (
+            "oversized active audit.log" if not args.rotate else "requested --rotate"
+        )
+        print(
+            f"  - send SIGUSR1 to auditd.service to rotate active audit.log ({reason})"
+        )
     if args.apply and deletions:
         print("  - delete the old rotated audit files marked [delete]")
     elif args.apply:
@@ -363,7 +375,9 @@ def main() -> int:
         deletions = plan_deletions(logs, keep_files, keep_size_bytes)
         print()
         print("Post-rotation deletion plan:")
-        print_inventory(logs, deletions, keep_files, keep_size_bytes, max_log_file_bytes)
+        print_inventory(
+            logs, deletions, keep_files, keep_size_bytes, max_log_file_bytes
+        )
         confirm_deletions_after_rotation(args, deletions)
 
     if args.apply:

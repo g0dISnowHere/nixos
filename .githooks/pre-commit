@@ -20,6 +20,7 @@ git diff --name-only --cached > "$staged_files_file"
 has_nix_files=0
 has_markdown_files=0
 has_shell_files=0
+has_flake_lock=0
 
 if grep -E '\.nix$' "$staged_files_file" | grep -vq -x "dconf.nix"; then
     has_nix_files=1
@@ -33,8 +34,12 @@ if grep -Eq '(^|/)[^/]+\.sh$|^scripts/secrets$|^\.githooks/pre-commit$' "$staged
     has_shell_files=1
 fi
 
-if [ "$has_nix_files" -eq 0 ] && [ "$has_markdown_files" -eq 0 ] && [ "$has_shell_files" -eq 0 ]; then
-    echo "   ℹ️  No staged .nix, .md, or shell files requiring repo checks; skipping."
+if grep -Eq '^flake\.lock$' "$staged_files_file"; then
+    has_flake_lock=1
+fi
+
+if [ "$has_nix_files" -eq 0 ] && [ "$has_markdown_files" -eq 0 ] && [ "$has_shell_files" -eq 0 ] && [ "$has_flake_lock" -eq 0 ]; then
+    echo "   ℹ️  No staged Nix, Markdown, shell, or flake lock files requiring repo checks; skipping."
     exit 0
 fi
 cleanup_staged_file() {

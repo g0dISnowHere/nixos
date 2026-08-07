@@ -76,6 +76,11 @@ echo "Nix:"
 run_check "Nix lint failed" \
   bash "${script_dir}/lint-nix.sh"
 
+
+echo ""
+echo "Flake inputs:"
+run_check "flake-linter failed" \
+  nix build .#checks.x86_64-linux.flake-linter --no-link
 echo ""
 echo "Documentation:"
 run_check "markdown lint failed" \

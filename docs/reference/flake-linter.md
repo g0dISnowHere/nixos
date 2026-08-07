@@ -29,6 +29,9 @@ Or via package app wrapper:
 nix run .#flakelintRepo
 ```
 
+`scripts/validate-fast.sh` builds this check. The pre-commit hook runs that
+pipeline when you stage `flake.lock`, Nix, Markdown, or shell files.
+
 ## Typical Output And What To Do
 
 ### "has multiple versions"

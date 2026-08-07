@@ -1,10 +1,7 @@
 - devenv should only auto update on rebuild in this repo. Not good if `git pull` causes it to update and download dependencies.
 
 - [general skills](https://github.com/Mic92/mics-skills)
-- [direnv-instant](https://github.com/Mic92/direnv-instant): Non-blocking direnv integration daemon with tmux support that provides instant shell prompts by running direnv asynchronously in the background.
-- [nix fast update](https://github.com/Mic92/fast-flake-update)
 - [fast gc](https://github.com/Mic92/fast-nix-gc)
-- [flake linter](https://github.com/Mic92/flake-linter): Find duplicate dependencies.
 
 ## Plan: add [nix-fast-build](https://github.com/Mic92/nix-fast-build)
 
