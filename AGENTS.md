@@ -54,7 +54,7 @@
   - `sudo nixos-rebuild switch --flake .#centauri`
 
 ## Coding Style & Naming Conventions
-- Format with `nix fmt` (treefmt; currently `nixfmt`, `yamlfmt`, and `black`).
+- Format with `nix run --no-write-lock-file .#flake-fmt --` (cached `flake-fmt` wrapper over treefmt).
 - Keep imports explicit and modules focused on one feature or responsibility.
 - Hostnames map to folder names: `nixos/machines/<hostname>/default.nix`.
 - Keep commits focused, lowercase, and descriptive, matching existing history.

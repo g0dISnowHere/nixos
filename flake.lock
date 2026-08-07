@@ -141,6 +141,26 @@
         "type": "github"
       }
     },
+    "flake-fmt": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783557899,
+        "narHash": "sha256-zpyrja8s+hmANNpoKb6ffm3HZWjgNCa8OVXtJFCYm5o=",
+        "owner": "Mic92",
+        "repo": "flake-fmt",
+        "rev": "f46dd93676214f5756c8dcf9ece2584fd7f23f50",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "flake-fmt",
+        "type": "github"
+      }
+    },
     "flake-linter": {
       "inputs": {
         "nixpkgs": [
@@ -572,6 +592,7 @@
         "direnv-instant": "direnv-instant",
         "disko": "disko",
         "fast-flake-update": "fast-flake-update",
+        "flake-fmt": "flake-fmt",
         "flake-linter": "flake-linter",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",

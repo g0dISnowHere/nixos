@@ -34,12 +34,11 @@ in
     '';
   };
 
-
   enterShell = ''
     export REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
     alias check="cd \"$REPO_ROOT\" && nix flake check"
-    alias fmt="cd \"$REPO_ROOT\" && nix fmt"
+    alias fmt="cd \"$REPO_ROOT\" && nix run --no-write-lock-file .#flake-fmt --"
     alias switch="cd \"$REPO_ROOT\" && sudo nixos-rebuild switch --flake .# 2>&1 | tee nixos-switch.log || { grep --color error nixos-switch.log && exit 1; }"
     alias test="cd \"$REPO_ROOT\" && sudo nixos-rebuild test --flake .# 2>&1 | tee nixos-switch.log || { grep --color error nixos-switch.log && exit 1; }"
     alias gc="sudo nix-collect-garbage --delete-older-than 10d && nix-collect-garbage --delete-older-than 10d && nix-store --optimise"

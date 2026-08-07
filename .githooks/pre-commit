@@ -49,8 +49,8 @@ trap cleanup_staged_file EXIT
 
 # === Format Code ===
 if [ "$has_nix_files" -eq 1 ]; then
-    echo "1️⃣  Formatting code with nix fmt..."
-    nix fmt
+    echo "1️⃣  Formatting code with flake-fmt..."
+    nix run --no-write-lock-file .#flake-fmt --
     if git diff-index --quiet HEAD --; then
         echo "   ✓ No formatting changes"
     else

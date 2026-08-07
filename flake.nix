@@ -42,6 +42,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    flake-fmt = {
+      url = "github:Mic92/flake-fmt";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-fast-build = {
       url = "github:Mic92/nix-fast-build";
       inputs = {

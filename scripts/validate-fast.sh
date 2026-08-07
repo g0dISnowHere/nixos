@@ -72,6 +72,11 @@ run_check "shell lint failed" \
   bash "${script_dir}/lint-shell.sh"
 
 echo ""
+echo "Formatting:"
+run_check "flake-fmt check failed" \
+  nix run --no-write-lock-file .#flake-fmt -- -- --ci
+
+echo ""
 echo "Nix:"
 run_check "Nix lint failed" \
   bash "${script_dir}/lint-nix.sh"

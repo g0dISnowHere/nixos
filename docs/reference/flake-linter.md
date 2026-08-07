@@ -63,8 +63,21 @@ nix flake check -L
 
 ## Fast Loop
 
+`flake-fmt` caches this flake's `formatter` output. Format locally:
+
 ```bash
-nix fmt
+nix run --no-write-lock-file .#flake-fmt --
+```
+
+Check formatting without changing files:
+
+```bash
+nix run --no-write-lock-file .#flake-fmt -- -- --ci
+```
+
+Then run the linter and full checks:
+
+```bash
 nix build .#checks.x86_64-linux.flake-linter
 nix flake check -L
 ```

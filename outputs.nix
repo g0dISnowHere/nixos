@@ -36,7 +36,10 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
   perSystem =
     { inputs', ... }:
     {
-      packages.fast-flake-update = inputs'.fast-flake-update.packages.default;
+      packages = {
+        fast-flake-update = inputs'.fast-flake-update.packages.default;
+        flake-fmt = inputs'.flake-fmt.packages.default;
+      };
     };
 
   flake = {
