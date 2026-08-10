@@ -49,7 +49,7 @@ Building and activation use separate connections:
 2. deploy-rs copies those closures to each target over SSH.
 3. deploy-rs activates each target as `root` with automatic and magic rollback enabled.
 
-A deployment launched on Centauri cannot activate Centauri through `centauri.wallaby-clownfish.ts.net`: that address resolves to Centauri's own Tailscale IP and the self-SSH connection is refused. Build placement remains correct, but that activation transport needs a local path or an exclusion from the fleet run.
+A deployment launched from a target host cannot activate that same host through its Tailscale hostname: the self-SSH connection is refused. Build placement remains correct, but self-activation must use `sudo nixos-rebuild switch --flake .#<hostname>`; exclude that host from a fleet run.
 
 ## Implementation Map
 
