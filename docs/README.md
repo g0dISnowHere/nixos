@@ -39,6 +39,7 @@ When new thing worth keeping:
 - `secrets-workflows.md`: SOPS operator guide
 - `architecture/`: design boundaries, structure decisions
 - `reference/`: quick lookup material (`ai-skills.md` covers installed skill packs, OMP repo scoping, and submodule refresh; `fast-development.md` covers instant direnv, local flake-input testing, and validation; `flake-linter.md` includes lint commands and response steps; `nix-fast-build.md` covers fast multi-target builds)
+- `architecture/deployment-and-remote-builds.md`: deployment source selection, Albaldah build policy, closure transfer, and activation transport.
 - `dev-templates.md`: local flake template workflow
 - `vps/`: VPS context, runbooks
 - `dotfiles/`: why `dotfiles/` exist, how fit repo

@@ -31,6 +31,7 @@
     ../../../modules/nixos/services/flatpak.nix # Flatpak infrastructure
     ../../../modules/nixos/services/mosh.nix
     ../../../modules/nixos/services/tailscale-client.nix
+    ../../../modules/nixos/system/albaldah-builder.nix
     ../../../modules/nixos/services/avahi-discovery.nix
     ../../../modules/nixos/virtualisation/docker.nix
     ../../../modules/nixos/desktop/gnome.nix
@@ -78,6 +79,8 @@
     mode = "consumer";
     onCalendar = "daily";
   };
+
+  my.tailscale.enableSSH = true;
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
   system.stateVersion = "25.11";

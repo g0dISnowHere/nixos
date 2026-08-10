@@ -1,8 +1,4 @@
 inputs:
-
-let
-  monitoringInventory = import ./flake/monitoring-inventory.nix;
-in
 inputs."flake-parts".lib.mkFlake { inherit inputs; } {
 
   imports = [
@@ -34,17 +30,42 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
   ];
 
   perSystem =
-    { inputs', ... }:
     {
+      inputs',
+      pkgs,
+      system,
+      ...
+    }:
+    {
+      checks = inputs.deploy-rs.lib.${system}.deployChecks inputs.self.lib.deploy;
+
       packages = {
+        deploy-rs = inputs'.deploy-rs.packages.default;
+        deploy-fleet = pkgs.writeShellApplication {
+          name = "deploy-fleet";
+          runtimeInputs = [
+            pkgs.nix
+            inputs'.deploy-rs.packages.default
+          ];
+          # Force deploy-rs profile builds onto Albaldah; deploy then copies closures to targets.
+          text = ''
+            nix eval --json .#lib.deploy > /dev/null
+            exec deploy \
+              --skip-checks \
+              --rollback-succeeded true \
+              "$@" \
+              -f ./flake/deploy \
+              -- \
+              --builders 'ssh-ng://root@albaldah.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -' \
+              --max-jobs 0
+          '';
+        };
         fast-flake-update = inputs'.fast-flake-update.packages.default;
         flake-fmt = inputs'.flake-fmt.packages.default;
       };
     };
 
   flake = {
-    inherit monitoringInventory;
-    monitoringInventoryJson = builtins.toJSON monitoringInventory;
 
     # `nixosConfigurations` are defined by flake/machines/default.nix,
     # which registers canonical host definitions under nixos/machines/.

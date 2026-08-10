@@ -219,6 +219,29 @@ rg -n 'nixos-06cb-009a-fingerprint-sensor|url = ' flake.nix flake.lock | tail -n
 nix build .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 20
 ```
 
+## Deploy Fleet
+
+`deploy-fleet` forces every deploy-rs profile build onto `albaldah` over Tailscale SSH; Nix copies finished closures back to deploy-rs, which distributes them to target hosts. `deploy-rs` activates every target as `root`; automatic and magic rollback remain enabled. Do not pass `--remote-build`: that builds each profile on its target instead.
+
+First connection accepts each target's Tailscale SSH host key. Later key
+changes fail deployment until explicitly reviewed.
+
+After applying the bootstrap configuration on `centauri`, deploy every online
+host. `deploy-fleet` evaluates deployment configuration first; if any node
+fails, deploy-rs rolls successful nodes back:
+
+```bash
+nix run .#deploy-fleet
+```
+
+`alhena` must be online. Before first fleet rollout, bootstrap `centauri` once.
+This installs Albaldah's pinned SSH host key for Nix daemon remote builds and
+enables Centauri's Tailscale SSH listener:
+
+```bash
+sudo nixos-rebuild switch --flake .#centauri
+```
+
 ## Install `albaldah` With `nixos-anywhere`
 
 ```bash

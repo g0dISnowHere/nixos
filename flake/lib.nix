@@ -6,6 +6,33 @@ let
     nixpkgs-unstable
     sops-nix
     ;
+  monitoringInventory = import ./monitoring-inventory.nix;
+  mkDeployNode = nodeName: hostname: {
+    inherit hostname;
+    sshUser = "root";
+    autoRollback = true;
+    magicRollback = true;
+
+    profiles.system = {
+      user = "root";
+      path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos inputs.self.nixosConfigurations.${nodeName};
+    };
+  };
+  deploy = {
+    autoRollback = true;
+    magicRollback = true;
+    sshOpts = [
+      "-o"
+      "StrictHostKeyChecking=accept-new"
+    ];
+
+    nodes = {
+      centauri = mkDeployNode "centauri" "centauri.wallaby-clownfish.ts.net";
+      mirach = mkDeployNode "mirach" "mirach.wallaby-clownfish.ts.net";
+      albaldah = mkDeployNode "albaldah" "albaldah.wallaby-clownfish.ts.net";
+      alhena = mkDeployNode "alhena" "alhena.wallaby-clownfish.ts.net";
+    };
+  };
   mkPkgs =
     nixpkgsInput: system:
     import nixpkgsInput {
@@ -77,8 +104,14 @@ let
 in
 {
   flake.lib = {
-    inherit secretsPolicy renderSopsConfig;
+    inherit
+      secretsPolicy
+      renderSopsConfig
+      monitoringInventory
+      deploy
+      ;
     renderedSopsConfig = renderSopsConfig secretsPolicy;
+    monitoringInventoryJson = builtins.toJSON monitoringInventory;
 
     # Helper function to create a NixOS system configuration.
     # Machine behavior is assembled from explicit capability modules.
