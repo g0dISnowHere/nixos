@@ -6,6 +6,8 @@ set -euo pipefail
 
 KEEP_DAYS=10
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 resolve_system_tool() {
     local tool="$1"
     local candidate
@@ -59,6 +61,9 @@ if command -v docker &>/dev/null; then
 else
     echo "    docker not found, skipping."
 fi
+
+echo "==> Syncing managed AI skills..."
+"${script_dir}/sync-ai-skills.sh"
 
 echo "==> User-level nix garbage collection (older than ${KEEP_DAYS} days)..."
 nix-collect-garbage --delete-older-than "${KEEP_DAYS}d"

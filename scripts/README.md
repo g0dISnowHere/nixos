@@ -70,9 +70,9 @@ Current update helpers include:
   - the timer/service path runs as root for `nixos-rebuild switch`
   - git operations still run as the configured repo user so existing SSH keys
     remain usable
-  - by default it syncs repo-managed `pnpm-globals/` and `uv-tools/` runtimes
-    after a successful rebuild; `--no-sync-pnpm-globals` and
-    `--no-sync-uv-tools` are explicit escape hatches
+  - by default it syncs repo-managed `pnpm-globals/`, `uv-tools/`, and managed
+    AI skills after a successful rebuild; the corresponding `--no-sync-*`
+    flags are explicit escape hatches
   - if a package-specific nixpkgs escape hatch is ever needed again, prefer a
     `nixpkgs-<pkg>-pinned` input name and probe the main package set during
     lockfile updates before keeping the pin
@@ -82,8 +82,11 @@ Current update helpers include:
 - `scripts/sync-uv-tools.sh` installs locked `uv-tools/` dependencies into the
   current user's XDG data directory and writes managed wrappers in
   `$HOME/.local/bin`; it leaves uv's standard tool store paths alone
-- `scripts/gc.sh` prunes the user-visible `pnpm` store and `uv` cache alongside
-  the existing Nix, Flatpak, Docker, and devenv cleanup steps
+- `scripts/global-skills.txt` is the one-source-per-line global skill manifest;
+  `scripts/sync-ai-skills.sh` refetches and installs its packs for every
+  compatible global agent
+- `scripts/gc.sh` synchronizes managed AI skills, then prunes the user-visible
+  `pnpm` store and `uv` cache alongside Nix, Flatpak, Docker, and devenv cleanup
 
 ## Tool Runtime Policy
 

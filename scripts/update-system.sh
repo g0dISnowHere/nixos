@@ -25,6 +25,9 @@ Options:
   --sync-uv-tools           Explicit no-op; syncing is now on by default.
   --no-sync-uv-tools        Skip scripts/sync-uv-tools.sh after a successful
                            rebuild.
+  --sync-ai-skills          Explicit no-op; syncing is now on by default.
+  --no-sync-ai-skills       Skip scripts/sync-ai-skills.sh after a successful
+                            rebuild.
 EOF
 }
 
@@ -38,6 +41,7 @@ branch="main"
 validation_mode="eval"
 sync_pnpm_globals=1
 sync_uv_tools=1
+sync_ai_skills=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -87,6 +91,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --sync-uv-tools)
       sync_uv_tools=1
+      shift
+      ;;
+    --sync-ai-skills)
+      sync_ai_skills=1
+      shift
+      ;;
+    --no-sync-ai-skills)
+      sync_ai_skills=0
       shift
       ;;
     -h|--help)
@@ -264,6 +276,19 @@ sync_uv_tools_after_switch() {
   fi
 
   printf 'Syncing uv tools for %s\n' "$repo_user"
+  run_as_repo_user bash "$sync_script"
+}
+
+sync_ai_skills_after_switch() {
+  local sync_script
+  sync_script="${repo_root}/scripts/sync-ai-skills.sh"
+
+  if [[ ! -r "$sync_script" ]]; then
+    printf 'AI skills sync requested but script missing: %s\n' "$sync_script" >&2
+    exit 1
+  fi
+
+  printf 'Syncing AI skills for %s\n' "$repo_user"
   run_as_repo_user bash "$sync_script"
 }
 run_updater_flow() {
@@ -529,6 +554,10 @@ fi
 
 if [[ "$mode" != "bootstrap" && "$did_switch_system" -eq 1 && "$sync_uv_tools" -eq 1 ]]; then
   sync_uv_tools_after_switch
+fi
+
+if [[ "$mode" != "bootstrap" && "$did_switch_system" -eq 1 && "$sync_ai_skills" -eq 1 ]]; then
+  sync_ai_skills_after_switch
 fi
 
 if [[ "$mode" != "bootstrap" ]]; then

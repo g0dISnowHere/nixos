@@ -1,0 +1,5 @@
+# One skills CLI source per line. This is the managed global skill set.
+mattpocock/skills
+hardikpandya/stop-slop
+JuliusBrussee/caveman
+dietrichgebert/ponytail@ponytail

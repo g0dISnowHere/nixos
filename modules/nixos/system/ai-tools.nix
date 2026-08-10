@@ -6,6 +6,7 @@
     pkgs-unstable.opencode
     pkgs-unstable.antigravity-ide
     pkgs-unstable.fabric-ai
+    pkgs-unstable.skills
   ];
 
   environment.sessionVariables.OPENAI_BASE_URL = "https://headroom.int.djoolz.de";
