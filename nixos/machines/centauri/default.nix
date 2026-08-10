@@ -76,7 +76,6 @@
   services.automatic-timezoned.enable = true;
   my.autoUpdate = {
     enable = true;
-    mode = "consumer";
     onCalendar = "daily";
   };
 

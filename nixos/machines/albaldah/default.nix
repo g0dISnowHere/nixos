@@ -38,7 +38,6 @@
 
   my.autoUpdate = {
     enable = true;
-    mode = "updater";
     onCalendar = "weekly";
   };
 

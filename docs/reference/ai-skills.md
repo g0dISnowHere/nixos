@@ -16,9 +16,8 @@ Inspect the manifest without changing state:
 scripts/sync-ai-skills.sh --list
 ```
 
-The synchronizer runs automatically after a successful
-`scripts/update-system.sh` rebuild and during `scripts/gc.sh` before Nix
-collection. Run it directly to repair or immediately refresh the global set:
+Run the synchronizer directly to repair or immediately refresh the global set.
+`scripts/gc.sh` also runs it before Nix collection:
 
 ```bash
 scripts/sync-ai-skills.sh

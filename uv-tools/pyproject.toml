@@ -3,10 +3,9 @@ name = "mine-uv-tools"
 version = "1.0.0"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-  "basic-memory",
-  "graphifyy",
-  "headroom-ai",
-  "specify-cli @ git+https://github.com/github/spec-kit.git",
+  # "basic-memory",
+  "headroom-ai[all]",
+  # "specify-cli @ git+https://github.com/github/spec-kit.git",
 ]
 
 [tool.uv]

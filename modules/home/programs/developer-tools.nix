@@ -49,6 +49,8 @@
       "$HOME/go/bin"
       "$HOME/.cargo/bin"
       "$HOME/.local/bin"
+      "$HOME/.local/share/mine/pnpm-globals/node_modules/.bin"
+      "$HOME/.local/share/mine/uv-tools/.venv/bin"
     ];
   };
 }

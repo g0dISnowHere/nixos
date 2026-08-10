@@ -91,7 +91,6 @@
 
   my.autoUpdate = {
     enable = true;
-    mode = "consumer";
     onCalendar = "daily";
     randomizedDelaySec = "90min";
   };

@@ -60,7 +60,6 @@ assert_not_contains "$centauri_packages" "gemini-cli-" "system packages leave ge
 assert_not_contains "$centauri_packages" "codex-" "system packages leave codex to pnpm-globals"
 assert_not_contains "$centauri_packages" "bun-" "system packages leave bun to pnpm-globals"
 assert_not_contains "$centauri_packages" "basic-memory-" "system packages leave basic-memory to uv-tools"
-assert_not_contains "$centauri_packages" "graphifyy-" "system packages leave graphifyy to uv-tools"
 assert_not_contains "$centauri_packages" "headroom-ai-" "system packages leave headroom-ai to uv-tools"
 assert_not_contains "$centauri_packages" "specify-cli-" "system packages leave specify-cli to uv-tools"
 
@@ -86,7 +85,6 @@ assert_not_contains "$standalone_packages" "gemini-cli-" "standalone Home Manage
 assert_not_contains "$standalone_packages" "codex-" "standalone Home Manager leaves codex to pnpm-globals"
 assert_not_contains "$standalone_packages" "bun-" "standalone Home Manager leaves bun to pnpm-globals"
 assert_not_contains "$standalone_packages" "basic-memory-" "standalone Home Manager leaves basic-memory to uv-tools"
-assert_not_contains "$standalone_packages" "graphifyy-" "standalone Home Manager leaves graphifyy to uv-tools"
 assert_not_contains "$standalone_packages" "headroom-ai-" "standalone Home Manager leaves headroom-ai to uv-tools"
 assert_not_contains "$standalone_packages" "specify-cli-" "standalone Home Manager leaves specify-cli to uv-tools"
 assert_contains "$standalone_packages" "opencode-" "standalone Home Manager keeps unstable AI CLI packages"
