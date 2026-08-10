@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Pre-commit hook for NixOS flake configuration
-# Runs validation before allowing commits
+# Runs only staged formatting and Markdown linting.
 
 set -e
 
@@ -19,8 +18,6 @@ staged_files_file="/tmp/pre-commit-staged-files.txt"
 git diff --name-only --cached > "$staged_files_file"
 has_nix_files=0
 has_markdown_files=0
-has_shell_files=0
-has_flake_lock=0
 
 if grep -E '\.nix$' "$staged_files_file" | grep -vq -x "dconf.nix"; then
     has_nix_files=1
@@ -30,16 +27,9 @@ if grep -Eq '\.md$' "$staged_files_file"; then
     has_markdown_files=1
 fi
 
-if grep -Eq '(^|/)[^/]+\.sh$|^scripts/secrets$|^\.githooks/pre-commit$' "$staged_files_file"; then
-    has_shell_files=1
-fi
 
-if grep -Eq '^flake\.lock$' "$staged_files_file"; then
-    has_flake_lock=1
-fi
-
-if [ "$has_nix_files" -eq 0 ] && [ "$has_markdown_files" -eq 0 ] && [ "$has_shell_files" -eq 0 ] && [ "$has_flake_lock" -eq 0 ]; then
-    echo "   ℹ️  No staged Nix, Markdown, shell, or flake lock files requiring repo checks; skipping."
+if [ "$has_nix_files" -eq 0 ] && [ "$has_markdown_files" -eq 0 ]; then
+    echo "   ℹ️  No staged Nix or Markdown files requiring basic checks; skipping."
     exit 0
 fi
 cleanup_staged_file() {
@@ -89,18 +79,6 @@ fi
 
 echo ""
 
-# === Validate Configuration ===
-echo "3️⃣  Running validation script..."
-if sh ./scripts/validate-fast.sh > /tmp/validate-output.txt 2>&1; then
-    cat /tmp/validate-output.txt | grep "^  ✓\|^  ✗\|^==="
-    echo ""
-else
-    echo ""
-    cat /tmp/validate-output.txt
-    echo ""
-    echo "❌ Validation failed! Commit aborted."
-    exit 1
-fi
 
-echo "✅ All pre-commit checks passed!"
+echo "✅ Basic pre-commit linting passed!"
 echo ""

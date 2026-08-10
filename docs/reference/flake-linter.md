@@ -29,8 +29,8 @@ Or via package app wrapper:
 nix run .#flakelintRepo
 ```
 
-`scripts/validate-fast.sh` builds this check. The pre-commit hook runs that
-pipeline when you stage `flake.lock`, Nix, Markdown, or shell files.
+`scripts/validate-fast.sh` builds this check. It is a manual pre-push
+validation gate; the pre-commit hook does not run it.
 
 ## Typical Output And What To Do
 

@@ -19,6 +19,21 @@ configuration. `direnv-instant` replaces that hook. When evaluation takes more
 than four seconds, it opens a multiplexer pane with direnv output; use Ctrl-C
 there to stop a stuck evaluation.
 
+## Repository-local codebase memory
+
+`codebase-memory-mcp` is provided by this repository's unstable `devenv`
+channel and registered only through the root [`.mcp.json`](../../.mcp.json).
+Enter the development shell before using the CLI directly:
+
+```bash
+devenv shell
+codebase-memory-mcp
+```
+
+The MCP server confines indexing and its cache to this repository via
+`CBM_ALLOWED_ROOT=.` and `CBM_CACHE_DIR=.codebase-memory`. The cache is ignored
+by Git.
+
 ## Test a local flake input
 
 Use `fast-flake-update` when testing a local Git checkout of a flake input. It
@@ -60,8 +75,8 @@ bash scripts/validate-fast.sh
 
 The pipeline evaluates each configured host and Home Manager profile, checks
 secrets policy, runs shell/Nix/Markdown linters, and builds the flake-linter
-check. The pre-commit hook runs this pipeline for staged Nix, Markdown, shell,
-or `flake.lock` files.
+check. The pre-commit hook instead limits itself to formatting staged Nix files
+and auto-fixing staged Markdown, so use this command before pushing changes.
 
 `flake-linter` reports the root stable and unstable Nixpkgs inputs as separate
 versions. This repository keeps both: NixOS hosts use `nixos-26.05`, while

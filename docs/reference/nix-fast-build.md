@@ -42,8 +42,9 @@ nix flake check
 
 ## Where to use in your pipeline
 
-- **Pre-commit:** keep current fast eval/lint checks (`scripts/validate-fast.sh`).
-- **Pre-push / manual gate:** run `fcheck` to catch real build breakage across core targets.
+- **Pre-commit:** staged Nix formatting and Markdown auto-fixes only.
+- **Pre-push / manual gate:** run `scripts/validate-fast.sh` and `fcheck` to
+  catch evaluation and build breakage across core targets.
 - **CI/build jobs:** use `nix-fast-build` for multi-target parallel builds.
 
 ## Notes
