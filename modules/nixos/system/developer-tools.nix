@@ -78,6 +78,7 @@ in
       pkgs-unstable.herdr
       # inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
       pkgs-unstable.hunk
+      pkgs-unstable.tuicr
 
     ];
 
