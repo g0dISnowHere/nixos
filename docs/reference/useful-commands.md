@@ -221,7 +221,14 @@ nix build .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 
 
 ## Deploy Fleet
 
-`deploy-fleet` forces every deploy-rs profile build onto `albaldah` over Tailscale SSH; Nix copies finished closures back to deploy-rs, which distributes them to target hosts. `deploy-rs` activates every target as `root`; automatic and magic rollback remain enabled. Do not pass `--remote-build`: that builds each profile on its target instead.
+Outside Albaldah, `deploy-fleet` sends eligible deploy-rs profile builds to
+Albaldah over Tailscale SSH. It keeps one local job for
+`preferLocalBuild` derivations such as the NixOS firmware link farm. When
+launched on Albaldah, it builds locally rather than configuring Albaldah as its
+own remote builder. Nix copies finished remote closures back to deploy-rs,
+which distributes them to target hosts. `deploy-rs` activates every target as
+`root`; automatic and magic rollback remain enabled. Do not pass
+`--remote-build`: that builds each profile on its target instead.
 
 First connection accepts each target's Tailscale SSH host key. Later key
 changes fail deployment until explicitly reviewed.

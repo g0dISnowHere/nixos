@@ -10,16 +10,22 @@ nix run .#deploy-fleet
 
 `deploy-fleet` evaluates the checkout from which you run it. It does not deploy a separately fetched Git revision. A dirty tracked worktree participates in the evaluation; flake inputs resolve through `flake.lock`.
 
-The wrapper passes these Nix build options to every deploy-rs profile build:
+The wrapper passes these Nix build options when launched anywhere except
+Albaldah:
 
 ```text
 --builders 'ssh-ng://root@albaldah.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -'
---max-jobs 0
+--max-jobs 1
 ```
 
-`--max-jobs 0` prevents Nix from building profiles on the deployment machine. Nix builds eligible derivations on Albaldah, returns their output closures to the deployment machine, then deploy-rs copies closures to each target and activates them as `root`.
+Eligible derivations build on Albaldah. The one local job is required for
+`preferLocalBuild` derivations, including NixOS's firmware link farm; setting
+`--max-jobs 0` makes those deployments fail. When launched on Albaldah, the
+wrapper uses its local builder and does not configure Albaldah as its own
+remote builder.
 
-Do not pass deploy-rs `--remote-build`. That option makes each deployment target build its own profile, which violates this contract.
+Do not pass deploy-rs `--remote-build`. That option makes each deployment
+target build its own profile, which violates this contract.
 
 ## Source Transfer Is Required
 
@@ -29,9 +35,11 @@ Avoiding source transfer requires a different workflow: commit and push a revisi
 
 ## Builder Access
 
-The deployment machine's Nix daemon must authenticate to Albaldah as `root` over `ssh-ng`. It needs Albaldah's host key, a usable root SSH identity, and access to the Tailscale hostname. Albaldah must run Nix, accept the connection, and trust the connecting user.
-
-`modules/nixos/system/albaldah-builder.nix` configures this access for Centauri. A different launch host needs equivalent Nix daemon and SSH configuration before it can use `deploy-fleet`.
+The deployment machine's Nix daemon must authenticate to Albaldah as `root`
+over `ssh-ng`. It needs Albaldah's host key, a usable root SSH identity, and
+access to the Tailscale hostname. Albaldah must run Nix, accept the connection,
+and trust the connecting user. Albaldah itself does not need this self-builder
+configuration.
 
 ## Transport and Activation
 

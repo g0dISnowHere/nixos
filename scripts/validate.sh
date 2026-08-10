@@ -232,16 +232,18 @@ validate_monitoring_inventory() {
   fi
 
   if ! jq -e '
-    (.hosts | keys == ["albaldah", "centauri", "mirach"]) and
-    (.groups.all_hosts == ["albaldah", "centauri", "mirach"]) and
+    (.hosts | keys == ["albaldah", "alhena", "centauri", "mirach"]) and
+    (.groups.all_hosts == ["albaldah", "alhena", "centauri", "mirach"]) and
     (.groups.public_edge_hosts == ["albaldah"]) and
-    (.groups.docker_hosts == ["albaldah", "centauri", "mirach"]) and
-    (.groups.frontend_hosts == ["albaldah", "centauri"]) and
+    (.groups.docker_hosts == ["albaldah", "alhena", "centauri", "mirach"]) and
+    (.groups.frontend_hosts == ["albaldah", "alhena", "centauri"]) and
     (.groups.monitoring_hosts == ["albaldah"]) and
     (.groups.security_hosts == ["albaldah"]) and
     (all(.hosts[]; has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
     (.hosts.albaldah.exposure_tier == "public_edge") and
     (.hosts.albaldah.service_roles == ["edge", "monitoring", "security", "frontend"]) and
+    (.hosts.alhena.exposure_tier == "tailscale_only") and
+    (.hosts.alhena.service_roles == ["frontend"]) and
     (.hosts.centauri.exposure_tier == "tailscale_only") and
     (.hosts.centauri.service_roles == ["frontend"]) and
     (.hosts.mirach.exposure_tier == "lan_only") and
@@ -251,7 +253,7 @@ validate_monitoring_inventory() {
     return 1
   fi
 
-  echo "  ✓ monitoring inventory export matches the current three-host fleet"
+  echo "  ✓ monitoring inventory export matches the current four-host fleet"
 }
 
 echo "Shell:"

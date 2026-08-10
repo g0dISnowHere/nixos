@@ -44,12 +44,24 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
         deploy-fleet = pkgs.writeShellApplication {
           name = "deploy-fleet";
           runtimeInputs = [
+            pkgs.coreutils
             pkgs.nix
             inputs'.deploy-rs.packages.default
           ];
-          # Force deploy-rs profile builds onto Albaldah; deploy then copies closures to targets.
+          # All launch hosts except Albaldah send eligible builds to Albaldah.
+          # Nix still needs one local job for preferLocalBuild derivations such as
+          # NixOS's firmware link farm.
           text = ''
             nix eval --json .#lib.deploy > /dev/null
+
+            if [ "$(hostname --short)" = albaldah ]; then
+              exec deploy \
+                --skip-checks \
+                --rollback-succeeded true \
+                "$@" \
+                -f ./flake/deploy
+            fi
+
             exec deploy \
               --skip-checks \
               --rollback-succeeded true \
@@ -57,7 +69,7 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
               -f ./flake/deploy \
               -- \
               --builders 'ssh-ng://root@albaldah.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -' \
-              --max-jobs 0
+              --max-jobs 1
           '';
         };
         fast-flake-update = inputs'.fast-flake-update.packages.default;

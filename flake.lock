@@ -267,11 +267,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1786327955,
-        "narHash": "sha256-lv8BqcQpYTgXpvWkzjwpVM/nSkpXNxhINfkmEjFKb2k=",
+        "lastModified": 1786360049,
+        "narHash": "sha256-pkeLqdSFJgA8UxNxxRzyGC9i3spDKkMQnpEwSWfPx2U=",
         "owner": "modem-dev",
         "repo": "hunk",
-        "rev": "dd6939faf2cf65fcc459f7792fe05f719ae50dd0",
+        "rev": "19bf7059371e62826f20783d5e7f1c155cb8e032",
         "type": "github"
       },
       "original": {
@@ -567,11 +567,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1786201459,
-        "narHash": "sha256-CiOTEjmwAmG2AWnaIno9YaCJJmpca2FXPhMAsnrolCg=",
+        "lastModified": 1786313170,
+        "narHash": "sha256-9BG7OgUWdu0ONDO5X2q6+K4bsuBITkX/3W4nNJu1Ito=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8b8c811c7c2541c30382c5de7ed26be055569c60",
+        "rev": "fcb8fcd6bf2d0adecae5bd491afaaaf8311b758d",
         "type": "github"
       },
       "original": {
