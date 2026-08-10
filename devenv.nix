@@ -14,6 +14,7 @@ in
       deadnix
       markdownlint-cli
       shellcheck
+      codebase-memory-mcp
     ]
     ++ lib.optional (flakeLinterPkg != null) flakeLinterPkg
     ++ lib.optional (nixFastBuildPkg != null) nixFastBuildPkg;
@@ -48,8 +49,10 @@ in
       .#nixosConfigurations.albaldah.config.system.build.toplevel \
       .#homeConfigurations."djoolz@workstation".activationPackage'
 
-    echo "NixOS configuration development environment"
-    echo "Current system: ${pkgs.stdenv.hostPlatform.system}"
+    if [[ $- == *i* ]]; then
+      echo "NixOS configuration development environment"
+      echo "Current system: ${pkgs.stdenv.hostPlatform.system}"
+    fi
 
   '';
 }

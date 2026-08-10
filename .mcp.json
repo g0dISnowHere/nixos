@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codebase-memory": {
+      "command": "devenv",
+      "args": ["shell", "--quiet", "--", "codebase-memory-mcp"],
+      "env": {
+        "CBM_ALLOWED_ROOT": ".",
+        "CBM_CACHE_DIR": ".codebase-memory"
+      }
+    }
+  }
+}
