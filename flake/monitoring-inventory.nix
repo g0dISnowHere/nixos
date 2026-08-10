@@ -22,6 +22,17 @@ let
       monitoring_enabled = true;
     };
 
+    alhena = mkHost "alhena" {
+      exposure_tier = "tailscale_only";
+      capabilities = [
+        "docker"
+        "monitoring_baseline"
+        "wsl"
+      ];
+      service_roles = [ "frontend" ];
+      monitoring_enabled = true;
+    };
+
     centauri = mkHost "centauri" {
       exposure_tier = "tailscale_only";
       capabilities = [

@@ -1,0 +1,3 @@
+[ui]
+# Keep terminal-side selection copy enabled.
+copy_on_select = true

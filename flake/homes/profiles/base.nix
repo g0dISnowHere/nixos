@@ -5,6 +5,7 @@
 
   imports = [
     ../../../modules/home/programs/programs.nix
+    ../../../modules/home/programs/herdr.nix
     ../../../modules/home/programs/ssh.nix
   ];
 }
