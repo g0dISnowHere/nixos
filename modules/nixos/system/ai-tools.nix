@@ -4,7 +4,6 @@
     pkgs.bubblewrap
     pkgs.rtk
     pkgs-unstable.opencode
-    pkgs-unstable.antigravity-ide
     pkgs-unstable.fabric-ai
     pkgs-unstable.skills
   ];
