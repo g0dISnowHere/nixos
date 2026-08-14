@@ -13,7 +13,7 @@ importers:
         version: 0.84.1(ws@8.21.3)(zod@4.4.3)
       '@github/copilot':
         specifier: latest
-        version: 1.0.78
+        version: 1.0.79
       '@google/gemini-cli':
         specifier: latest
         version: 0.54.4
@@ -195,60 +195,60 @@ packages:
   '@emnapi/runtime@1.11.3':
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
 
-  '@github/copilot-darwin-arm64@1.0.78':
-    resolution: {integrity: sha512-P11+VyWg8ad0WlywGtO2d7AxqTLJv4hkUicFg6Ycth5lfk00aCu/74YOOZSPO6C2bBBJhAza7oAdmauM6KEojw==}
+  '@github/copilot-darwin-arm64@1.0.79':
+    resolution: {integrity: sha512-rsw7JoMvlcxXb0yx08oIeEc0x2hUEwKSfhX9ESKfdMVt0Ckrzm4OEvNUyzOpOnLJ9+l3h/aI+u1w5g2ZU2K7UA==}
     cpu: [arm64]
     os: [darwin]
     hasBin: true
 
-  '@github/copilot-darwin-x64@1.0.78':
-    resolution: {integrity: sha512-stimP3WDFs2GU8nJzTJbtRpZViV4bsf80yg7QrFq+G4RISQ3Nihg/3/H0U6UQF1+txMJ/Ohmb5RFYxSw1Hj2sw==}
+  '@github/copilot-darwin-x64@1.0.79':
+    resolution: {integrity: sha512-D983e2lXYnq+KhjA8mTZXonY1+LGfJN9BM195J73shUvx49nRJmibDHWLvVtGeYc+43evGUOAQrOqOspAhhWPQ==}
     cpu: [x64]
     os: [darwin]
     hasBin: true
 
-  '@github/copilot-linux-arm64@1.0.78':
-    resolution: {integrity: sha512-K31PRKGTm252V1Lof7ypjg283R2QSm3BgoCvZfX2taos4wqC3SaTozSQKwW3dgrAx7A3G3SGEoilVCNqfigdZA==}
+  '@github/copilot-linux-arm64@1.0.79':
+    resolution: {integrity: sha512-qqaNkvi92Wg+4OZk/kTWC2nUG72G0vV6eRAo5+PnKaPmjdX1GsI0a+lPxXPEbzX0zYLi/8yrUyANwyyNEsGgXA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
     hasBin: true
 
-  '@github/copilot-linux-x64@1.0.78':
-    resolution: {integrity: sha512-QK3oMtAn9dIv+1u1kx0xNpZNtZxdI+uZVIyLl7myp+Oh2Uj8BLagVv6a7uP0cDphO3TgfIdlvpepCe5MIcx0fw==}
+  '@github/copilot-linux-x64@1.0.79':
+    resolution: {integrity: sha512-wzotZfvHkItutciLFMXZT2k9Qiii4Ta8tsVDCMQ7CP8hPxV91FyJ1yf3+FFSSfPvWrfYM6BOAiqIuX+LjgRuiw==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
     hasBin: true
 
-  '@github/copilot-linuxmusl-arm64@1.0.78':
-    resolution: {integrity: sha512-F/0cTMsz6ug4yiXn3RKaCAMsLR261U5Njb6G9Y/HeAI7ES/tKEo2t5SHuvgXaIH4mYiZsRvfDKdX7c0WgBX/Jg==}
+  '@github/copilot-linuxmusl-arm64@1.0.79':
+    resolution: {integrity: sha512-INtRSARl7DdNm2MXnn4GJuK+Y7QD24ANox02uH8htNQwRlNvdvg+YGS1V/mYgLDXFepeUjMjzTNC+i70+kh5uw==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
     hasBin: true
 
-  '@github/copilot-linuxmusl-x64@1.0.78':
-    resolution: {integrity: sha512-YMaJaeBGbArGAFYel+yFaFW/0rFgh0Oqki2f2mUtlonTX/xHr8EB4+mTnMJkHYMFy4gOTC3OtSEEe1NaW/cBXQ==}
+  '@github/copilot-linuxmusl-x64@1.0.79':
+    resolution: {integrity: sha512-LxJAIfPP6Ok/9qpXGZuhnAft3W9JVcK9tbO3jWXcGDJT3v+2NtutyjmP/A7/cDXdTruXVQ4MybwAgacN8Gj/sg==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
     hasBin: true
 
-  '@github/copilot-win32-arm64@1.0.78':
-    resolution: {integrity: sha512-ktDkFXaaecEKD3hpM6ydM9lKOdoCfsQsXCmzLzE7DCmSpbbMCdfPfWfZ7MOclmKmpZ5/MNfr4U2l8CUqGerzYA==}
+  '@github/copilot-win32-arm64@1.0.79':
+    resolution: {integrity: sha512-5wg/ayCBTVy4g4FdO/9BJZRVARY0sgjAn9rBkw5BSJMv4u7Mvxg5Sftlift+V5UWxTyCSHAELZ5IHKvox4Yi8w==}
     cpu: [arm64]
     os: [win32]
     hasBin: true
 
-  '@github/copilot-win32-x64@1.0.78':
-    resolution: {integrity: sha512-Gd8l2T4eqYEWlOEPd0SZznQ+YYgYrwOkE0QXodMkhCBbPdgu/uTzb7mnISWwnVAgqs7pONdF1GOpHkTo+ay8CQ==}
+  '@github/copilot-win32-x64@1.0.79':
+    resolution: {integrity: sha512-FTpThWwwCDYnLdE0pfdo5zpAQLLVg36kmC2IKyVMuCYv9iPe7rE1mz7ng/UITN9M3TAMBrwHSvCV3pITvw4W8Q==}
     cpu: [x64]
     os: [win32]
     hasBin: true
 
-  '@github/copilot@1.0.78':
-    resolution: {integrity: sha512-jn+8HLZC3R7d6K1/1g9L1iWNKzBVS3JdVcx40r3aWyS5r+MLV1OPNp0fo5OfRMCDIm3NmEaaoqypi9sQkCXuiQ==}
+  '@github/copilot@1.0.79':
+    resolution: {integrity: sha512-uHBm2BYbKJgyfiKp1WokX7QUNHGvzEX0zaGeb3qM3CybP06rsJrX3JgQe95qwwma6vQz0ah9gV68ERW2JqaKRA==}
     hasBin: true
 
   '@github/keytar@7.10.6':
@@ -1514,36 +1514,36 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  sherpa-onnx-darwin-arm64@1.13.4:
-    resolution: {integrity: sha512-QcYKzyrTzGSx6aKCD6hUODgRS1LetqfG57Z/+i5LCyfMlrgCvDc1lRcl9cdB+TozBsLha9QwLTlI0vmDcf5JKg==}
+  sherpa-onnx-darwin-arm64@1.13.5:
+    resolution: {integrity: sha512-weDBAV6da64j6PPYuuG1VYqHzmjthNFZmrFV9yyJ8YXxWrZvIe8kXXYvOIU2curODucvLObHosZU9kJ4uVwM3Q==}
     cpu: [arm64]
     os: [darwin]
 
-  sherpa-onnx-darwin-x64@1.13.4:
-    resolution: {integrity: sha512-6RGeis9K9gV/UQWOgd6Rf3iqXr2/YsBQswxHaCR4hrYkHfEIpHMfFmRWLt6nJJCOWgYW2xFxEd9yzjrafAV/Pw==}
+  sherpa-onnx-darwin-x64@1.13.5:
+    resolution: {integrity: sha512-Ay//Bq4T3RHYhzdYk9O0ahg0UoEgbRMDGZvtpQi2D0oHOcXv0M5tP3OKlx4AvWNXYl0SL+rUObUFe5IIqROrfQ==}
     cpu: [x64]
     os: [darwin]
 
-  sherpa-onnx-linux-arm64@1.13.4:
-    resolution: {integrity: sha512-RMjMRqT82BgTXypNNGmLe6ZFYhc3WEvnAGl3DdkK7qB/kuXwkL3iHhV31wAecbnWPsnEpUoD+8cFovWSBzsCuw==}
+  sherpa-onnx-linux-arm64@1.13.5:
+    resolution: {integrity: sha512-1Jpkyv+Sg7wl+jCOlttcudVpVdlCNPXMf/RYT4+FU4/VmoMIx9MZbcSu2Nf8gtKq3mnYdkk7HtCK5AA3Dtuvwg==}
     cpu: [arm64]
     os: [linux]
 
-  sherpa-onnx-linux-x64@1.13.4:
-    resolution: {integrity: sha512-WZh5NCkGPFHHpYSd78iN4OnmxQeSTGyt9uZskH+im/NFHQ7elQ7B0sLzCMeRpvJxiIKvd9C6WxIJ4hYaxClfsQ==}
+  sherpa-onnx-linux-x64@1.13.5:
+    resolution: {integrity: sha512-eedC/AMCL2cvwhtPnmRlLHKXuwBmD7o2r+Kb+I0krg4PlQejR9y6O1oKqdLko5vFaWe2A8/rQORKGXE+We3y4Q==}
     cpu: [x64]
     os: [linux]
 
   sherpa-onnx-node@1.13.2:
     resolution: {integrity: sha512-uIH6SA5Or4pb8HlCYWB3K54XkMtzdef4/tkw1amtIf8GB1tt6hQLpur9p2jSFNfTYRyzZ8XrXofxefXQ0A7EUA==}
 
-  sherpa-onnx-win-ia32@1.13.4:
-    resolution: {integrity: sha512-/JbPjldrfNv+t+uIS3MlkuhfIf5l3FHUGkRC2oRXgjRqOaVmEyP3vLlQ7dTa4J7raG5oB8c3GoPjuSWSqT9GOQ==}
+  sherpa-onnx-win-ia32@1.13.5:
+    resolution: {integrity: sha512-aQKTmzsvNyCMOoAs+Clx8Zsp05JSX37hVpts/yiO3+mUTXnbBIMAL3YgG49apz6JN/l/HCJBaEczXj3odOgS8A==}
     cpu: [ia32]
     os: [win32]
 
-  sherpa-onnx-win-x64@1.13.4:
-    resolution: {integrity: sha512-R0PWby1VxC14TDZPq7GcfSyXSY6SAFO8Y4JwdCdqouFmeXkZ1L7Is9m98C9KxQ0dN7ZtDzhAmE/43FUs/elXRQ==}
+  sherpa-onnx-win-x64@1.13.5:
+    resolution: {integrity: sha512-r1lKWEbFDquVjiij72nhNpmPBeqG7V06ZGx1uL2zWXFCYXmkpqawN5iHdkugVhb8QfYZ8x2tx88eYGHGMn88aA==}
     cpu: [x64]
     os: [win32]
 
@@ -1985,42 +1985,42 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@github/copilot-darwin-arm64@1.0.78':
+  '@github/copilot-darwin-arm64@1.0.79':
     optional: true
 
-  '@github/copilot-darwin-x64@1.0.78':
+  '@github/copilot-darwin-x64@1.0.79':
     optional: true
 
-  '@github/copilot-linux-arm64@1.0.78':
+  '@github/copilot-linux-arm64@1.0.79':
     optional: true
 
-  '@github/copilot-linux-x64@1.0.78':
+  '@github/copilot-linux-x64@1.0.79':
     optional: true
 
-  '@github/copilot-linuxmusl-arm64@1.0.78':
+  '@github/copilot-linuxmusl-arm64@1.0.79':
     optional: true
 
-  '@github/copilot-linuxmusl-x64@1.0.78':
+  '@github/copilot-linuxmusl-x64@1.0.79':
     optional: true
 
-  '@github/copilot-win32-arm64@1.0.78':
+  '@github/copilot-win32-arm64@1.0.79':
     optional: true
 
-  '@github/copilot-win32-x64@1.0.78':
+  '@github/copilot-win32-x64@1.0.79':
     optional: true
 
-  '@github/copilot@1.0.78':
+  '@github/copilot@1.0.79':
     dependencies:
       detect-libc: 2.1.2
     optionalDependencies:
-      '@github/copilot-darwin-arm64': 1.0.78
-      '@github/copilot-darwin-x64': 1.0.78
-      '@github/copilot-linux-arm64': 1.0.78
-      '@github/copilot-linux-x64': 1.0.78
-      '@github/copilot-linuxmusl-arm64': 1.0.78
-      '@github/copilot-linuxmusl-x64': 1.0.78
-      '@github/copilot-win32-arm64': 1.0.78
-      '@github/copilot-win32-x64': 1.0.78
+      '@github/copilot-darwin-arm64': 1.0.79
+      '@github/copilot-darwin-x64': 1.0.79
+      '@github/copilot-linux-arm64': 1.0.79
+      '@github/copilot-linux-x64': 1.0.79
+      '@github/copilot-linuxmusl-arm64': 1.0.79
+      '@github/copilot-linuxmusl-x64': 1.0.79
+      '@github/copilot-win32-arm64': 1.0.79
+      '@github/copilot-win32-x64': 1.0.79
 
   '@github/keytar@7.10.6':
     dependencies:
@@ -3235,32 +3235,32 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  sherpa-onnx-darwin-arm64@1.13.4:
+  sherpa-onnx-darwin-arm64@1.13.5:
     optional: true
 
-  sherpa-onnx-darwin-x64@1.13.4:
+  sherpa-onnx-darwin-x64@1.13.5:
     optional: true
 
-  sherpa-onnx-linux-arm64@1.13.4:
+  sherpa-onnx-linux-arm64@1.13.5:
     optional: true
 
-  sherpa-onnx-linux-x64@1.13.4:
+  sherpa-onnx-linux-x64@1.13.5:
     optional: true
 
   sherpa-onnx-node@1.13.2:
     optionalDependencies:
-      sherpa-onnx-darwin-arm64: 1.13.4
-      sherpa-onnx-darwin-x64: 1.13.4
-      sherpa-onnx-linux-arm64: 1.13.4
-      sherpa-onnx-linux-x64: 1.13.4
-      sherpa-onnx-win-ia32: 1.13.4
-      sherpa-onnx-win-x64: 1.13.4
+      sherpa-onnx-darwin-arm64: 1.13.5
+      sherpa-onnx-darwin-x64: 1.13.5
+      sherpa-onnx-linux-arm64: 1.13.5
+      sherpa-onnx-linux-x64: 1.13.5
+      sherpa-onnx-win-ia32: 1.13.5
+      sherpa-onnx-win-x64: 1.13.5
     optional: true
 
-  sherpa-onnx-win-ia32@1.13.4:
+  sherpa-onnx-win-ia32@1.13.5:
     optional: true
 
-  sherpa-onnx-win-x64@1.13.4:
+  sherpa-onnx-win-x64@1.13.5:
     optional: true
 
   signal-exit@3.0.7: {}
