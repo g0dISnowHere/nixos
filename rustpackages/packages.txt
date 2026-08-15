@@ -1,0 +1,2 @@
+# crate version
+mdtui 0.3.0

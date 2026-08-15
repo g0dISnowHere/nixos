@@ -6,13 +6,13 @@ usage() {
   cat <<'EOF'
 Usage: scripts/update-system.sh [options]
 
-Updates flake inputs, synchronizes global pnpm and uv tools, and rebuilds this
-NixOS host from an existing checkout.
+Updates flake inputs, synchronizes repo-managed pnpm, uv, and Rust packages,
+and rebuilds this NixOS host from an existing checkout.
 
 Options:
   --host HOST       NixOS host name to switch. Default: hostname -s
   --repo PATH       Existing Git checkout. Default: ~/nixos-deploy
-  --repo-user USER  User account used for Git, pnpm, and uv operations.
+  --repo-user USER  User account used for Git and package operations.
                     Default: invoking user, or SUDO_USER when invoked via sudo
   --remote REMOTE   Git remote to use. Default: origin
   --branch BRANCH   Git branch allowed for automation. Default: main
@@ -102,27 +102,15 @@ require_branch_safe_checkout() {
   fi
 }
 
-sync_pnpm_globals() {
-  local sync_script="${repo_root}/scripts/sync-pnpm-globals.sh"
+sync_repository() {
+  local sync_script="${repo_root}/scripts/sync.sh"
 
   if [[ ! -r "$sync_script" ]]; then
-    printf 'pnpm global sync script missing: %s\n' "$sync_script" >&2
+    printf 'repository sync script missing: %s\n' "$sync_script" >&2
     exit 1
   fi
 
-  printf 'Syncing pnpm global packages for %s\n' "$repo_user"
-  run_as_repo_user bash "$sync_script"
-}
-
-sync_uv_tools() {
-  local sync_script="${repo_root}/scripts/sync-uv-tools.sh"
-
-  if [[ ! -r "$sync_script" ]]; then
-    printf 'uv tools sync script missing: %s\n' "$sync_script" >&2
-    exit 1
-  fi
-
-  printf 'Syncing uv tools for %s\n' "$repo_user"
+  printf 'Syncing flake and managed packages for %s\n' "$repo_user"
   run_as_repo_user bash "$sync_script"
 }
 
@@ -143,8 +131,7 @@ cd "$repo_root"
 printf 'Pulling %s/%s\n' "$remote" "$branch"
 git_user pull --ff-only "$remote" "$branch"
 
-printf 'Updating flake inputs\n'
-run_as_repo_user nix flake update
+sync_repository
 
 if ! git_user diff --quiet -- flake.lock || ! git_user diff --cached --quiet -- flake.lock; then
   git_user add flake.lock
@@ -155,6 +142,4 @@ else
   printf 'Git: flake.lock already current\n'
 fi
 
-sync_pnpm_globals
-sync_uv_tools
 switch_system

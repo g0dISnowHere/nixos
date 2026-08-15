@@ -14,3 +14,5 @@ enp0s25-diag/
 .tokensave
 .codebase-memory
 pnpm-globals/node_modules
+result
+.mdt.lock

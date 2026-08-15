@@ -94,7 +94,7 @@ in
     };
 
     extraInit = ''
-      export PATH="$HOME/go/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+      export PATH="$HOME/go/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.local/share/mine/rustpackages/bin:$PATH"
 
     '';
   };

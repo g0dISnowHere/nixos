@@ -67,17 +67,24 @@ Current update helpers include:
 
 - `scripts/update-system.sh` updates and rebuilds only its current host
   - uses an existing `main` checkout; it never clones a checkout or deploys another host
-  - fast-forwards from the configured remote, updates and pushes `flake.lock`,
-    syncs repo-managed `pnpm-globals/` and `uv-tools/`, then rebuilds the host
+  - fast-forwards from the configured remote, runs `scripts/sync.sh`, commits
+    and pushes `flake.lock`, then rebuilds the host
   - the timer/service path runs as root for `nixos-rebuild switch`; Git and
     global tool operations run as the configured repo user so existing SSH keys
     and user-owned stores remain usable
+- `scripts/sync.sh` is the single repository sync entrypoint:
+  `nix flake update`, `pnpm-globals/`, `uv-tools/`, and `rustpackages/`
+  - `--dry-run` prints commands
+  - `--update` refreshes pnpm and uv lockfiles plus Rust crate pins
 - `scripts/sync-pnpm-globals.sh` installs locked `pnpm-globals/` dependencies
   into the current user's XDG data directory; Home Manager exposes its
   `node_modules/.bin` directory on `PATH`
 - `scripts/sync-uv-tools.sh` installs locked `uv-tools/` dependencies into the
   current user's XDG data directory; Home Manager exposes its `.venv/bin`
   directory on `PATH`
+- `scripts/sync-rustpackages.sh` installs pinned crates from `rustpackages/`
+  into the current user's XDG data directory; Home Manager exposes its `bin`
+  directory on `PATH`; `--update` refreshes crate versions in `packages.txt`
 - `scripts/global-skills.txt` is the one-source-per-line global skill manifest;
   `scripts/sync-ai-skills.sh` refetches and installs its packs for every
   compatible global agent
@@ -91,10 +98,13 @@ Current update helpers include:
 - Repo-managed runtime projects such as `pnpm-globals/` and `uv-tools/` should
   lock dependencies, not pin the package-manager binary version in manifest
   metadata.
-- Do not add `packageManager` pins or version-manager marker files just to restate
-  the Nix-provided tool version.
-- Keep semantic runtime constraints when they describe the project contract rather
-  than the installer choice, for example Python `requires-python` ranges or lockfiles.
+- `rustpackages/packages.txt` pins each crate version; Cargo remains the
+  package-manager binary supplied by Nixpkgs.
+- Do not add `packageManager` pins or version-manager marker files just to
+  restate the Nix-provided tool version.
+- Keep semantic runtime constraints when they describe the project contract
+  rather than the installer choice, for example Python `requires-python` ranges
+  or lockfiles.
 
 Current secret helpers include:
 

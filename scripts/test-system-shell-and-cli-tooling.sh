@@ -9,6 +9,7 @@ literal_home_go_bin="\$HOME/go/bin"
 literal_local_bin="\$HOME/.local/bin"
 literal_pnpm_global_bin="\$HOME/.local/share/pnpm/bin"
 literal_cargo_bin="\$HOME/.cargo/bin"
+literal_rustpackages_bin="\$HOME/.local/share/mine/rustpackages/bin"
 literal_ssh_identity='~'"/.ssh/id_ed25519"
 
 fail() {
@@ -95,6 +96,7 @@ assert_contains "$centauri_extra_init" "$literal_local_bin" "developer PATH wiri
 assert_not_contains "$centauri_extra_init" "$literal_pnpm_global_bin" "developer PATH wiring no longer includes pnpm global bin"
 assert_not_contains "$centauri_extra_init" ".npm-global/bin" "developer PATH wiring no longer includes npm user binaries"
 assert_contains "$centauri_extra_init" "$literal_cargo_bin" "developer PATH wiring includes cargo user binaries"
+assert_contains "$centauri_extra_init" "$literal_rustpackages_bin" "developer PATH wiring includes managed Rust package binaries"
 
 centauri_zsh_init="$(nix eval --raw .#nixosConfigurations.centauri.config.programs.zsh.interactiveShellInit)"
 assert_contains "$centauri_zsh_init" "alias npx='pnpm dlx'" "interactive shell aliases npx to pnpm dlx"
