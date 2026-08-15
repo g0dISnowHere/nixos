@@ -13,6 +13,7 @@ let
         "crowdsec"
         "traefik"
       ];
+      host_role = "public_edge";
       service_roles = [
         "edge"
         "monitoring"
@@ -28,7 +29,9 @@ let
         "docker"
         "monitoring_baseline"
         "wsl"
+        "nvidia_gpu"
       ];
+      host_role = "workstation";
       service_roles = [ "frontend" ];
       monitoring_enabled = true;
     };
@@ -40,6 +43,7 @@ let
         "desktop"
         "monitoring_baseline"
       ];
+      host_role = "workstation";
       service_roles = [ "frontend" ];
       monitoring_enabled = true;
     };
@@ -56,6 +60,7 @@ let
         "infra"
         "vm_host"
       ];
+      host_role = "local_server";
       monitoring_enabled = true;
     };
   };
@@ -72,6 +77,7 @@ let
     assert host ? hostname;
     assert host ? exposure_tier;
     assert host ? capabilities;
+    assert host ? host_role;
     assert host ? service_roles;
     assert host ? monitoring_enabled;
     assert !(host.exposure_tier == "public_edge" && !hasServiceRole "edge" host);
@@ -88,5 +94,8 @@ assert builtins.all validateHost monitoredHosts;
     frontend_hosts = group (hasServiceRole "frontend");
     monitoring_hosts = group (hasServiceRole "monitoring");
     security_hosts = group (hasServiceRole "security");
+    gpu_hosts = group (hasCapability "nvidia_gpu");
+    local_servers = group (host: host.exposure_tier == "lan_only");
+    vps_hosts = group (host: host.exposure_tier == "public_edge");
   };
 }

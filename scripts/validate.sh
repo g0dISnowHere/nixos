@@ -225,7 +225,7 @@ validate_monitoring_inventory() {
   if [[ -n "${MONITORING_INVENTORY_JSON}" ]]; then
     inventory_json="${MONITORING_INVENTORY_JSON}"
   elif ! inventory_json="$(
-    nix eval --json .#monitoringInventory 2>/dev/null
+    nix eval --json .#lib.monitoringInventory 2>/dev/null
   )"; then
     echo "  ✗ monitoring inventory failed to evaluate"
     return 1
@@ -239,11 +239,15 @@ validate_monitoring_inventory() {
     (.groups.frontend_hosts == ["albaldah", "alhena", "centauri"]) and
     (.groups.monitoring_hosts == ["albaldah"]) and
     (.groups.security_hosts == ["albaldah"]) and
-    (all(.hosts[]; has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
+    (.groups.gpu_hosts == ["alhena"]) and
+    (.groups.local_servers == ["mirach"]) and
+    (.groups.vps_hosts == ["albaldah"]) and
+    (all(.hosts[]; has("host_role") and has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
     (.hosts.albaldah.exposure_tier == "public_edge") and
     (.hosts.albaldah.service_roles == ["edge", "monitoring", "security", "frontend"]) and
     (.hosts.alhena.exposure_tier == "tailscale_only") and
     (.hosts.alhena.service_roles == ["frontend"]) and
+    (.hosts.alhena.capabilities | index("nvidia_gpu")) and
     (.hosts.centauri.exposure_tier == "tailscale_only") and
     (.hosts.centauri.service_roles == ["frontend"]) and
     (.hosts.mirach.exposure_tier == "lan_only") and
@@ -315,7 +319,7 @@ fi
 echo ""
 echo "NixOS Configurations:"
 
-MONITORING_INVENTORY_JSON="$(nix eval --raw .#monitoringInventoryJson 2>/dev/null || true)"
+MONITORING_INVENTORY_JSON="$(nix eval --raw .#lib.monitoringInventoryJson 2>/dev/null || true)"
 if [[ -n "${MONITORING_INVENTORY_JSON}" ]]; then
   mapfile -t MONITORING_DOCKER_HOSTS < <(
     jq -r '.groups.docker_hosts[]' <<<"${MONITORING_INVENTORY_JSON}"
