@@ -1,5 +1,24 @@
 # Future Idea: Branch-Safe Fleet Auto-Update
 
+------------------------------------------------------------------------------------------
+My notes. they take precedence over the rest of this document. I will clean them up later.
+
+Currently:
+- deploy-rs through albaldah: `nix run .#deploy-fleet`
+- Bad:
+  - centralized deployment from whatever the repo looks like on whatever computer triggers the build. As far as I understand.
+  - missing CI/CD pipeline
+  - doesnt update itself, only deploys
+  - what if on metered connection? Updates are force pushed?
+
+Better:
+- regular builds on albaldah,
+- then tests
+- into cache
+-
+
+------------------------------------------------------------------------------------------
+
 ## Summary
 
 Use `modules/nixos/system/autoupgrade.nix` as the declarative layer for
