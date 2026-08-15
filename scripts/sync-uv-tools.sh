@@ -25,7 +25,8 @@ legacy_uv_tools_dir="${xdg_data_home}/uv/tools"
 lock_root="${XDG_RUNTIME_DIR:-/tmp}"
 lock_file="${lock_root}/mine-uv-tools-$(id -u).lock"
 managed_marker="# managed-by: mine/scripts/sync-uv-tools.sh"
-wrapper_commands=(basic-memory bm graphify headroom specify)
+wrapper_commands=(headroom)
+obsolete_wrapper_commands=(basic-memory bm graphify specify)
 dry_run=0
 update_lock=0
 
@@ -129,9 +130,14 @@ EOF
 }
 
 remove_obsolete_wrappers() {
-  # Keep cleanup bounded to this script's command set. Do not scan arbitrary
-  # executables in ~/.local/bin; some commands may block when read.
-  :
+  local command wrapper
+
+  for command in "${obsolete_wrapper_commands[@]}"; do
+    wrapper="${local_bin}/${command}"
+    if is_managed_wrapper "$wrapper"; then
+      rm -f "$wrapper"
+    fi
+  done
 }
 
 sync_locked_project() {
