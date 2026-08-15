@@ -31,7 +31,8 @@
     ../../../modules/nixos/services/monitoring-baseline.nix
     ../../../modules/nixos/services/vscode-remote.nix
     ../../../modules/nixos/services/ssh-server.nix
-    ../../../modules/nixos/services/tailscale-router.nix
+    # ../../../modules/nixos/services/tailscale-router.nix
+    ./tailscale.nix
     ../../../modules/nixos/virtualisation/docker.nix
     ../../../modules/nixos/desktop/gnome.nix
     ../../../modules/nixos/flatpak/browsers.nix
