@@ -2,7 +2,6 @@
 _: {
   imports = [
     ./docker-options.nix
-    ./monitoring-docker-scrape-access.nix
   ];
 
   my.virtualisation.docker.rootful = true;

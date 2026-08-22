@@ -29,10 +29,14 @@
     ../../../modules/nixos/services/printing.nix
     ../../../modules/nixos/services/avahi-discovery.nix
     ../../../modules/nixos/services/monitoring-baseline.nix
+    ../../../modules/nixos/services/monitoring-alloy.nix
     ../../../modules/nixos/services/vscode-remote.nix
     ../../../modules/nixos/services/ssh-server.nix
-    # ../../../modules/nixos/services/tailscale-router.nix
-    ./tailscale.nix
+    ../../../modules/nixos/services/tailscale-base.nix
+    ../../../modules/nixos/services/tailscale-ssh.nix
+    ../../../modules/nixos/services/tailscale-exit-node.nix
+    ../../../modules/nixos/services/tailscale-subnet-router.nix
+    ./tailscale-subnet-router.nix
     ../../../modules/nixos/virtualisation/docker.nix
     ../../../modules/nixos/desktop/gnome.nix
     ../../../modules/nixos/flatpak/browsers.nix
@@ -84,18 +88,18 @@
     binfmt = true;
   };
 
-  my.tailscale = {
-    enableSSH = true;
-    advertiseExitNode = true;
-    advertiseRoutes = [ "192.168.3.0/24" ];
-  };
-
   my.autoUpdate = {
     enable = true;
     onCalendar = "daily";
     randomizedDelaySec = "90min";
   };
 
+  my.monitoring = {
+    enable = true;
+    site = "home";
+  };
+
   # Do not change casually. See docs/architecture/state-version-reasons.md.
+
   system.stateVersion = "25.11";
 }

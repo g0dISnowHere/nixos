@@ -14,9 +14,13 @@
     ../../../modules/nixos/system/ai-tools.nix
     ../../../modules/nixos/system/developer-tools.nix
     ../../../modules/nixos/services/monitoring-baseline.nix
+    ../../../modules/nixos/services/monitoring-alloy.nix
     ../../../modules/nixos/services/vscode-remote.nix
     ../../../modules/nixos/services/crowdsec.nix
-    ../../../modules/nixos/services/tailscale-client.nix
+    ../../../modules/nixos/services/tailscale-base.nix
+    ../../../modules/nixos/services/tailscale-ssh.nix
+    ../../../modules/nixos/services/tailscale-exit-node.nix
+    ../../../modules/nixos/services/tailscale-subnet-router.nix
     ../../../modules/nixos/virtualisation/docker.nix
     inputs.disko.nixosModules.disko
     ../../../modules/nixos/system/disko-install-test-compat.nix
@@ -41,9 +45,9 @@
     onCalendar = "weekly";
   };
 
-  my.tailscale = {
-    enableSSH = true;
-    advertiseExitNode = true;
+  my.monitoring = {
+    enable = true;
+    site = "vps";
   };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.

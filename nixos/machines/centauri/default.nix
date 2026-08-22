@@ -25,12 +25,14 @@
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules and bridge networking
     ../../../modules/nixos/services/fingerprint-06cb-009a.nix
     ../../../modules/nixos/services/monitoring-baseline.nix
+    ../../../modules/nixos/services/monitoring-alloy.nix
     # ../../../modules/nixos/services/icmp-ping-lan.nix # Allow ping from local network
     ../../../modules/nixos/services/platformio.nix # USB serial and debugger udev access for PlatformIO
     ../../../modules/nixos/services/scanner.nix # SANE scanner support
     ../../../modules/nixos/services/flatpak.nix # Flatpak infrastructure
     ../../../modules/nixos/services/mosh.nix
-    ../../../modules/nixos/services/tailscale-client.nix
+    ../../../modules/nixos/services/tailscale-base.nix
+    ../../../modules/nixos/services/tailscale-ssh.nix
     ../../../modules/nixos/system/albaldah-builder.nix
     ../../../modules/nixos/services/avahi-discovery.nix
     ../../../modules/nixos/virtualisation/docker.nix
@@ -79,7 +81,10 @@
     onCalendar = "daily";
   };
 
-  my.tailscale.enableSSH = true;
+  my.monitoring = {
+    enable = true;
+    site = "home";
+  };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
   system.stateVersion = "25.11";

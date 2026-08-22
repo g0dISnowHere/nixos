@@ -4,14 +4,14 @@ _: {
       node = {
         enable = true;
         port = 9100;
-        listenAddress = "0.0.0.0";
+        listenAddress = "127.0.0.1";
         openFirewall = false;
       };
 
       systemd = {
         enable = true;
         port = 9558;
-        listenAddress = "0.0.0.0";
+        listenAddress = "127.0.0.1";
         openFirewall = false;
       };
     };
