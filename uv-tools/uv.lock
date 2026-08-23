@@ -9,7 +9,7 @@ supported-markers = [
 ]
 
 [options]
-exclude-newer = "2026-08-19T13:09:37Z"
+exclude-newer = "2026-08-20T06:46:52Z"
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -72,7 +72,7 @@ wheels = [
 
 [[package]]
 name = "anthropic"
-version = "0.122.0"
+version = "0.125.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -84,9 +84,9 @@ dependencies = [
     { name = "sniffio", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/23/9987d70b74e3481d5bc5d2021d3e10fd5f60c1f7b54088ea86506d9b7f2b/anthropic-0.122.0.tar.gz", hash = "sha256:ffec56ae96657c8d19fa575ec96f140f380c353a07ab7d61b92eb18ee6536601", size = 1021535, upload-time = "2026-08-13T18:36:00.307Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/62/f8/6f0560884b5363848347bd640b6c1d04abc25e7aa61787a232f790c6b60a/anthropic-0.125.0.tar.gz", hash = "sha256:e0cdd336580cb7411c1cdab69f80973e9bf4bff7f8e08141811d46307d45c682", size = 1112593, upload-time = "2026-08-19T22:00:42.837Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/26/5b/f5c87e71097a9f89f1b414d1ef7ae8439051fae57d5e4ee90946082982b8/anthropic-0.122.0-py3-none-any.whl", hash = "sha256:45ec906452ffae6b5f7f0c53d01f50bfb7e4ce878d7ae8e4309d13171e557e67", size = 1041853, upload-time = "2026-08-13T18:36:01.831Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/1a/b1bd30cda3790557e8791bec5922a6ec8fabb6fa8b008c76a39cf7be6152/anthropic-0.125.0-py3-none-any.whl", hash = "sha256:3486013602eca76d8b12540764e53654f02cf4951110bca86cf06e67428a9f21", size = 1184067, upload-time = "2026-08-19T22:00:44.596Z" },
 ]
 
 [[package]]
@@ -492,7 +492,7 @@ wheels = [
 
 [[package]]
 name = "headroom-ai"
-version = "0.35.0"
+version = "0.36.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ast-grep-cli", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -505,9 +505,9 @@ dependencies = [
     { name = "tiktoken", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "tomlkit", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/93/07bbc8efb08ad2f80d712e65fef3e6d4ecce0f938ca7f682af2831a8aeed/headroom_ai-0.35.0.tar.gz", hash = "sha256:79f61a032f36608bf60eceec8411f9e94e28c889bf535ef02e893529733c0ce9", size = 2709688, upload-time = "2026-08-13T04:05:33.033Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8b/9f/866537d9be9803fdcf2a7f857b11485c95f4998d15c87c19c1f326ab0583/headroom_ai-0.36.0.tar.gz", hash = "sha256:7747dbd91e471550ec43fbf6c089b28fcb8fb1250a816b239d7799fcf36cfca5", size = 2793801, upload-time = "2026-08-20T04:36:14.634Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/56/ea/b5f112b90ea2033276c35a7bddd4bdfd4429a1c011b2f109fa5a809bac14/headroom_ai-0.35.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:abdbbabc314b09e0f27b166f0be43dc386b8de338048a66fe804bc1d3cf2bff4", size = 13646431, upload-time = "2026-08-13T04:05:27.662Z" },
+    { url = "https://files.pythonhosted.org/packages/2e/72/b649ebd394b9a09be3fc1af17db4d97ed4a85ca050c8a7a0a855dd049452/headroom_ai-0.36.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:fab6af014363c5a9a6bb41913a84df6f1daaecb56edf005925940e4501937f42", size = 13730353, upload-time = "2026-08-20T04:36:08.771Z" },
 ]
 
 [package.optional-dependencies]

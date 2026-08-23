@@ -3,6 +3,7 @@ _: {
   # Applies to all machines
 
   nix = {
+    nixPath = [ "nixpkgs=flake:nixpkgs" ];
     extraOptions = "experimental-features = nix-command flakes";
     settings = {
       trusted-users = [ "djoolz" ];
