@@ -29,6 +29,8 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
     # "x86_64-darwin"
   ];
 
+  flake.deploy = inputs.self.lib.deploy;
+
   perSystem =
     {
       inputs',
@@ -59,14 +61,14 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
                 --skip-checks \
                 --rollback-succeeded true \
                 "$@" \
-                -f ./flake/deploy
+                .
             fi
 
             exec deploy \
               --skip-checks \
               --rollback-succeeded true \
               "$@" \
-              -f ./flake/deploy \
+              . \
               -- \
               --builders 'ssh-ng://root@albaldah.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -' \
               --max-jobs 1

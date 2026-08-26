@@ -53,7 +53,6 @@ A deployment launched from a target host cannot activate that same host through 
 
 ## Implementation Map
 
-- `outputs.nix`: `deploy-fleet` wrapper and forced remote-builder flags.
+- `outputs.nix`: root `deploy` output, `deploy-fleet` wrapper, and forced remote-builder flags.
 - `flake/lib.nix`: deploy-rs nodes, activation profiles, rollback policy, and target hostnames.
 - `modules/nixos/system/albaldah-builder.nix`: Centauri's Albaldah builder access.
-- `flake/deploy/default.nix`: adapter that exposes local flake deployment configuration to deploy-rs.
