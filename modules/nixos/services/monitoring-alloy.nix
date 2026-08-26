@@ -8,10 +8,25 @@ let
   cfg = config.my.monitoring;
   textfileDirectory = "/var/lib/prometheus-node-exporter-textfile";
   importantUnitRegex = lib.concatStringsSep "|" cfg.importantUnits;
+  publicFirewallPorts =
+    let
+      ports = protocol: entries: map (port: { inherit protocol port; }) entries;
+      portRanges =
+        protocol: ranges: lib.concatMap (range: ports protocol (lib.range range.from range.to)) ranges;
+    in
+    ports "tcp" config.networking.firewall.allowedTCPPorts
+    ++ ports "udp" config.networking.firewall.allowedUDPPorts
+    ++ portRanges "tcp" config.networking.firewall.allowedTCPPortRanges
+    ++ portRanges "udp" config.networking.firewall.allowedUDPPortRanges;
+  firewallPortMetrics = lib.concatMapStrings (entry: ''
+    printf 'nixos_firewall_allowed_port_info{protocol="${entry.protocol}",port="${toString entry.port}"} 1\n'
+  '') publicFirewallPorts;
+
   nixosStateWriter = pkgs.writeShellApplication {
     name = "monitoring-nixos-state";
     runtimeInputs = [
       pkgs.coreutils
+      pkgs.docker
       pkgs.gnused
     ];
     text = ''
@@ -33,6 +48,23 @@ let
           "$(escape_label "$generation")" "$(escape_label "$revision")" "$(escape_label "$kernel")"
         printf 'nixos_pending_reboot %s\n' "$pending_reboot"
         printf 'monitoring_config_info{revision="%s"} 1\n' "$(escape_label "$revision")"
+        printf 'nixos_firewall_allowed_port_count %s\n' ${toString (builtins.length publicFirewallPorts)}
+        ${firewallPortMetrics}
+        if docker info >/dev/null 2>&1; then
+          docker ps --format '{{.ID}}' | while read -r container_id; do
+            docker inspect --format '{{range $container_port, $bindings := .HostConfig.PortBindings}}{{range $bindings}}{{printf "%s|%s|%s|%s|%s\n" $container_port .HostIp .HostPort (index $.Config.Labels "com.docker.compose.service") (index $.Config.Labels "com.docker.compose.project")}}{{end}}{{end}}' "$container_id"
+          done | while IFS='|' read -r container_port host_ip host_port service compose_project; do
+            case "$host_ip" in
+              ""|0.0.0.0|::)
+                protocol="$(printf '%s' "$container_port" | sed 's#.*/##')"
+                [ "$service" = "<no value>" ] && service="container"
+                [ "$compose_project" = "<no value>" ] && compose_project="unknown"
+                printf 'docker_public_published_port_info{protocol="%s",port="%s",service="%s",compose_project="%s"} 1\n' \
+                  "$protocol" "$host_port" "$(escape_label "$service")" "$(escape_label "$compose_project")"
+                ;;
+            esac
+          done
+        fi
       } > "$temporary"
       mv "$temporary" "$output"
     '';
