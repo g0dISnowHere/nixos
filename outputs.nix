@@ -59,14 +59,14 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
             if [ "$(hostname --short)" = albaldah ]; then
               exec deploy \
                 --skip-checks \
-                --rollback-succeeded true \
+                --rollback-succeeded false \
                 "$@" \
                 .
             fi
 
             exec deploy \
               --skip-checks \
-              --rollback-succeeded true \
+              --rollback-succeeded false \
               "$@" \
               . \
               -- \

@@ -233,15 +233,17 @@ which distributes them to target hosts. `deploy-rs` activates every target as
 First connection accepts each target's Tailscale SSH host key. Later key
 changes fail deployment until explicitly reviewed.
 
-After applying the bootstrap configuration on `centauri`, deploy every online
-host. `deploy-fleet` evaluates deployment configuration first; if any node
-fails, deploy-rs rolls successful nodes back:
+`deploy-fleet` leaves successfully activated nodes in place when another node
+fails. Automatic and magic rollback still protect the node whose activation
+failed. Run it only when every target is intended to receive the checkout:
 
 ```bash
 nix run .#deploy-fleet
 ```
 
-`alhena` must be online. Before first fleet rollout, bootstrap `centauri` once.
+When launching from a deployment target, exclude that host: self-activation
+through its Tailscale hostname is refused.
+Before the first remote fleet deployment, bootstrap Centauri once locally.
 This installs Albaldah's pinned SSH host key for Nix daemon remote builds and
 enables Centauri's Tailscale SSH listener:
 
