@@ -221,10 +221,10 @@ nix build .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 
 
 ## Deploy Fleet
 
-Outside Albaldah, `deploy-fleet` sends eligible deploy-rs profile builds to
-Albaldah over Tailscale SSH. It keeps one local job for
+Outside Alhena, `deploy-fleet` sends eligible deploy-rs profile builds to
+Alhena over Tailscale SSH. It keeps one local job for
 `preferLocalBuild` derivations such as the NixOS firmware link farm. When
-launched on Albaldah, it builds locally rather than configuring Albaldah as its
+launched on Alhena, it builds locally rather than configuring Alhena as its
 own remote builder. Nix copies finished remote closures back to deploy-rs,
 which distributes them to target hosts. `deploy-rs` activates every target as
 `root`; automatic and magic rollback remain enabled. Do not pass
@@ -243,13 +243,9 @@ nix run .#deploy-fleet
 
 When launching from a deployment target, exclude that host: self-activation
 through its Tailscale hostname is refused.
-Before the first remote fleet deployment, bootstrap Centauri once locally.
-This installs Albaldah's pinned SSH host key for Nix daemon remote builds and
-enables Centauri's Tailscale SSH listener:
-
-```bash
-sudo nixos-rebuild switch --flake .#centauri
-```
+Before the first remote fleet deployment, ensure the deployment machine's Nix
+daemon recognizes Alhena's SSH host key and has a root SSH identity authorized
+by Alhena's Tailscale SSH policy.
 
 ## Install `albaldah` With `nixos-anywhere`
 

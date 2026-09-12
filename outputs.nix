@@ -50,13 +50,13 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
             pkgs.nix
             inputs'.deploy-rs.packages.default
           ];
-          # All launch hosts except Albaldah send eligible builds to Albaldah.
+          # All launch hosts except Alhena send eligible builds to Alhena.
           # Nix still needs one local job for preferLocalBuild derivations such as
           # NixOS's firmware link farm.
           text = ''
             nix eval --json .#lib.deploy > /dev/null
 
-            if [ "$(hostname --short)" = albaldah ]; then
+            if [ "$(hostname --short)" = alhena ]; then
               exec deploy \
                 --skip-checks \
                 --rollback-succeeded false \
@@ -70,7 +70,7 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
               "$@" \
               . \
               -- \
-              --builders 'ssh-ng://root@albaldah.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -' \
+              --builders 'ssh-ng://root@alhena.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -' \
               --max-jobs 1
           '';
         };
