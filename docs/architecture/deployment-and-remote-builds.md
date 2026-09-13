@@ -10,48 +10,40 @@ nix run .#deploy-fleet
 
 `deploy-fleet` evaluates the checkout from which you run it. It does not deploy a separately fetched Git revision. A dirty tracked worktree participates in the evaluation; flake inputs resolve through `flake.lock`.
 
-The wrapper passes these Nix build options when launched anywhere except
-Alhena:
+The wrapper deploys each configured node in a separate deploy-rs invocation.
+It continues after an unreachable node and reports every failed node after
+attempting the rest. It skips the host from which it runs because Tailscale
+refuses self-SSH activation.
 
-```text
---builders 'ssh-ng://root@alhena.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -'
---max-jobs 1
-```
-
-Eligible derivations build on Alhena. The one local job is required for
-`preferLocalBuild` derivations, including NixOS's firmware link farm; setting
-`--max-jobs 0` makes those deployments fail. When launched on Alhena, the
-wrapper uses its local builder and does not configure Alhena as its own
-remote builder.
-
-Do not pass deploy-rs `--remote-build`. That option makes each deployment
-target build its own profile, which violates this contract.
+The deployment machine evaluates and builds each profile locally, then
+deploy-rs copies the completed closure to its target. Do not pass deploy-rs
+`--remote-build`: that makes each deployment target build its own profile.
 
 ## Source Transfer Is Required
 
-Alhena builds the derivations, but the deployment machine evaluates the local flake first. Nix copies missing source paths, including the flake source NAR and required input paths, to Alhena before the build. This transfer preserves the exact local checkout selected by the operator.
+The deployment machine evaluates the local flake and builds the derivations.
+Nix copies missing source paths, including the flake source NAR and required
+input paths, during those local builds. This preserves the exact checkout
+selected by the operator.
 
-Avoiding source transfer requires a different workflow: commit and push a revision, arrange for Alhena to fetch that revision into its own checkout, build there, and deploy only the resulting closures. That workflow cannot deploy uncommitted local changes.
-
-## Builder Access
-
-The deployment machine's Nix daemon must authenticate to Alhena as `root`
-over `ssh-ng`. It needs Alhena's host key, a usable root SSH identity, and
-access to the Tailscale hostname. Alhena must run Nix, accept the connection,
-and trust the connecting user. Alhena itself does not need this self-builder
-configuration.
+Avoiding source transfer requires a different workflow: commit and push a
+revision, arrange for a builder to fetch that revision into its own checkout,
+build there, and deploy only the resulting closures. That workflow cannot
+deploy uncommitted local changes.
 
 ## Transport and Activation
 
-Building and activation use separate connections:
+Each independent deployment:
 
-1. Nix sends build inputs to Alhena and retrieves completed output closures.
-2. deploy-rs copies those closures to each target over SSH.
-3. deploy-rs activates each target as `root` with automatic and magic rollback enabled.
+1. builds its profile on the deployment machine;
+2. copies that closure to its target over SSH;
+3. activates the target as `root` with automatic and magic rollback enabled.
 
-A deployment launched from a target host cannot activate that same host through its Tailscale hostname: the self-SSH connection is refused. Build placement remains correct, but self-activation must use `sudo nixos-rebuild switch --flake .#<hostname>`; exclude that host from a fleet run.
+A deployment launched from a target host skips that host because
+self-activation through its Tailscale hostname is refused. Update it locally
+with `sudo nixos-rebuild switch --flake .#<hostname>`.
 
 ## Implementation Map
 
-- `outputs.nix`: root `deploy` output, `deploy-fleet` wrapper, and forced remote-builder flags.
+- `outputs.nix`: root `deploy` output and the independent-node `deploy-fleet` wrapper.
 - `flake/lib.nix`: deploy-rs nodes, activation profiles, rollback policy, and target hostnames.

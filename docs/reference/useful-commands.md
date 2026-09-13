@@ -221,31 +221,24 @@ nix build .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 
 
 ## Deploy Fleet
 
-Outside Alhena, `deploy-fleet` sends eligible deploy-rs profile builds to
-Alhena over Tailscale SSH. It keeps one local job for
-`preferLocalBuild` derivations such as the NixOS firmware link farm. When
-launched on Alhena, it builds locally rather than configuring Alhena as its
-own remote builder. Nix copies finished remote closures back to deploy-rs,
-which distributes them to target hosts. `deploy-rs` activates every target as
-`root`; automatic and magic rollback remain enabled. Do not pass
-`--remote-build`: that builds each profile on its target instead.
+`deploy-fleet` builds each deploy-rs profile locally, then copies it to its
+target over SSH. Each node runs in a separate deploy-rs invocation: an
+unreachable node is reported as failed but does not stop subsequent nodes from
+activating. It exits nonzero after all nodes have been attempted if any failed.
+`deploy-rs` activates each reachable target as `root`; automatic and magic
+rollback remain enabled. Do not pass `--remote-build`: that builds each profile
+on its target instead.
 
 First connection accepts each target's Tailscale SSH host key. Later key
-changes fail deployment until explicitly reviewed.
-
-`deploy-fleet` leaves successfully activated nodes in place when another node
-fails. Automatic and magic rollback still protect the node whose activation
-failed. Run it only when every target is intended to receive the checkout:
+changes fail only that node until explicitly reviewed.
 
 ```bash
 nix run .#deploy-fleet
 ```
 
-When launching from a deployment target, exclude that host: self-activation
-through its Tailscale hostname is refused.
-Before the first remote fleet deployment, ensure the deployment machine's Nix
-daemon recognizes Alhena's SSH host key and has a root SSH identity authorized
-by Alhena's Tailscale SSH policy.
+When launching from a deployment target, the wrapper skips that host because
+self-activation through its Tailscale hostname is refused. Update it locally
+with `sudo nixos-rebuild switch --flake .#<hostname>`.
 
 ## Install `albaldah` With `nixos-anywhere`
 

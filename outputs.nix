@@ -50,28 +50,36 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
             pkgs.nix
             inputs'.deploy-rs.packages.default
           ];
-          # All launch hosts except Alhena send eligible builds to Alhena.
-          # Nix still needs one local job for preferLocalBuild derivations such as
-          # NixOS's firmware link farm.
+          # Each node deploys independently so an unreachable node cannot block
+          # activation on the rest of the fleet.
           text = ''
-            nix eval --json .#lib.deploy > /dev/null
+            nodes="$(nix eval --raw .#lib.deploy --apply \
+              'deploy: builtins.concatStringsSep " " (builtins.attrNames deploy.nodes)')"
+            local_host="$(hostname --short)"
+            failed_nodes=()
 
-            if [ "$(hostname --short)" = alhena ]; then
-              exec deploy \
+            for node in $nodes; do
+              if [ "$node" = "$local_host" ]; then
+                printf 'Skipping %s: cannot activate this host through its own Tailscale address\n' "$node"
+                continue
+              fi
+
+              if deploy \
                 --skip-checks \
                 --rollback-succeeded false \
                 "$@" \
-                .
-            fi
+                ".#''${node}"; then
+                printf 'Activated %s\n' "$node"
+              else
+                printf 'Failed to activate %s\n' "$node" >&2
+                failed_nodes+=("$node")
+              fi
+            done
 
-            exec deploy \
-              --skip-checks \
-              --rollback-succeeded false \
-              "$@" \
-              . \
-              -- \
-              --builders 'ssh-ng://root@alhena.wallaby-clownfish.ts.net x86_64-linux - 3 100 big-parallel - -' \
-              --max-jobs 1
+            if [ "''${#failed_nodes[@]}" -gt 0 ]; then
+              printf 'Fleet deployment failed for: %s\n' "''${failed_nodes[*]}" >&2
+              exit 1
+            fi
           '';
         };
         fast-flake-update = inputs'.fast-flake-update.packages.default;
