@@ -8,6 +8,7 @@
     "@google/gemini-cli": "latest",
     "@oh-my-pi/pi-coding-agent": "latest",
     "@openai/codex": "latest",
+    "@deepseek-ai/dsh": "latest",
     "bun": "latest",
     "headroom-ai": "latest"
   }

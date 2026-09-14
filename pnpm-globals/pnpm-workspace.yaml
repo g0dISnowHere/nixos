@@ -2,9 +2,11 @@ minimumReleaseAge: 4320
 minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
 allowBuilds:
+  '@deepseek-ai/dsh-subprocess-local': true
   "@github/keytar": true
   "@google/genai": true
   bun: true
+  koffi: false
   node-pty: true
   onnxruntime-node: true
   protobufjs: true
