@@ -140,6 +140,11 @@ remove_obsolete_wrappers() {
   done
 }
 
+prune_uv_cache() {
+  printf 'Pruning uv cache\n'
+  "$uv_cmd" cache prune
+}
+
 sync_locked_project() {
   if [[ "$dry_run" -eq 1 ]]; then
     printf 'uv tools source: %s\n' "$source_dir"
@@ -150,6 +155,7 @@ sync_locked_project() {
     if [[ "$update_lock" -eq 1 ]]; then
       printf 'would refresh source lockfile with exclude-newer cutoff: %s\n' "$(cooldown_cutoff)"
     fi
+    printf 'would prune uv cache after successful sync\n'
     return
   fi
 
@@ -173,6 +179,7 @@ sync_locked_project() {
     write_wrapper "$command"
   done
   remove_obsolete_wrappers
+  prune_uv_cache
   printf 'uv tools: sync complete\n'
 }
 

@@ -77,11 +77,11 @@ Current update helpers include:
   - `--dry-run` prints commands
   - `--update` refreshes pnpm and uv lockfiles plus Rust crate pins
 - `scripts/sync-pnpm-globals.sh` installs locked `pnpm-globals/` dependencies
-  into the current user's XDG data directory; Home Manager exposes its
-  `node_modules/.bin` directory on `PATH`
+  into the current user's XDG data directory, writes managed wrappers in
+  `$HOME/.local/bin`, and prunes the pnpm store after a successful sync
 - `scripts/sync-uv-tools.sh` installs locked `uv-tools/` dependencies into the
-  current user's XDG data directory; Home Manager exposes its `.venv/bin`
-  directory on `PATH`
+  current user's XDG data directory, writes managed wrappers in
+  `$HOME/.local/bin`, and prunes the uv cache after a successful sync
 - `scripts/sync-rustpackages.sh` installs pinned crates from `rustpackages/`
   into the current user's XDG data directory; Home Manager exposes its `bin`
   directory on `PATH`; `--update` refreshes crate versions in `packages.txt`
@@ -103,9 +103,8 @@ Current update helpers include:
 - Do not add `packageManager` pins or version-manager marker files just to
   restate the Nix-provided tool version.
 - Keep semantic runtime constraints when they describe the project contract
-  rather than the installer choice, for example Python `requires-python` ranges
-  or lockfiles.
-
+  rather than the installer choice, for example Python `requires-python`
+  ranges or lockfiles.
 Current secret helpers include:
 
 - `scripts/secrets` as the operator-facing SOPS orchestrator

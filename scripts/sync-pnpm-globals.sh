@@ -108,6 +108,11 @@ remove_obsolete_wrappers() {
   :
 }
 
+prune_pnpm_store() {
+  printf 'Pruning pnpm store\n'
+  "$pnpm_cmd" store prune
+}
+
 sync_locked_project() {
   if [[ "$dry_run" -eq 1 ]]; then
     printf 'pnpm globals source: %s\n' "$source_dir"
@@ -118,6 +123,7 @@ sync_locked_project() {
     if [[ "$update_lock" -eq 1 ]]; then
       printf 'would refresh source lockfile before syncing\n'
     fi
+    printf 'would prune pnpm store after successful sync\n'
     return
   fi
 
@@ -143,6 +149,7 @@ sync_locked_project() {
     write_wrapper "$command"
   done
   remove_obsolete_wrappers
+  prune_pnpm_store
   printf 'pnpm globals: sync complete\n'
 }
 
