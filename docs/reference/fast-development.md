@@ -59,6 +59,50 @@ nix run .#fast-flake-update -- --rev <commit> nixpkgs ~/src/nixpkgs
 Use `nix flake update` and `scripts/update-system.sh` for normal remote input
 updates. `fast-flake-update` only supports deliberate local-checkout testing.
 
+## Pull with local changes
+
+`git pull` cannot proceed when local edits would be overwritten or when the
+index already contains unmerged paths. A recent incident combined both cases:
+
+1. Local edits and untracked findings existed while `flake.lock` and
+   `scripts/README.md` still had unresolved stash conflicts.
+2. The first `git pull` stopped because unmerged files remained.
+3. After resolving those files, `git pull` still stopped because remote commits
+   touched files with local edits.
+4. Stashing tracked and untracked work, pulling, then applying the stash
+   restored local changes but produced two new documentation conflicts.
+5. The conflicts were resolved by keeping the current flake inputs in
+   `flake.lock`, combining non-overlapping script documentation, and preserving
+   the local proposal status.
+
+Safer workflow:
+
+```bash
+git status --short --branch
+git diff --check
+git stash push --include-untracked -m "pre-pull local work"
+git pull
+git stash pop
+```
+
+For lockfile conflicts, always keep the most recent lockfile. Identify the
+newer side from commit chronology or lock metadata, then take that file
+whole; never manually merge lockfile JSON or choose a side because it is
+shorter. Validate its input topology against `flake.nix` afterward.
+
+After applying the stash:
+
+```bash
+git diff --name-only --diff-filter=U
+git diff --check
+python -m json.tool flake.lock >/dev/null
+bash -n scripts/*.sh
+git status --short --branch
+```
+
+Do not drop the backup stash until restored files and validation pass. Keep
+local changes uncommitted unless the user explicitly asks for a commit.
+
 ## Validate input topology
 
 Run the targeted input linter:
