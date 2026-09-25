@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: scripts/sync.sh [--dry-run] [--update]
 
-Sync flake inputs and repo-managed pnpm, uv, and Rust packages.
+Sync flake inputs and repo-managed pnpm, uv, AI skills, and Rust packages.
 
 Options:
   --dry-run  Show planned commands without changing state.
@@ -82,6 +82,9 @@ sync_repository() {
   else
     sync_package_project sync-uv-tools.sh
   fi
+
+  printf 'Syncing AI skills\n'
+  sync_package_project sync-ai-skills.sh
 
   printf 'Syncing Rust packages\n'
   if [[ "$update_packages" -eq 1 ]]; then

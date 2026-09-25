@@ -73,7 +73,8 @@ Current update helpers include:
     global tool operations run as the configured repo user so existing SSH keys
     and user-owned stores remain usable
 - `scripts/sync.sh` is the single repository sync entrypoint:
-  `nix flake update`, `pnpm-globals/`, `uv-tools/`, and `rustpackages/`
+  `nix flake update`, `pnpm-globals/`, `uv-tools/`, managed AI skills, and
+  `rustpackages/`
   - `--dry-run` prints commands
   - `--update` refreshes pnpm and uv lockfiles plus Rust crate pins
 - `scripts/sync-pnpm-globals.sh` installs locked `pnpm-globals/` dependencies
