@@ -2,7 +2,6 @@
   hostname,
   inputs,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -29,20 +28,6 @@
     enable = true;
     defaultUser = "djoolz";
     startMenuLaunchers = true;
-  };
-
-  # Alhena-only: constrain the Tailscale tunnel MTU in WSL.
-  systemd.services.tailscale-wsl-mtu = {
-    description = "Set Tailscale tunnel MTU for WSL";
-    wantedBy = [ "tailscaled.service" ];
-    partOf = [ "tailscaled.service" ];
-    after = [ "tailscaled.service" ];
-    requires = [ "tailscaled.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = "${pkgs.iproute2}/bin/ip link set dev tailscale0 mtu 1200";
   };
 
   # Hardware configuration for NVIDIA GPU support in containers

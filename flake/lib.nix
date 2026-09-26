@@ -21,9 +21,12 @@ let
   deploy = {
     autoRollback = true;
     magicRollback = true;
+    # Alhena's Tailscale SSH server stalls during ML-KEM key exchange.
     sshOpts = [
       "-o"
       "StrictHostKeyChecking=accept-new"
+      "-o"
+      "KexAlgorithms=curve25519-sha256"
     ];
 
     nodes = {

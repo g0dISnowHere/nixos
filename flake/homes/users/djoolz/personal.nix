@@ -42,14 +42,19 @@
       IdentitiesOnly = true;
     };
     alhena = {
-      HostName = "192.168.3.211";
+      HostName = "alhena.wallaby-clownfish.ts.net";
       User = "djoolz";
       IdentitiesOnly = true;
+      KexAlgorithms = "curve25519-sha256";
     };
     alhena-root = {
-      HostName = "192.168.3.211";
+      HostName = "alhena.wallaby-clownfish.ts.net";
       User = "root";
       IdentitiesOnly = true;
+      KexAlgorithms = "curve25519-sha256";
+    };
+    "alhena.wallaby-clownfish.ts.net" = {
+      KexAlgorithms = "curve25519-sha256";
     };
   };
 }

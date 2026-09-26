@@ -9,7 +9,7 @@ supported-markers = [
 ]
 
 [options]
-exclude-newer = "2026-09-18T15:23:22Z"
+exclude-newer = "2026-09-23T06:13:55Z"
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -72,7 +72,7 @@ wheels = [
 
 [[package]]
 name = "anthropic"
-version = "1.6.0"
+version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -83,9 +83,9 @@ dependencies = [
     { name = "sniffio", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/3d/4170318539de0c163e1806509b0bb9cd7d611ee15e7885f1d16a11a37d29/anthropic-1.6.0.tar.gz", hash = "sha256:ce3c032f940984f67c516db896375bff36959f8dc589973e386f8e6ea81bbec3", size = 1172375, upload-time = "2026-09-15T15:14:55.826Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/65/b8/f4de0e90bbd641e86a1d6b20e017442033a2c1d2f5381799f82057115bd7/anthropic-1.8.0.tar.gz", hash = "sha256:9c1783ed90f409617749a61c5ab98e20624a572626f2e0a15cea03ed8e1401e5", size = 1221762, upload-time = "2026-09-22T16:25:38.167Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c1/32/57a8b6c5441d9e6a1f332f70ee02375af6d9b5b65b42689ba83f7c7d010a/anthropic-1.6.0-py3-none-any.whl", hash = "sha256:049434f013d3a874acdfee696ec626e19166d58f4277e8fa34e5d0a5ec250ad0", size = 1249068, upload-time = "2026-09-15T15:14:54.326Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/18/5d25a703b66ba34e9277f875f692a3bea3b0ff4d47ee5d188521a01cdd2a/anthropic-1.8.0-py3-none-any.whl", hash = "sha256:79a4516a21e64fd7b15be1a49ebf544bd6376c96a971a77365358823a2717bc6", size = 1348276, upload-time = "2026-09-22T16:25:36.515Z" },
 ]
 
 [[package]]
@@ -136,30 +136,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.43.97"
+version = "1.43.100"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "jmespath", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "s3transfer", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/39/bd/928bf084b0441b2efbac3e02299892dfb07899cd3617af6ebdc13be2cfb9/boto3-1.43.97.tar.gz", hash = "sha256:ffe9a93a6b4b2c1b59f4f5e07c18d2acfe8f68c320a1a12251d4ea8570b9bdfe", size = 112655, upload-time = "2026-09-17T19:28:52.805Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/98/93754b03cb746202f216bdfa970d56d72c105b27187506336c443e4ffac3/boto3-1.43.100.tar.gz", hash = "sha256:ae8d81e1f14699959eb38757c2e0044f4e3a303a57a0335d0be4cd3c07529763", size = 112649, upload-time = "2026-09-22T19:21:21.906Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/7f/068104b9d07b0e3e262074bf4efb36a72c836654a14bdfa911ad1e42b393/boto3-1.43.97-py3-none-any.whl", hash = "sha256:420b45f566d3b49c6c1f021c50f47f66ea99ef05b1872d80b472c536542b321e", size = 140032, upload-time = "2026-09-17T19:28:51.212Z" },
+    { url = "https://files.pythonhosted.org/packages/98/37/0ffe0ceb6227381f852f51777c9338115958d24d436bef990c73b6660bf4/boto3-1.43.100-py3-none-any.whl", hash = "sha256:49785c310057c2c650d62ca3ba28e88ad87c3827b490312711e81968a9d21fd8", size = 140042, upload-time = "2026-09-22T19:21:20.41Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.43.97"
+version = "1.43.100"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "python-dateutil", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "urllib3", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f9/c7/aff84828bc3cd05328c65650320be27bb13e63f37917f1aba3f6309498c8/botocore-1.43.97.tar.gz", hash = "sha256:7c0e18686367e98de49826d8ac9ae951ce0915c172969a5d96b768c9afa9e979", size = 16120115, upload-time = "2026-09-17T19:28:48.141Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/b7/6ec11bf6b07c961ab2692cc082662f7279d7860921e2d0ed14f7f6cd6cfe/botocore-1.43.100.tar.gz", hash = "sha256:b6e64e38e3c03663a0c20d3d207afd97a0409dbc27e4e43384ac3f93cb61279f", size = 16166265, upload-time = "2026-09-22T19:21:16.93Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/3b/ffb7780e5f4c6af60eee31b8badd2762bba1793ca05f926e9381919c7d85/botocore-1.43.97-py3-none-any.whl", hash = "sha256:6b2beefd4f515aa7bfc614c945493a19315577ff31b464abbc9e33b7aff5112c", size = 15813332, upload-time = "2026-09-17T19:28:45.248Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/f2/93ce07251665ed422d4ae175b65741d3c02495acbc183b84df6ca5a850c8/botocore-1.43.100-py3-none-any.whl", hash = "sha256:34c3232bc0f895091a15249903b3cab1148f5787f12389caa2d54a9175428d51", size = 15860706, upload-time = "2026-09-22T19:21:12.351Z" },
 ]
 
 [[package]]
@@ -260,13 +260,13 @@ wheels = [
 
 [[package]]
 name = "cuda-bindings"
-version = "13.4.2"
+version = "13.4.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cuda-pathfinder", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/cb/1f2719be03546aa9940bfab7ad6941335ec3326b48fe4e256d07d6d6bbc5/cuda_bindings-13.4.2-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:50e68c36222a58d271fbd2e23149497d35450a911d792d49a029e58519abb7e5", size = 6924257, upload-time = "2026-09-17T22:06:13.065Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/24/9c01edfd2210737ee9471b47db857a079e5a23f2677e5d9778c0ff23d099/cuda_bindings-13.4.3-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1fd7d8459b364aedc11f3e59703453ced823135f78a9111ca70feef8d56d4d21", size = 6929124, upload-time = "2026-09-23T02:22:11.765Z" },
 ]
 
 [[package]]
@@ -420,7 +420,7 @@ wheels = [
 
 [[package]]
 name = "fastembed"
-version = "0.8.0"
+version = "0.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -434,9 +434,9 @@ dependencies = [
     { name = "tokenizers", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "tqdm", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/26/25/58865e36b6e8a9a0d0ff905b5601aa30db97956327c0df42ec4ed6accc21/fastembed-0.8.0.tar.gz", hash = "sha256:75966edfa8b006ee78514c726bd7f6a50721dadc89305279052be9db72fd53e8", size = 75115, upload-time = "2026-03-23T16:34:41.699Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ae/84/09d221078b6e2e2169fab52506dc2e0a6c7a9a4f0699000e9b9df55b42b2/fastembed-0.8.1.tar.gz", hash = "sha256:ad815f14873dce918f755a99f16929a1384775f91ca8a14645993a165b5f65ba", size = 82392, upload-time = "2026-09-22T20:01:24.201Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/e8/26b7d78bb8972498c467ca34cb12ee2e60d26ba5eae6d8443189a1af37a5/fastembed-0.8.0-py3-none-any.whl", hash = "sha256:40bee672657574a1009e35ec50030a55f2b426842cb011845379817641bbbbd0", size = 116572, upload-time = "2026-03-23T16:34:40.69Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/76/209f9f4c421853f729176c5a6ca99a9cd92b3b593390a20f9414fd333ad7/fastembed-0.8.1-py3-none-any.whl", hash = "sha256:b4f4043080af36ee820d22d2d3034df635c1a8b9764e5d2a642bc7aeb1d0e749", size = 129755, upload-time = "2026-09-22T20:01:22.789Z" },
 ]
 
 [[package]]
@@ -451,11 +451,11 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "4.0.0"
+version = "4.0.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5e/ac/8c98b17ee3900147b38ef7884a1e590b070b63f0d59fd8b46ef0205f4576/filelock-4.0.0.tar.gz", hash = "sha256:3611eca5d818ca9b00ec3cc7db1dcfe1e2aafc8d44fb4920d8cf60ad1f6bfda6", size = 237935, upload-time = "2026-09-17T03:59:02.967Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/38/88cd6eda96c40594a1e3da7d8b40f04bc40ace5a6aef9ac5cb407540f173/filelock-4.0.1.tar.gz", hash = "sha256:fdefc3f3e87716d855ae2b732c1cfd521dd99799ef2b4d00e8c0d4dcdc7cc94b", size = 238888, upload-time = "2026-09-19T01:08:15.958Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/01/fb/0e4489505dac46a0487ba925ea4b046612f1a40f432d63a000421de78549/filelock-4.0.0-py3-none-any.whl", hash = "sha256:a850aa9ec2acba8db9ca2e9fcf8a327fbc2f85e432725715b37bd76b7dd1f798", size = 106036, upload-time = "2026-09-17T03:59:01.336Z" },
+    { url = "https://files.pythonhosted.org/packages/29/33/af0635ab07fe83b1788a1dbe370ff3e226062495a998335cb18a1cac81aa/filelock-4.0.1-py3-none-any.whl", hash = "sha256:481a321a27bef441e23c53371c6abc8d7d16e26b97090074ba44f7538a3fd55a", size = 106219, upload-time = "2026-09-19T01:08:14.49Z" },
 ]
 
 [[package]]
@@ -529,7 +529,7 @@ wheels = [
 
 [[package]]
 name = "headroom-ai"
-version = "0.37.0"
+version = "0.38.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ast-grep-cli", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -542,9 +542,9 @@ dependencies = [
     { name = "tiktoken", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "tomlkit", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/17/10c3eb35dddb30055d84116444b7158d435758c4cfc161d7c206fb871782/headroom_ai-0.37.0.tar.gz", hash = "sha256:7ffdecba91ce44dd02f1601499f6c935c47374b7cb6ec61e569b816a4bb78a26", size = 2842752, upload-time = "2026-08-27T21:51:09.995Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/91/820d30f0d615d996627f8ff4ecde8b429c1da363ff36979213db1a34bf48/headroom_ai-0.38.0.tar.gz", hash = "sha256:63800dfc037fcb38dfdb2d0582f672218c489048546a76de70fb9afde9312f59", size = 2991919, upload-time = "2026-09-22T00:25:52.689Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46", size = 13961835, upload-time = "2026-08-27T21:51:05.842Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/e8/2edff8f87f7035ee04e0a0316193aa11a71d80d82f86482ee0c6eae23303/headroom_ai-0.38.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:941d1f0c0aa0754bd4959bba0b212d1554a56c179c0643dd7852a4b9d95c7db7", size = 14112436, upload-time = "2026-09-22T00:25:49.095Z" },
 ]
 
 [package.optional-dependencies]
@@ -823,7 +823,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.101.0"
+version = "1.102.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -841,10 +841,10 @@ dependencies = [
     { name = "tiktoken", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "tokenizers", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/c0/08a31c8c5f7fce96e98e2a7f818f446d0468da484228a7450cd2b6f71dcf/litellm-1.101.0.tar.gz", hash = "sha256:734ab2b8cad6a3b582d52d9c9c5fcab759eb382b93935ef808fda0e16d822ac3", size = 17447699, upload-time = "2026-09-14T23:15:36.135Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e9/f0/acc98d2c47215aac9bda2c7d18c3d08e025b50ba3dadd7c449fa34811d15/litellm-1.102.1.tar.gz", hash = "sha256:7216f46e6a1eba50f4dbb6000afdb1f5b77360eb498a4f341fc655191108cfd4", size = 18489222, upload-time = "2026-09-23T03:59:02.189Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/0e/561d7a314a08940688814be590544907fdfde9225dce35badbd79fc9ad4c/litellm-1.101.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:140ee0997324b8fd2405f7f8c26f42c0f364996dc4030187344a90cf27916667", size = 23944856, upload-time = "2026-09-14T23:15:26.417Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/b6/9d69e95de9465cd23651c6623518d5e711d8776a0e58e6ea62066c9d9470/litellm-1.101.0-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:85d88053148c5c6e016e495273eeaf8f3a29779b60d18977ec42e2a6bbd2d8eb", size = 24042718, upload-time = "2026-09-14T23:15:31.044Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/ff/ef3186da67f297edfa5c01a6b92ee7b2b2406056b0a7415945e0cf490a2d/litellm-1.102.1-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:b36c46e89e2fc50f42848120ed03a31c7347103cbaa733421f8843915b6f3355", size = 27352604, upload-time = "2026-09-23T03:58:48.456Z" },
+    { url = "https://files.pythonhosted.org/packages/86/09/ba63c28d3373389022d8686396f26b28ac89c1e324e2b1fa00b4578e9b63/litellm-1.102.1-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:c5fcfbe322e3052f96fa92409fc61ec9712a7b2b567e7760e057b17b7587d021", size = 27475133, upload-time = "2026-09-23T03:58:55.204Z" },
 ]
 
 [[package]]
@@ -988,13 +988,13 @@ wheels = [
 
 [[package]]
 name = "multidict"
-version = "6.9.0"
+version = "6.9.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e7/59/84b6cad9ddfdd9471db727b0e987c60ecbdb6b206ba265e8c50e74a1ab80/multidict-6.9.0.tar.gz", hash = "sha256:d7d32c0543494efbc9394e2b571725071d08e295993486bc9a43f6f89375ee01", size = 173221, upload-time = "2026-09-18T12:50:55.299Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/99/1d4d69c3512d0ddbfa3a1b69cfd9a151012ab2eb4eabbb096201b1f0b7d8/multidict-6.9.1.tar.gz", hash = "sha256:0f06e60fa190aa7abd0914c2a766736fdc8e9f34878c4346338534b73d1b20e2", size = 182404, upload-time = "2026-09-21T17:59:05.362Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/82/fc/19deb0d051c694dbc2d5008ec89b341f7ee42c4412b38630a47a14339115/multidict-6.9.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c51fd8d59e72e45c64907bf7f81fbd94f4c8dcd1c8b2f23f4c2d7ede788fcfc3", size = 316918, upload-time = "2026-09-18T12:47:33Z" },
-    { url = "https://files.pythonhosted.org/packages/b6/99/08c09a9aa8797246bf6b646e603654a8f25326df4881855da4b9b10a5e56/multidict-6.9.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:254e53be2ec70518bb82dfa9b0c7166baaf2bd0e918bd17b65caaf489d5a5522", size = 313360, upload-time = "2026-09-18T12:47:47.503Z" },
-    { url = "https://files.pythonhosted.org/packages/75/2a/557689d56936a83c112ee28f4c4d7698ff01c24e22d217ad8fcce19982c7/multidict-6.9.0-py3-none-any.whl", hash = "sha256:57c2445049f7d8e66306f712868219da7ff7168ef42263dc032401211bf1205c", size = 19175, upload-time = "2026-09-18T12:50:52.172Z" },
+    { url = "https://files.pythonhosted.org/packages/93/f2/e06c8e42074d0a4b8419bfe92afbd1d262190b69549ecbcd2dffa4f103c2/multidict-6.9.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7fd79c521f6290c69125fa2b85fa65d9e657e6a8ffaf722dc881b926bef4aa5c", size = 336213, upload-time = "2026-09-21T17:55:59.723Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/03/a8fc809ef364b8c231c065ea2ea2f97ae86d4f9a0e36b5721759fd606778/multidict-6.9.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:6441cc837aea58be7d9baef1b2383eb8311ab9303f500f99ac90b584cd78bb14", size = 332826, upload-time = "2026-09-21T17:56:15.175Z" },
+    { url = "https://files.pythonhosted.org/packages/be/59/e26cb779be4c591d1a910f59d29aca9fba4de70349840a833beba2652371/multidict-6.9.1-py3-none-any.whl", hash = "sha256:7bf6478188f4e47bf5686e8a33da4ae28bf43b1b2528d9ee144d28492bfac60b", size = 19176, upload-time = "2026-09-21T17:59:03.501Z" },
 ]
 
 [[package]]
@@ -1024,11 +1024,11 @@ wheels = [
 
 [[package]]
 name = "networkx"
-version = "3.6.1"
+version = "3.7"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6a/51/63fe664f3908c97be9d2e4f1158eb633317598cfa6e1fc14af5383f17512/networkx-3.6.1.tar.gz", hash = "sha256:26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509", size = 2517025, upload-time = "2025-12-08T17:02:39.908Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/76/3af777226b63a5e64a6b36b1ec5855c14e2b94a37096d4760e595fc43511/networkx-3.7.tar.gz", hash = "sha256:fd77a511bd90f39f3d016351345b52cf5319b813bdca01de3f755d3cca62e96a", size = 1866482, upload-time = "2026-09-21T16:45:16.974Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl", hash = "sha256:d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762", size = 2068504, upload-time = "2025-12-08T17:02:38.159Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/cd/fe58041e9011f307c490e3e17dd48cc516448f7c698a3f2d9d9d65d7e6a8/networkx-3.7-py3-none-any.whl", hash = "sha256:e3fd2c13a7814cee3746340d8d7f8598a67f16a58bf47fb7f8793fab6efca1b0", size = 2142205, upload-time = "2026-09-21T16:45:14.609Z" },
 ]
 
 [[package]]
@@ -1684,7 +1684,7 @@ wheels = [
 
 [[package]]
 name = "sentence-transformers"
-version = "5.7.0"
+version = "6.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -1697,9 +1697,9 @@ dependencies = [
     { name = "transformers", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "typing-extensions", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9d/59/867381b1414a975da6c9953f48a07c05cb0629305e2d37c9bcc9764367b2/sentence_transformers-5.7.0.tar.gz", hash = "sha256:fd8c8fc35e6323631dff9f3760969ebf7980dc3cfda0ab1354bc6a774cc0e5d8", size = 466382, upload-time = "2026-08-06T12:12:33.371Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/a1/53ae87971817e2d8370f8e79b843a881be33ab339502d71c5f82ac31f7af/sentence_transformers-6.1.0.tar.gz", hash = "sha256:299025df51550dc1a38f05be27a9b0bf881c4e5e70542b3b7757d05e00aa3868", size = 576566, upload-time = "2026-09-18T10:44:24.279Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/c8/f63d99e354532f5b83e735dd1e001bda92495fbfde934f65d924abf2b071/sentence_transformers-5.7.0-py3-none-any.whl", hash = "sha256:b78141da3d8137e70d965866e2ca43190b9266f3d4d8752e250ded75e7136730", size = 611333, upload-time = "2026-08-06T12:12:31.881Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/6e/9115e19589c83172bd37ec793cfef7f7c719464053fa6a8882700c1f4488/sentence_transformers-6.1.0-py3-none-any.whl", hash = "sha256:eb8122f4d180f552eda26dc3d77e84e8c11dc2b1d456a406b9f24abb70ceeadd", size = 740560, upload-time = "2026-09-18T10:44:22.841Z" },
 ]
 
 [[package]]

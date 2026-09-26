@@ -98,6 +98,13 @@
   my.monitoring = {
     enable = true;
     site = "home";
+    openwrtTarget = "192.168.3.1:9100";
+    wanProbe = true;
+  };
+
+  my.syslogReceiver = {
+    enable = true;
+    allowedIPv4Sources = [ "192.168.3.1" ];
   };
 
   # Do not change casually. See docs/architecture/state-version-reasons.md.
