@@ -8,7 +8,7 @@ let
   cfg = config.my.monitoring;
   textfileDirectory = "/var/lib/prometheus-node-exporter-textfile";
   importantUnitRegex = lib.concatStringsSep "|" cfg.importantUnits;
-  publicFirewallPorts =
+  publicFirewallPorts = lib.unique (
     let
       ports = protocol: entries: map (port: { inherit protocol port; }) entries;
       portRanges =
@@ -17,7 +17,8 @@ let
     ports "tcp" config.networking.firewall.allowedTCPPorts
     ++ ports "udp" config.networking.firewall.allowedUDPPorts
     ++ portRanges "tcp" config.networking.firewall.allowedTCPPortRanges
-    ++ portRanges "udp" config.networking.firewall.allowedUDPPortRanges;
+    ++ portRanges "udp" config.networking.firewall.allowedUDPPortRanges
+  );
   firewallPortMetrics = lib.concatMapStrings (entry: ''
     printf 'nixos_firewall_allowed_port_info{protocol="${entry.protocol}",port="${toString entry.port}"} 1\n'
   '') publicFirewallPorts;
@@ -69,6 +70,30 @@ let
       mv "$temporary" "$output"
     '';
   };
+  wanReachabilityWriter = pkgs.writeShellApplication {
+    name = "monitoring-wan-reachability";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.glibc
+      pkgs.iputils
+    ];
+    text = ''
+      set -eu
+      output="${textfileDirectory}/wan_reachability.prom"
+      temporary="$output.$$"
+      wan_reachable=0
+      dns_reachable=0
+
+      ping -c 1 -W 2 1.1.1.1 >/dev/null 2>&1 && wan_reachable=1
+      getent ahostsv4 one.one.one.one >/dev/null 2>&1 && dns_reachable=1
+
+      {
+        printf 'monitoring_wan_reachable %s\n' "$wan_reachable"
+        printf 'monitoring_dns_reachable %s\n' "$dns_reachable"
+      } > "$temporary"
+      mv "$temporary" "$output"
+    '';
+  };
 in
 {
   options.my.monitoring = {
@@ -85,6 +110,20 @@ in
       default = "prod";
       description = "Stable deployment environment label.";
     };
+
+    openwrtTarget = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "LAN OpenWrt exporter target scraped by this Alloy relay.";
+    };
+
+    openwrtHost = lib.mkOption {
+      type = lib.types.str;
+      default = "auriga";
+      description = "Stable host label for the LAN OpenWrt exporter and syslog.";
+    };
+
+    wanProbe = lib.mkEnableOption "LAN WAN and DNS reachability metrics";
 
     importantUnits = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -106,6 +145,7 @@ in
   config = lib.mkIf cfg.enable {
     services = {
       alloy.enable = true;
+      alloy.extraFlags = [ "--stability.level=experimental" ];
 
       prometheus.exporters.node = {
         enabledCollectors = [ "textfile" ];
@@ -146,6 +186,20 @@ in
         forward_to = [prometheus.remote_write.remote.receiver]
       }
 
+      ${lib.optionalString (cfg.openwrtTarget != null) ''
+        prometheus.scrape "openwrt" {
+          targets = [{
+            __address__ = "${cfg.openwrtTarget}",
+            job = "openwrt",
+            host = "${cfg.openwrtHost}",
+            site = "${cfg.site}",
+            environment = "${cfg.environment}",
+          }]
+          forward_to = [prometheus.remote_write.remote.receiver]
+        }
+      ''}
+
+
       prometheus.scrape "systemd" {
         targets = [{
           __address__ = "127.0.0.1:9558",
@@ -168,9 +222,26 @@ in
         forward_to = [prometheus.remote_write.remote.receiver]
       }
 
+      prometheus.scrape "alloy" {
+        targets = [{
+          __address__ = "127.0.0.1:12345",
+          job = "alloy",
+          host = "${config.networking.hostName}",
+          site = "${cfg.site}",
+          environment = "${cfg.environment}",
+        }]
+        forward_to = [prometheus.remote_write.remote.receiver]
+      }
+
       loki.write "remote" {
         endpoint {
           url = "https://loki.int.djoolz.de/loki/api/v1/push"
+          max_backoff_retries = 0
+        }
+
+        wal {
+          enabled = true
+          max_segment_age = "168h"
         }
       }
 
@@ -217,6 +288,24 @@ in
           source = "journald",
         }
       }
+
+      ${lib.optionalString (cfg.openwrtTarget != null) ''
+        loki.source.file "openwrt_syslog" {
+          targets = [{
+            __path__ = "/var/log/remote/*/*.log",
+            host = "${cfg.openwrtHost}",
+            site = "${cfg.site}",
+            environment = "${cfg.environment}",
+            source = "openwrt_syslog",
+          }]
+          forward_to = [loki.relabel.labels.receiver]
+          tail_from_end = true
+
+          file_match {
+            enabled = true
+          }
+        }
+      ''}
     '';
 
     systemd = {
@@ -229,6 +318,22 @@ in
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${nixosStateWriter}/bin/monitoring-nixos-state";
+        };
+      };
+
+      services.monitoring-wan-reachability = lib.mkIf cfg.wanProbe {
+        description = "Write LAN WAN and DNS reachability metrics";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${wanReachabilityWriter}/bin/monitoring-wan-reachability";
+        };
+      };
+
+      timers.monitoring-wan-reachability = lib.mkIf cfg.wanProbe {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "1min";
         };
       };
 
