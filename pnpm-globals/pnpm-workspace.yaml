@@ -6,6 +6,7 @@ allowBuilds:
   "@github/keytar": true
   "@google/genai": true
   bun: true
+  esbuild: true
   koffi: false
   node-pty: true
   onnxruntime-node: true

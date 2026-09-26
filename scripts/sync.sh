@@ -58,39 +58,51 @@ sync_package_project() {
 
   if [[ ! -r "${script_dir}/${script}" ]]; then
     printf 'sync script missing: %s\n' "${script_dir}/${script}" >&2
-    exit 1
+    return 1
   fi
   run_command bash "${script_dir}/${script}" "$@"
 }
 
+sync_step() {
+  local name="$1"
+  shift
+
+  printf 'Syncing %s\n' "$name"
+  if "$@"; then
+    return
+  fi
+  printf 'Failed to sync %s\n' "$name" >&2
+  return 1
+}
+
 sync_repository() {
+  local failed=0
+  local -a package_args=()
+
   cd "$repo_root"
-
-  printf 'Syncing flake inputs\n'
-  run_command nix flake update
-
-  printf 'Syncing pnpm globals\n'
   if [[ "$update_packages" -eq 1 ]]; then
-    sync_package_project sync-pnpm-globals.sh --update
-  else
-    sync_package_project sync-pnpm-globals.sh
+    package_args=(--update)
   fi
 
-  printf 'Syncing uv tools\n'
-  if [[ "$update_packages" -eq 1 ]]; then
-    sync_package_project sync-uv-tools.sh --update
-  else
-    sync_package_project sync-uv-tools.sh
+  if ! sync_step 'flake inputs' run_command nix flake update; then
+    failed=1
+  fi
+  if ! sync_step 'pnpm globals' sync_package_project sync-pnpm-globals.sh "${package_args[@]}"; then
+    failed=1
+  fi
+  if ! sync_step 'uv tools' sync_package_project sync-uv-tools.sh "${package_args[@]}"; then
+    failed=1
+  fi
+  if ! sync_step 'AI skills' sync_package_project sync-ai-skills.sh; then
+    failed=1
+  fi
+  if ! sync_step 'Rust packages' sync_package_project sync-rustpackages.sh "${package_args[@]}"; then
+    failed=1
   fi
 
-  printf 'Syncing AI skills\n'
-  sync_package_project sync-ai-skills.sh
-
-  printf 'Syncing Rust packages\n'
-  if [[ "$update_packages" -eq 1 ]]; then
-    sync_package_project sync-rustpackages.sh --update
-  else
-    sync_package_project sync-rustpackages.sh
+  if [[ "$failed" -eq 1 ]]; then
+    printf 'Repository sync completed with failures\n' >&2
+    return 1
   fi
 }
 

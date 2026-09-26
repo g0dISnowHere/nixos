@@ -69,8 +69,50 @@ if ! flock -n 9; then
   exit 1
 fi
 
+is_unsupported_global_agent_failure() {
+  local results="$1"
+  local error match
+  local failure_count=0
+
+  while [[ "$results" =~ \"error\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; do
+    error="${BASH_REMATCH[1]}"
+    match="${BASH_REMATCH[0]}"
+    case "$error" in
+      'Eve does not support global skill installation'|'PromptScript does not support global skill installation') ;;
+      *) return 1 ;;
+    esac
+    results="${results#*"$match"}"
+    ((failure_count += 1))
+  done
+
+  [[ "$failure_count" -gt 0 ]]
+}
+
+install_managed_source() {
+  local source="$1"
+  local results stderr_file
+
+  stderr_file="$(mktemp)"
+  if results="$("$skills_cmd" add "$source" -g --all --json 2>"$stderr_file")"; then
+    cat "$stderr_file" >&2
+    rm -f "$stderr_file"
+    return
+  fi
+
+  if is_unsupported_global_agent_failure "$results"; then
+    rm -f "$stderr_file"
+    printf 'Skipped unsupported global skill agents for %s\n' "$source" >&2
+    return
+  fi
+
+  cat "$stderr_file" >&2
+  rm -f "$stderr_file"
+  printf '%s\n' "$results" >&2
+  return 1
+}
+
 export DISABLE_TELEMETRY=1
 for source in "${managed_sources[@]}"; do
   printf 'Installing managed global skills from %s\n' "$source"
-  "$skills_cmd" add "$source" -g --all
+  install_managed_source "$source"
 done
