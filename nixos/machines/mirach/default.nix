@@ -29,6 +29,7 @@
     ../../../modules/nixos/services/printing.nix
     ../../../modules/nixos/services/avahi-discovery.nix
     ../../../modules/nixos/services/monitoring-baseline.nix
+    ../../../modules/nixos/services/syslog-receiver.nix
     ../../../modules/nixos/services/monitoring-alloy.nix
     ../../../modules/nixos/services/vscode-remote.nix
     ../../../modules/nixos/services/ssh-server.nix
