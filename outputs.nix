@@ -42,7 +42,13 @@ inputs."flake-parts".lib.mkFlake { inherit inputs; } {
       checks = inputs.deploy-rs.lib.${system}.deployChecks inputs.self.lib.deploy;
 
       packages = {
-        deploy-rs = inputs'.deploy-rs.packages.default;
+        # Deploy checks run `nix flake check`, which is independent of target
+        # activation safety and unsuitable for deploying a focused host.
+        deploy-rs = pkgs.writeShellApplication {
+          name = "deploy";
+          runtimeInputs = [ inputs'.deploy-rs.packages.default ];
+          text = ''exec deploy --skip-checks "$@"'';
+        };
         deploy-fleet = pkgs.writeShellApplication {
           name = "deploy-fleet";
           runtimeInputs = [
