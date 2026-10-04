@@ -42,11 +42,12 @@
 - `devenv shell` enters the dev shell with formatting and linting tools.
 - `nix flake show` is the quick structure check.
 - `nix flake check` validates the flake and should be used before larger changes land.
-- Prefer fast evals during iteration:
-  - `nix eval .#nixosConfigurations.centauri.config.system.build.toplevel`
-  - `nix eval .#nixosConfigurations.mirach.config.system.build.toplevel`
-  - `nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel`
-  - `nix eval .#homeConfigurations."djoolz@workstation".activationPackage`
+- `nix eval .#nixosConfigurations.centauri.config.system.build.toplevel`
+- `nix eval .#nixosConfigurations.mirach.config.system.build.toplevel`
+- `nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel`
+- `nix eval .#nixosConfigurations.alhena.config.system.build.toplevel`
+- `nix eval .#nixosConfigurations.karaka.config.system.build.toplevel`
+- `nix eval .#homeConfigurations."djoolz@workstation".activationPackage`
 - `sh validate.sh` runs the broader validation flow for NixOS and Home Manager.
 - Use `sh validate.sh --dconf2nix` only when intentionally regenerating `modules/home/dconf/dconf.nix`.
 - Only deploy after evals and validation pass:

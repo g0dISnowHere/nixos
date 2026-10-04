@@ -48,6 +48,18 @@ let
       monitoring_enabled = true;
     };
 
+    karaka = mkHost "karaka" {
+      exposure_tier = "lan_only";
+      capabilities = [
+        "desktop"
+        "docker"
+        "monitoring_baseline"
+      ];
+      host_role = "local_server";
+      service_roles = [ "frontend" ];
+      monitoring_enabled = true;
+    };
+
     mirach = mkHost "mirach" {
       exposure_tier = "lan_only";
       capabilities = [

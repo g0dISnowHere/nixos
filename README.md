@@ -54,7 +54,10 @@ If you are new to this repo, the short version is:
   - homelab machine
 - `albaldah`
   - headless VPS
-
+- `alhena`
+  - WSL host
+- `karaka`
+  - Docker and media host
 ### Home Manager Outputs
 
 - `djoolz@workstation`
@@ -166,6 +169,8 @@ Use fast evals during iteration:
 nix eval .#nixosConfigurations.centauri.config.system.build.toplevel | tail -n 20
 nix eval .#nixosConfigurations.mirach.config.system.build.toplevel | tail -n 20
 nix eval .#nixosConfigurations.albaldah.config.system.build.toplevel | tail -n 20
+nix eval .#nixosConfigurations.alhena.config.system.build.toplevel | tail -n 20
+nix eval .#nixosConfigurations.karaka.config.system.build.toplevel | tail -n 20
 nix eval .#homeConfigurations."djoolz@workstation".activationPackage | tail -n 20
 ```
 

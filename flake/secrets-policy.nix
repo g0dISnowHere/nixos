@@ -18,6 +18,9 @@
     centauri = {
       recipient = "age1hus8yrj5y6aa0fntqp8glv7pqxqnhczt8y0xhaxznxvk6e2s4vls5v2dcc";
     };
+    karaka = {
+      recipient = "age1vtmfpjqpvdewmccmwr73l9n82upq4f892l6ec4dryqr0upcgpsuqhdhj8j";
+    };
     mirach = {
       recipient = "age1d860j0aa5d2fru0rfpyp4mxtyzwt6fw8crvlzerw542gqtfnnd3qfprgw2";
     };
@@ -30,6 +33,7 @@
           "albaldah"
           "alhena"
           "centauri"
+          "karaka"
           "mirach"
         ];
       };

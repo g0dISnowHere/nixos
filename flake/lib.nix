@@ -32,6 +32,7 @@ let
     nodes = {
       centauri = mkDeployNode "centauri" "centauri.wallaby-clownfish.ts.net";
       mirach = mkDeployNode "mirach" "mirach.wallaby-clownfish.ts.net";
+      karaka = mkDeployNode "karaka" "karaka.wallaby-clownfish.ts.net";
       albaldah = mkDeployNode "albaldah" "albaldah.wallaby-clownfish.ts.net";
       alhena = mkDeployNode "alhena" "alhena.wallaby-clownfish.ts.net";
     };

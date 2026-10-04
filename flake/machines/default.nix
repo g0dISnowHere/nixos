@@ -11,6 +11,11 @@
       system = "x86_64-linux";
       hostname = "mirach";
     };
+    # Karaka - remote NixOS host
+    karaka = self.lib.mkNixosSystem {
+      system = "x86_64-linux";
+      hostname = "karaka";
+    };
 
     # Albaldah - public-edge VPS
     albaldah = self.lib.mkNixosSystem {

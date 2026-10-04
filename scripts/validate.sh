@@ -232,15 +232,15 @@ validate_monitoring_inventory() {
   fi
 
   if ! jq -e '
-    (.hosts | keys == ["albaldah", "alhena", "centauri", "mirach"]) and
-    (.groups.all_hosts == ["albaldah", "alhena", "centauri", "mirach"]) and
+    (.hosts | keys == ["albaldah", "alhena", "centauri", "karaka", "mirach"]) and
+    (.groups.all_hosts == ["albaldah", "alhena", "centauri", "karaka", "mirach"]) and
     (.groups.public_edge_hosts == ["albaldah"]) and
-    (.groups.docker_hosts == ["albaldah", "alhena", "centauri", "mirach"]) and
-    (.groups.frontend_hosts == ["albaldah", "alhena", "centauri"]) and
+    (.groups.docker_hosts == ["albaldah", "alhena", "centauri", "karaka", "mirach"]) and
+    (.groups.frontend_hosts == ["albaldah", "alhena", "centauri", "karaka"]) and
     (.groups.monitoring_hosts == ["albaldah"]) and
     (.groups.security_hosts == ["albaldah"]) and
     (.groups.gpu_hosts == ["alhena"]) and
-    (.groups.local_servers == ["mirach"]) and
+    (.groups.local_servers == ["karaka", "mirach"]) and
     (.groups.vps_hosts == ["albaldah"]) and
     (all(.hosts[]; has("host_role") and has("exposure_tier") and has("capabilities") and has("service_roles") and has("monitoring_enabled"))) and
     (.hosts.albaldah.exposure_tier == "public_edge") and
@@ -250,6 +250,10 @@ validate_monitoring_inventory() {
     (.hosts.alhena.capabilities | index("nvidia_gpu")) and
     (.hosts.centauri.exposure_tier == "tailscale_only") and
     (.hosts.centauri.service_roles == ["frontend"]) and
+    (.hosts.karaka.exposure_tier == "lan_only") and
+    (.hosts.karaka.host_role == "local_server") and
+    (.hosts.karaka.service_roles == ["frontend"]) and
+    ((.hosts.karaka.capabilities | sort) == ["desktop", "docker", "monitoring_baseline"]) and
     (.hosts.mirach.exposure_tier == "lan_only") and
     (.hosts.mirach.service_roles == ["infra", "vm_host"])
   ' <<<"${inventory_json}" >/dev/null; then
@@ -257,7 +261,7 @@ validate_monitoring_inventory() {
     return 1
   fi
 
-  echo "  ✓ monitoring inventory export matches the current four-host fleet"
+  echo "  ✓ monitoring inventory export matches the current five-host fleet"
 }
 
 echo "Shell:"
