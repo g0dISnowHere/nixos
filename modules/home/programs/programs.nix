@@ -11,6 +11,9 @@
 
     zsh = {
       enable = true;
+      shellAliases = {
+        omp = "headroom wrap omp";
+      };
       initContent = ''
         # bun completions
         [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
@@ -27,6 +30,9 @@
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
+      settings = {
+        mux_delay = 60;
+      };
     };
 
     # thunderbird = {

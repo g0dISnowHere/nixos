@@ -50,6 +50,7 @@
         lt = "eza --tree --level=2 --group-directories-first";
         cat = "bat --style=plain --paging=never";
         c = "z";
+        omp = "headroom wrap omp";
       };
       histSize = 50000;
       # Prefer pnpm in interactive shells. Keep npm compatibility narrow so
@@ -135,7 +136,6 @@
           "docker"
           "docker-compose"
           "vscode"
-          "direnv"
         ];
         theme = "robbyrussell";
       };
