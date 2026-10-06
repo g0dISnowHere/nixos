@@ -21,6 +21,10 @@ Examples:
   than a public OpenSSH listener.
 - `alhena` imports base system behavior, WSL platform behavior, SSH server
   behavior, Tailscale client behavior, and Docker.
+  Its WSL environment cannot register the audit daemon PID, so the host disables
+  kernel audit configuration, `auditd`, and journald's audit subscription.
+  Ordinary journald logging and monitoring remain enabled; they do not replace
+  security audit events.
 
 ## Module Boundaries
 

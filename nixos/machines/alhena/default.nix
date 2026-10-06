@@ -24,11 +24,19 @@
 
   networking.hostName = hostname;
 
+  # Leave room for Tailscale encapsulation; the Windows WSL link uses MTU 1500.
+  networking.interfaces.eth0.mtu = 1500;
+
   wsl = {
     enable = true;
     defaultUser = "djoolz";
     startMenuLaunchers = true;
   };
+
+  # WSL exposes audit kernel support, but auditd cannot register its daemon PID.
+  security.audit.enable = lib.mkForce false;
+  security.auditd.enable = lib.mkForce false;
+  services.journald.audit = lib.mkForce false;
 
   # Hardware configuration for NVIDIA GPU support in containers
   hardware.nvidia-container-toolkit = {

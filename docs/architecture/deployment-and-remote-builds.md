@@ -43,6 +43,20 @@ A deployment launched from a target host skips that host because
 self-activation through its Tailscale hostname is refused. Update it locally
 with `sudo nixos-rebuild switch --flake .#<hostname>`.
 
+### Alhena WSL MTU
+
+Alhena sets its Linux `eth0` MTU to 1500, matching the Windows WSL virtual
+interface; `tailscale0` remains at 1280. An underlay MTU of 1280 caused
+packet-size-dependent loss: 1028-byte tunnel packets passed, but 1228- and
+1280-byte packets received no replies. ML-KEM SSH key exchange and deployment
+closure transfers stalled. Restoring `eth0` to 1500 made full-size tunnel
+packets and ML-KEM key exchange succeed.
+
+Check the affected path with `ping -M do -s 1252 -c 3 alhena`.
+The Curve25519 SSH setting avoids the large handshake but does not fix
+bulk-transfer packet loss.
+
+
 ## Implementation Map
 
 - `outputs.nix`: root `deploy` output and the independent-node `deploy-fleet` wrapper.
