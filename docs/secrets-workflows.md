@@ -214,3 +214,21 @@ Design healthy when all true:
 - `scripts/secrets validate-access --actor operator --host <host>` passes from
   a working operator machine
 - mutating workflows end with validation
+
+## Native Application Credentials
+
+Selected native application files use chezmoi templates that read sops-nix
+runtime secrets. Their encrypted artifacts remain under `secrets/users/djoolz/`
+and reuse `users.djoolz` policy membership:
+
+- `chezmoi.yaml`: GitHub CLI's native hosts file, including its exported token,
+  and OpenCode's native OpenRouter API-key auth file;
+- `orca-machine-presets.yaml`: four native credentialed machine presets;
+- `prusa-machine-presets.yaml`: native printer and physical-printer preset map.
+
+Runtime files belong to `djoolz:users`, mode `0400`; chezmoi renders private
+credential-bearing destinations at `0600`. Provisioning must precede apply.
+Never capture rendered files as plaintext source or decrypt credentials during
+Nix evaluation. GitHub keyring metadata alone is not a portable login.
+See the [chezmoi runbook](reference/chezmoi.md) for native capture boundaries,
+authentication checks and recovery.

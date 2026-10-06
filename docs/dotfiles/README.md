@@ -29,6 +29,11 @@ Common examples:
 Point of `dotfiles/`: keep editing smooth where direct file edit best. Home
 Manager links files into wider user env, not replace them all.
 
+Selected app-written settings now use a separate native chezmoi source rather
+than Home Manager links. Nix still owns packages, platform configuration and
+SOPS provisioning. See the [chezmoi runbook](../reference/chezmoi.md) for the
+allowlist, credential boundary, capture/apply workflow and inventory.
+
 ## Related Docs
 
 - [docs/architecture/home-manager-dotfiles-strategy.md](../architecture/home-manager-dotfiles-strategy.md)

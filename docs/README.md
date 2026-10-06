@@ -43,6 +43,7 @@ When new thing worth keeping:
 - `dev-templates.md`: local flake template workflow
 - `vps/`: VPS context, runbooks
 - `dotfiles/`: why `dotfiles/` exist, how fit repo
+- `reference/chezmoi.md`: native settings ownership, SOPS credentials, capture/apply, recovery and fleet inventory.
 - `findings/`: dated investigations
 - `future-ideas/`: drafts, proposals, backlog
 

@@ -40,6 +40,7 @@
     ./tailscale-subnet-router.nix
     ../../../modules/nixos/virtualisation/docker.nix
     ../../../modules/nixos/desktop/gnome.nix
+    ../../../modules/nixos/users/djoolz/printer-secrets.nix
     ../../../modules/nixos/flatpak/browsers.nix
     ../../../modules/nixos/flatpak/development.nix
     ../../../modules/nixos/flatpak/productivity.nix
