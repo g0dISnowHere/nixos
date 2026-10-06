@@ -14,6 +14,7 @@
     ../../../modules/nixos/services/flatpak.nix
     ../../../modules/nixos/desktop/gnome.nix
     ../../../modules/nixos/desktop/gnome-local-admin.nix
+    ../../../modules/nixos/users/djoolz/printer-secrets.nix
     ../../../modules/nixos/services/monitoring-baseline.nix
     ../../../modules/nixos/services/monitoring-alloy.nix
     ../../../modules/nixos/virtualisation/docker.nix

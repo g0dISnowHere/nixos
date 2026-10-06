@@ -41,6 +41,7 @@
     ../../../modules/nixos/virtualisation/docker.nix
     ../../../modules/nixos/desktop/gnome.nix
     ../../../modules/nixos/desktop/gnome-local-admin.nix
+    ../../../modules/nixos/users/djoolz/printer-secrets.nix
   ];
 
   networking.hostName = hostname;

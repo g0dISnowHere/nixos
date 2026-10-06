@@ -74,6 +74,19 @@ When deciding where thing lives, choose representation that keeps behavior
 clear and maintenance burden low. Architecture matters more than forcing one
 style everywhere.
 
+## App-Written Portable Settings
+
+Selected app-written files have a separate mutable chezmoi source in the private
+`g0dISnowHere/dotfiles` repository. Home Manager installs its tools and guarded
+user timer; sops-nix provisions credentials. Centauri captures and publishes plain
+files, while other hosts only receive revisions and preserve divergent local edits.
+
+This does not replace existing `dotfiles/` links or enroll whole application
+profiles. Credential-bearing native files use runtime-secret templates instead
+of plaintext Git capture. Each migrated destination loses its previous file owner.
+See the [chezmoi runbook](../reference/chezmoi.md) for the allowlist, active-app
+guards, synchronization checks and backup/recovery behavior.
+
 ## Related Files
 
 - [docs/dotfiles/README.md](../dotfiles/README.md)
