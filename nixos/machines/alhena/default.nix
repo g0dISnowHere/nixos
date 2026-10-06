@@ -1,7 +1,9 @@
 {
+  config,
   hostname,
   inputs,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -26,6 +28,23 @@
 
   # Leave room for Tailscale encapsulation; the Windows WSL link uses MTU 1500.
   networking.interfaces.eth0.mtu = 1500;
+
+  # WSL creates eth0 before NixOS starts; its MTU is not reapplied by the .link rule.
+  systemd.services.wsl-eth0-mtu = {
+    description = "Apply the WSL underlay MTU before Tailscale starts";
+    wantedBy = [ "multi-user.target" ];
+    requires = [ "sys-subsystem-net-devices-eth0.device" ];
+    after = [ "sys-subsystem-net-devices-eth0.device" ];
+    before = [
+      "network-pre.target"
+      "tailscaled.service"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.iproute2}/bin/ip link set dev eth0 mtu ${toString config.networking.interfaces.eth0.mtu}";
+    };
+  };
 
   wsl = {
     enable = true;

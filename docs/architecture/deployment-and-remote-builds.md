@@ -52,10 +52,22 @@ packet-size-dependent loss: 1028-byte tunnel packets passed, but 1228- and
 closure transfers stalled. Restoring `eth0` to 1500 made full-size tunnel
 packets and ML-KEM key exchange succeed.
 
+`networking.interfaces.eth0.mtu` alone generated a `.link` rule but did not
+preserve the MTU across a WSL instance restart. Alhena's `wsl-eth0-mtu.service`
+waits for the existing `eth0` device and applies that configured value before
+Tailscale starts. A WSL instance restart verified `eth0` at 1500, `tailscale0`
+at 1280, three full-size ping replies and a fresh SSH connection without a
+manual MTU adjustment.
+
+To verify a restart, check PID 1's start time and the service execution time:
+`ps -p 1 -o lstart=` and
+`systemctl show wsl-eth0-mtu.service -p ExecMainStartTimestamp -p Result`.
+WSL may retain the shared kernel, so an unchanged kernel boot ID does not
+mean the distribution's init was not restarted.
+
 Check the affected path with `ping -M do -s 1252 -c 3 alhena`.
 The Curve25519 SSH setting avoids the large handshake but does not fix
 bulk-transfer packet loss.
-
 
 ## Implementation Map
 
