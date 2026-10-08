@@ -6,17 +6,35 @@
   ...
 }:
 let
-  hostNames = [
-    "albaldah"
-    "alhena"
-    "centauri"
-    "karaka"
-    "mirach"
+  secretNames = [
+    "djoolz-gh-hosts"
+    "djoolz-opencode-auth"
+    "djoolz-orca-ender3-04"
+    "djoolz-orca-ender3-06"
+    "djoolz-orca-magicianx-04"
+    "djoolz-orca-magicianx-06"
+    "djoolz-prusa-presets"
   ];
-  enabled =
-    config.home.username == "djoolz"
-    && osConfig != null
-    && builtins.elem osConfig.networking.hostName hostNames;
+  declaredSecrets = if osConfig == null then { } else osConfig.sops.secrets or { };
+  expectedSecrets = builtins.filter (path: path != null) (
+    map (
+      name: if builtins.hasAttr name declaredSecrets then declaredSecrets.${name}.path else null
+    ) secretNames
+  );
+  githubHosts =
+    if builtins.hasAttr "djoolz-gh-hosts" declaredSecrets then
+      declaredSecrets."djoolz-gh-hosts".path
+    else
+      null;
+  enabled = config.home.username == "djoolz";
+  syncEnvironment =
+    lib.optionalAttrs (osConfig != null) {
+      CHEZMOI_EXPECTED_SECRETS = builtins.toJSON expectedSecrets;
+    }
+    // lib.optionalAttrs (githubHosts != null) {
+      CHEZMOI_GH_HOSTS = githubHosts;
+    };
+  quoteSystemd = value: "\"${builtins.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] value}\"";
   sync = pkgs.writeShellApplication {
     name = "chezmoi-sync";
     runtimeInputs = [
@@ -48,6 +66,7 @@ in
       };
       Service = {
         Type = "oneshot";
+        Environment = lib.mapAttrsToList (name: value: quoteSystemd "${name}=${value}") syncEnvironment;
         ExecStart = "${sync}/bin/chezmoi-sync";
       };
     };

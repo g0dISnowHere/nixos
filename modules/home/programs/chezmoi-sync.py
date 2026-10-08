@@ -17,7 +17,6 @@ import time
 import tomllib
 
 REMOTE = "https://github.com/g0dISnowHere/dotfiles.git"
-HOSTS = {"albaldah", "alhena", "centauri", "karaka", "mirach"}
 # These applications write their native configuration when running or exiting.
 WRITERS = {
     ".config/btop/": {"btop"},
@@ -45,6 +44,7 @@ SECRET_VALUE_PATTERN = re.compile(
     r"""refresh[_-]?token|oauth[_-]?token|password|secret|token)["']?[ \t]*[:=][ \t]*"""
     r"""(?:"([^"\r\n]*)"|'([^'\r\n]*)'|([^,\s#}\r\n]+))"""
 )
+
 
 def log(message):
     print(f"chezmoi-sync: {message}", flush=True)
@@ -81,7 +81,10 @@ def credential_env():
 
 def setup_auth_config(state_dir):
     global AUTH_CONFIG
-    secret = Path("/run/secrets/djoolz-gh-hosts")
+    secret_path = os.environ.get("CHEZMOI_GH_HOSTS")
+    if not secret_path:
+        return
+    secret = Path(secret_path)
     if not secret.is_file() or not os.access(secret, os.R_OK):
         raise RuntimeError("runtime GitHub credential file unavailable")
     AUTH_CONFIG = Path(tempfile.mkdtemp(prefix="gh-config-", dir=state_dir))
@@ -135,6 +138,7 @@ def clone_remote(destination):
         },
     )
 
+
 def chezmoi(source, *args, check=True, capture=True):
     return run(
         ["chezmoi", f"--source={source}", "--no-tty", *args],
@@ -147,13 +151,13 @@ def status(source):
     return git(source, "status", "--porcelain=v1", "--untracked-files=all").stdout
 
 
-
-
 def active_processes():
     return set(
-        run(["ps", "-u", str(os.getuid()), "-o", "comm="], check=True)
-        .stdout.splitlines()
+        run(
+            ["ps", "-u", str(os.getuid()), "-o", "comm="], check=True
+        ).stdout.splitlines()
     )
+
 
 def busy_targets(targets, processes):
     busy = []
@@ -170,19 +174,77 @@ def read_metadata(source):
         return tomllib.load(metadata)
 
 
-def targets_for(source, host, data):
-    names = list(data.get("sharedPaths", []))
-    if host in data.get("desktopHosts", []):
-        names.extend(data.get("desktopPaths", []))
-    return names
+def plain_targets(data):
+    return list(data.get("plainPaths", []))
 
 
-def source_target_map(source, targets):
+def secret_target_map(data):
+    targets = data.get("secretTargets", {})
+    if not isinstance(targets, dict):
+        raise RuntimeError("secretTargets must be a destination-to-paths map")
+    return targets
+
+
+def expected_secret_paths():
+    raw = os.environ.get("CHEZMOI_EXPECTED_SECRETS")
+    if raw is None:
+        return None
+    try:
+        declared = json.loads(raw)
+    except json.JSONDecodeError:
+        raise RuntimeError("CHEZMOI_EXPECTED_SECRETS is not valid JSON") from None
+    if not isinstance(declared, list) or any(
+        not isinstance(path, str) for path in declared
+    ):
+        raise RuntimeError("CHEZMOI_EXPECTED_SECRETS must be a JSON string array")
+    missing = [
+        path
+        for path in declared
+        if not os.path.isfile(path) or not os.access(path, os.R_OK)
+    ]
+    if missing:
+        raise RuntimeError(f"required runtime secrets unavailable ({len(missing)})")
+    return set(declared)
+
+
+def provisioned_secret_paths(data, expected):
+    dependencies = {
+        path
+        for paths in secret_target_map(data).values()
+        if isinstance(paths, list)
+        for path in paths
+        if isinstance(path, str)
+    }
+    if expected is not None:
+        unmatched = expected - dependencies
+        if unmatched:
+            raise RuntimeError(
+                "declared runtime secret paths do not match source dependencies"
+            )
+        return expected
+    return {
+        path
+        for path in dependencies
+        if os.path.isfile(path) and os.access(path, os.R_OK)
+    }
+
+
+def credential_targets(data, available_secrets):
+    return [
+        target
+        for target, dependencies in secret_target_map(data).items()
+        if isinstance(dependencies, list)
+        and dependencies
+        and all(path in available_secrets for path in dependencies)
+    ]
+
+
+def source_target_map(source, targets, *, include_templates=False):
     mapping = {}
     for target in targets:
         result = chezmoi(source, "source-path", str(Path.home() / target), check=False)
         if result.returncode:
-            continue
+            raise RuntimeError("declared managed target has no source entry")
         path = Path(result.stdout.strip())
         try:
             relative = (
@@ -192,20 +254,25 @@ def source_target_map(source, targets):
             )
         except ValueError:
             raise RuntimeError("chezmoi source path escapes its source directory")
-        # `.tmpl` sources and credential-bearing destinations are never captured.
-        if relative.endswith(".tmpl") or target in SENSITIVE_CAPTURE_TARGETS:
+        if (
+            relative.endswith(".tmpl") and not include_templates
+        ) or target in SENSITIVE_CAPTURE_TARGETS:
             continue
         mapping[relative] = target
     return mapping
 
 
 def is_credential_placeholder(value):
-    return isinstance(value, str) and re.fullmatch(
-        r"\$\{[A-Za-z_][A-Za-z0-9_]*\}|\$[A-Za-z_][A-Za-z0-9_]*|"
-        r"\{env:[A-Za-z_][A-Za-z0-9_]*\}",
-        value.strip(),
-        re.IGNORECASE,
-    ) is not None
+    return (
+        isinstance(value, str)
+        and re.fullmatch(
+            r"\$\{[A-Za-z_][A-Za-z0-9_]*\}|\$[A-Za-z_][A-Za-z0-9_]*|"
+            r"\{env:[A-Za-z_][A-Za-z0-9_]*\}",
+            value.strip(),
+            re.IGNORECASE,
+        )
+        is not None
+    )
 
 
 def contains_credential_fields(value):
@@ -297,13 +364,13 @@ def check_other_logins(targets):
         )
 
 
-
-
-def runtime_secret_paths(host, data):
-    paths = list(data.get("sharedSecrets", []))
-    if host in data.get("desktopHosts", []):
-        paths.extend(data.get("desktopSecrets", []))
-    return paths
+def runtime_secret_paths(data, available_secrets):
+    return [
+        path
+        for paths in secret_target_map(data).values()
+        for path in paths
+        if path in available_secrets
+    ]
 
 
 def credential_values(value):
@@ -322,7 +389,11 @@ def credential_values(value):
                     "token",
                 )
             ):
-                if isinstance(item, str) and item and not is_credential_placeholder(item):
+                if (
+                    isinstance(item, str)
+                    and item
+                    and not is_credential_placeholder(item)
+                ):
                     values.append(item.encode())
             values.extend(credential_values(item))
     elif isinstance(value, list):
@@ -336,9 +407,9 @@ def credential_values(value):
     return values
 
 
-def runtime_secret_values(host, data):
+def runtime_secret_values(data, available_secrets):
     values = []
-    for secret_path in runtime_secret_paths(host, data):
+    for secret_path in runtime_secret_paths(data, available_secrets):
         payload = Path(secret_path).read_bytes().strip()
         if not payload:
             continue
@@ -358,16 +429,6 @@ def runtime_secret_values(host, data):
 
 def contains_runtime_secret(contents, values):
     return any(value in contents for value in values)
-
-
-def check_secrets(host, data):
-    missing = [
-        path
-        for path in runtime_secret_paths(host, data)
-        if not os.path.isfile(path) or not os.access(path, os.R_OK)
-    ]
-    if missing:
-        raise RuntimeError(f"required runtime secrets unavailable ({len(missing)})")
 
 
 def check_auth():
@@ -398,15 +459,15 @@ def upstream(source):
     if ref.returncode:
         raise RuntimeError("source branch has no configured upstream")
     return ref.stdout.strip()
-def check_publisher_branch(source):
+
+
+def check_main_branch(source):
     branch = git(source, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
     if branch != "main":
-        raise RuntimeError("Centauri publisher must use the main branch")
+        raise RuntimeError("private source must use the main branch")
     if upstream(source) != "origin/main":
-        raise RuntimeError("Centauri publisher must track origin/main")
+        raise RuntimeError("private source must track origin/main")
     return "origin/main"
-
-
 
 
 def set_applied(state_file, revision):
@@ -470,11 +531,11 @@ def archive_unborn_source(source, state_dir):
 
 
 def main():
-    host = run(["hostname", "-s"]).stdout.strip().lower()
-    if host not in HOSTS or os.environ.get("USER") != "djoolz":
-        log("skip: unsupported host or user")
+    if os.environ.get("USER") != "djoolz":
+        log("skip: unsupported user")
         return 0
 
+    expected_secrets = expected_secret_paths()
     home = Path.home()
     state_dir = home / ".local/state/chezmoi-sync"
     state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -496,74 +557,216 @@ def main():
             clone_remote(str(source))
             log("cloned the private source after preserving the unborn local source")
     elif not source.exists():
-        if host == "centauri":
-            raise RuntimeError(
-                "Centauri source is absent; refusing to initialize its authority"
-            )
+        source.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         clone_remote(str(source))
         log("bootstrapped an absent source from the private remote")
     if not (source / ".git").exists():
         raise RuntimeError("source exists without Git metadata; preserving it")
-
     data = read_metadata(source)
-    targets = targets_for(source, host, data)
-    mapping = source_target_map(source, targets)
+    available_secrets = provisioned_secret_paths(data, expected_secrets)
+    plain = plain_targets(data)
+    credentials = credential_targets(data, available_secrets)
+    targets = list(dict.fromkeys(plain + credentials))
+    mapping = source_target_map(source, plain)
+    secret_mapping = source_target_map(source, credentials, include_templates=True)
     allowed_sources = set(mapping)
-    check_secrets(host, data)
     check_remote(source)
     check_auth()
     # A pre-existing, uncommitted source is user-owned state; never stash or clean it.
     if status(source):
         raise RuntimeError("source tree is dirty; refusing to modify it")
 
-    if host == "centauri":
-        git(source, "fetch", "origin")
-        origin_ref = check_publisher_branch(source)
-        head = git(source, "rev-parse", "HEAD").stdout.strip()
-        remote_head = git(source, "rev-parse", origin_ref).stdout.strip()
-        if git(
-            source,
-            "merge-base",
-            "--is-ancestor",
-            origin_ref,
-            "HEAD",
-            check=False,
-        ).returncode:
-            raise RuntimeError(
-                "origin/main is ahead of or diverged from Centauri; refusing incoming changes"
-            )
-
-        processes = active_processes()
-        runtime_secrets = runtime_secret_values(host, data)
-        candidates = []
-        for target in mapping.values():
-            destination = Path.home() / target
-            if (
-                target not in busy_targets([target], processes)
-                and destination.is_file()
-                and not destination.is_symlink()
-            ):
-                candidates.append((target, destination))
-        for _, destination in candidates:
-            check_capture_bytes(destination.read_bytes(), runtime_secrets)
-        for _, destination in candidates:
-            chezmoi(source, "re-add", str(destination))
-
-        changed = set(
-            git(source, "diff", "--name-only", "-z").stdout.rstrip("\0").split("\0")
+    git(source, "fetch", "origin")
+    remote_ref = check_main_branch(source)
+    head = git(source, "rev-parse", "HEAD").stdout.strip()
+    remote_head = git(source, "rev-parse", remote_ref).stdout.strip()
+    base_result = git(source, "merge-base", "HEAD", remote_ref, check=False)
+    if base_result.returncode:
+        raise RuntimeError("private source histories have no common base")
+    base = base_result.stdout.strip()
+    local_changes = set(
+        git(source, "diff", "--name-only", "-z", f"{base}..HEAD")
+        .stdout.rstrip("\0")
+        .split("\0")
+    ) - {""}
+    remote_changes = set(
+        git(source, "diff", "--name-only", "-z", f"{base}..{remote_ref}")
+        .stdout.rstrip("\0")
+        .split("\0")
+    ) - {""}
+    previous = marker.read_text(encoding="ascii").strip() if marker.exists() else None
+    if previous is not None:
+        for revision in (head, remote_ref):
+            if git(
+                source, "merge-base", "--is-ancestor", previous, revision, check=False
+            ).returncode:
+                raise RuntimeError("applied source marker is not in source history")
+        incoming_changes = set(
+            git(source, "diff", "--name-only", "-z", f"{previous}..{remote_ref}")
+            .stdout.rstrip("\0")
+            .split("\0")
         ) - {""}
-        if not changed:
-            if head != remote_head:
-                git(source, "push", "origin", check=True)
-                set_applied(marker, head)
-                log("published previously committed managed settings from Centauri")
-            else:
-                log("no managed plain-file changes to publish")
-            return 0
-        if not changed <= allowed_sources:
+    else:
+        incoming_changes = remote_changes
+
+    if not local_changes <= set(mapping):
+        raise RuntimeError(
+            "unpublished local commits contain non-host settings; preserving source"
+        )
+    if not incoming_changes <= allowed_sources:
+        raise RuntimeError(
+            "incoming update changes templates, scripts, metadata, or unexpected source entries"
+        )
+    if not remote_changes <= allowed_sources:
+        raise RuntimeError(
+            "remote update changes templates, scripts, metadata, or unexpected source entries"
+        )
+    local_targets = {mapping[path] for path in local_changes}
+    remote_targets = {mapping[path] for path in remote_changes if path in mapping}
+    if local_changes & remote_changes or local_targets & remote_targets:
+        raise RuntimeError(
+            "local and remote edits target the same managed setting; preserving both"
+        )
+    runtime_secrets = runtime_secret_values(data, available_secrets)
+    for source_file in sorted(local_changes):
+        local_file = source / source_file
+        if not local_file.is_file():
             raise RuntimeError(
-                "capture changed a template, script, metadata, or unexpected source entry"
+                "unpublished local change is not a plain file; preserving source"
             )
+        check_capture_bytes(local_file.read_bytes(), runtime_secrets)
+    for source_file in sorted(incoming_changes):
+        contents = git(source, "show", f"{remote_ref}:{source_file}").stdout
+        check_capture_bytes(contents.encode(), runtime_secrets)
+
+    bootstrap = previous is None
+    incoming_targets = {
+        (mapping | secret_mapping)[path]
+        for path in incoming_changes
+        if path in (mapping | secret_mapping)
+    }
+    target_states = {}
+    if bootstrap and head == remote_head:
+        target_states = {target: target_state(source, target) for target in targets}
+        apply_targets = [
+            target for target in targets if target_states[target] != "matches"
+        ]
+    else:
+        apply_targets = targets if bootstrap else sorted(incoming_targets)
+    processes = active_processes()
+    busy = busy_targets(apply_targets, processes)
+    if busy:
+        log(f"skip: affected application is running ({len(busy)} managed targets)")
+        return 0
+    check_other_logins(apply_targets)
+    sources_by_target = {
+        target: path for path, target in (mapping | secret_mapping).items()
+    }
+    preserved = 0
+    for target in apply_targets:
+        state = target_states.get(target)
+        if state is None:
+            state = target_state(source, target)
+            target_states[target] = state
+        if state != "diverged":
+            continue
+        destination = home / target
+        if (
+            previous is None
+            or target not in mapping.values()
+            or destination.is_symlink()
+        ):
+            preserved += 1
+            continue
+        original = git(
+            source, "rev-parse", f"{previous}:{sources_by_target[target]}", check=False
+        )
+        current = git(
+            source,
+            "hash-object",
+            "--no-filters",
+            "--",
+            str(destination),
+            check=False,
+        )
+        if (
+            original.returncode
+            or current.returncode
+            or original.stdout != current.stdout
+        ):
+            preserved += 1
+    if preserved:
+        raise RuntimeError(
+            f"native destinations differ from the incoming source; preserving local edits ({preserved})"
+        )
+    if head != remote_head:
+        if head == base:
+            git(source, "merge", "--ff-only", remote_ref)
+        else:
+            git(source, "merge", "--no-edit", remote_ref)
+
+    if apply_targets:
+        chezmoi(
+            source,
+            "apply",
+            "--",
+            str(home / "00-verified-backup.sh"),
+            capture=False,
+        )
+        result = chezmoi(
+            source,
+            "apply",
+            "--parent-dirs",
+            "--recursive=false",
+            "--exclude",
+            "scripts",
+            "--",
+            *[str(home / target) for target in apply_targets],
+            check=False,
+            capture=False,
+        )
+        if result.returncode:
+            raise RuntimeError(
+                "chezmoi apply failed; no force or source reset was attempted"
+            )
+
+    processes = active_processes()
+    candidates = []
+    for source_file, target in mapping.items():
+        destination = home / target
+        source_entry = source / source_file
+        try:
+            source_entry.resolve(strict=True).relative_to(source.resolve())
+        except (OSError, ValueError):
+            raise RuntimeError(
+                "managed plain source entry is missing or escapes source"
+            )
+        if not source_entry.is_file() or source_entry.is_symlink():
+            raise RuntimeError("managed plain source entry is not a regular file")
+        if (
+            target not in busy_targets([target], processes)
+            and destination.is_file()
+            and not destination.is_symlink()
+        ):
+            candidates.append((source_file, destination, source_entry))
+    captured = []
+    for source_file, destination, source_entry in candidates:
+        contents = destination.read_bytes()
+        check_capture_bytes(contents, runtime_secrets)
+        captured.append((source_file, source_entry, contents))
+    # Sync contents only; writing existing source entries preserves their paths and permissions.
+    for _, source_entry, contents in captured:
+        if source_entry.read_bytes() != contents:
+            source_entry.write_bytes(contents)
+
+    changed = set(
+        git(source, "diff", "--name-only", "-z").stdout.rstrip("\0").split("\0")
+    ) - {""}
+    if not changed <= set(mapping):
+        raise RuntimeError(
+            "capture changed a template, script, metadata, or unexpected source entry"
+        )
+    if changed:
         status_entries = git(
             source,
             "status",
@@ -595,135 +798,14 @@ def main():
         if staged != changed:
             raise RuntimeError("staging set differs from the audited capture set")
         git(source, "commit", "-m", "capture managed native settings", capture=False)
-        git(source, "push", "origin", check=True)
-        revision = git(source, "rev-parse", "HEAD").stdout.strip()
-        set_applied(marker, revision)
-        log("published managed plain-file changes from Centauri")
-        return 0
 
-    if git(source, "rev-parse", "--verify", "HEAD", check=False).returncode:
-        raise RuntimeError(
-            "uninitialized local source preserved; refusing bootstrap overwrite"
-        )
-
-    git(source, "fetch", "origin")
-    remote_ref = upstream(source)
-    head = git(source, "rev-parse", "HEAD").stdout.strip()
-    remote_head = git(source, "rev-parse", remote_ref).stdout.strip()
-    previous = marker.read_text(encoding="ascii").strip() if marker.exists() else None
-    bootstrap = previous is None
-    recovery = previous is not None and previous != head
-    if previous is not None and git(
-        source,
-        "merge-base",
-        "--is-ancestor",
-        previous,
-        remote_ref,
-        check=False,
-    ).returncode:
-        raise RuntimeError("applied source marker is not in remote history")
-    if git(
-        source,
-        "merge-base",
-        "--is-ancestor",
-        "HEAD",
-        remote_ref,
-        check=False,
-    ).returncode:
-        raise RuntimeError(
-            "private source is not a fast-forward; preserving local history"
-        )
-    if head == remote_head and previous == head:
-        log("skip: source revision already applied")
-        return 0
-
-    base = previous or head
-    changed = set(
-        git(source, "diff", "--name-only", "-z", f"{base}..{remote_ref}")
-        .stdout.rstrip("\0")
-        .split("\0")
-    ) - {""}
-    if not bootstrap and not changed <= allowed_sources:
-        raise RuntimeError(
-            "remote update changes templates, scripts, metadata, or unexpected source entries"
-        )
-    changed_targets = [mapping[path] for path in sorted(changed) if path in mapping]
-    if not bootstrap and len(changed_targets) != len(changed):
-        raise RuntimeError("remote update contains an unmanaged source change")
-    affected = targets if bootstrap or recovery else changed_targets
-
-    sources_by_target = {target: path for path, target in mapping.items()}
-    apply_targets = []
-    preserved = 0
-    for target in affected:
-        state = target_state(source, target)
-        if recovery and state == "diverged" and target in changed_targets:
-            original = git(
-                source, "rev-parse", f"{previous}:{sources_by_target[target]}", check=False
-            )
-            current = git(
-                source,
-                "hash-object",
-                "--no-filters",
-                "--",
-                str(home / target),
-                check=False,
-            )
-            if (
-                not original.returncode
-                and not current.returncode
-                and original.stdout == current.stdout
-            ):
-                state = "previous"
-        if state == "diverged":
-            preserved += 1
-        elif state in {"missing", "previous"} or (
-            state == "matches" and target in changed_targets and head != remote_head
-        ):
-            apply_targets.append(target)
-    if preserved:
-        raise RuntimeError(
-            f"native destinations differ from the current source; preserving local edits ({preserved})"
-        )
-
-    check_other_logins(apply_targets)
-    check_secrets(host, data)
-    check_auth()
-    processes = active_processes()
-    busy = busy_targets(apply_targets, processes)
-    if busy:
-        log(f"skip: affected application is running ({len(busy)} managed targets)")
-        return 0
-
-    if head != remote_head:
-        git(source, "merge", "--ff-only", remote_ref)
-    if apply_targets:
-        chezmoi(
-            source,
-            "apply",
-            "--",
-            str(home / "00-verified-backup.sh"),
-            capture=False,
-        )
-        result = chezmoi(
-            source,
-            "apply",
-            "--parent-dirs",
-            "--recursive=false",
-            "--exclude",
-            "scripts",
-            "--",
-            *[str(home / target) for target in apply_targets],
-            check=False,
-            capture=False,
-        )
-        if result.returncode:
-            raise RuntimeError(
-                "chezmoi apply failed; no force or source reset was attempted"
-            )
     revision = git(source, "rev-parse", "HEAD").stdout.strip()
+    if revision != remote_head or changed:
+        git(source, "push", "origin", check=True)
+        log("published managed plain-file changes")
+    else:
+        log("no managed plain-file changes to publish")
     set_applied(marker, revision)
-    log("applied the fast-forwarded private source")
     return 0
 
 

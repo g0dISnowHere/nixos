@@ -78,14 +78,25 @@ style everywhere.
 
 Selected app-written files have a separate mutable chezmoi source in the private
 `g0dISnowHere/dotfiles` repository. Home Manager installs its tools and guarded
-user timer; sops-nix provisions credentials. Centauri captures and publishes plain
-files, while other hosts only receive revisions and preserve divergent local edits.
+user timer; sops-nix provisions credentials. Every importing host receives the
+same managed plain-file targets. Secret templates are selected from each
+destination's declared runtime-secret dependencies, not a hostname or desktop
+registry. Unavailable undeclared optional credentials exclude only their own
+targets; a provisioned secret missing at runtime stops writes visibly. This does
+not erase credential files already rendered before provisioning is removed.
+Same-target collisions preserve both edits for manual reconciliation.
 
 This does not replace existing `dotfiles/` links or enroll whole application
-profiles. Credential-bearing native files use runtime-secret templates instead
-of plaintext Git capture. Each migrated destination loses its previous file owner.
-See the [chezmoi runbook](../reference/chezmoi.md) for the allowlist, active-app
-guards, synchronization checks and backup/recovery behavior.
+profiles. Each migrated destination loses its previous file owner. A newly
+configured host can bootstrap the private source on its first five-minute timer
+run, subject to authentication, app-writer guards, and conflict checks. See the
+[chezmoi runbook](../reference/chezmoi.md) for target ownership, secret selection,
+onboarding, synchronization checks, and backup/recovery behavior.
+
+On first enrollment, a native target already matching the fetched source is not
+rewritten; an active application on that unchanged target does not block other
+missing settings. A divergent native target stops onboarding before other writes
+or the applied-revision marker.
 
 ## Related Files
 
