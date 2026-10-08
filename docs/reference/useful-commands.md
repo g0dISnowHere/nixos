@@ -228,6 +228,17 @@ activating. It exits nonzero after all nodes have been attempted if any failed.
 `deploy-rs` activates each reachable target as `root`; automatic and magic
 rollback remain enabled. Do not pass `--remote-build`: that builds each profile
 on its target instead.
+After a successful confirmed activation, the wrapper also runs root GC on that
+target with `nix-collect-garbage --delete-older-than 30d`. Failed/rolled-back
+deployments skip GC; GC failures are reported without changing deployment
+success. Dry activation and boot-only deployments skip GC. External `--file`
+deployments enumerate nodes and read GC settings using deploy-rs' pinned
+no-flake evaluation transform.
+Single-target deployments must use the wrapper:
+
+```bash
+nix run .#deploy-rs -- .#<hostname>
+```
 
 First connection accepts each target's Tailscale SSH host key. Later key
 changes fail only that node until explicitly reviewed.
@@ -239,6 +250,8 @@ nix run .#deploy-fleet
 When launching from a deployment target, the wrapper skips that host because
 self-activation through its Tailscale hostname is refused. Update it locally
 with `sudo nixos-rebuild switch --flake .#<hostname>`.
+
+The normal weekly system garbage-collection timer remains enabled.
 
 ## Install `albaldah` With `nixos-anywhere`
 

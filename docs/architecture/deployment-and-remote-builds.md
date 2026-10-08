@@ -18,6 +18,32 @@ refuses self-SSH activation.
 The deployment machine evaluates and builds each profile locally, then
 deploy-rs copies the completed closure to its target. Do not pass deploy-rs
 `--remote-build`: that makes each deployment target build its own profile.
+After deploy-rs reports a successful, confirmed activation, `deploy-fleet` and
+the `deploy-rs` wrapper run `nix-collect-garbage --delete-older-than 30d`
+remotely as `root` on each fully confirmed target. For a multi-target
+`deploy-rs` invocation with `--rollback-succeeded false`, confirmed targets
+before a later failure are still collected. When deploy-rs reports that it is
+rolling back previously successful targets, the wrapper skips GC because those
+activations are being revoked. GC errors are reported separately and do not
+change the deployment result. Dry activation and boot-only deployments do not
+run GC. The existing weekly system GC timer remains enabled; this post-deployment
+cleanup is an additional pass.
+
+For a single target, use the wrapper rather than upstream deploy-rs directly:
+
+```bash
+nix run .#deploy-rs -- .#<hostname>
+```
+
+The `deploy-rs` wrapper preserves deploy-rs target, profile, group, and
+external-file selections. `deploy-fleet` also honors group filters and reads
+its node set from an external file when `--file` is selected. External `--file`
+node enumeration and GC settings use deploy-rs' pinned no-flake evaluation
+transform, including its profile-path derivation handling. Collection is based
+on deploy-rs profile build, activation, and confirmation events, so only fully
+confirmed selected targets are considered. `--ssh-user`, `--sudo`, `--ssh-opts`,
+and `--hostname` are used for the collector connection. GC failures remain
+nonfatal. Dry/boot deployments skip GC.
 
 ## Source Transfer Is Required
 
@@ -71,5 +97,5 @@ bulk-transfer packet loss.
 
 ## Implementation Map
 
-- `outputs.nix`: root `deploy` output and the independent-node `deploy-fleet` wrapper.
+- `outputs.nix`: root `deploy`, post-confirmation GC helper, and deployment wrappers.
 - `flake/lib.nix`: deploy-rs nodes, activation profiles, rollback policy, and target hostnames.
