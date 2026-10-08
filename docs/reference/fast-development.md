@@ -19,6 +19,28 @@ configuration. `direnv-instant` replaces that hook. When evaluation takes more
 than four seconds, it opens a multiplexer pane with direnv output; use Ctrl-C
 there to stop a stuck evaluation.
 
+## Linting and language servers
+
+`devenv shell` provides:
+
+| Language | Linters | Language server command |
+| --- | --- | --- |
+| Python | `ruff check .` | `pyright-langserver --stdio`, `ruff server` |
+| Shell | `shellcheck script.sh` | `bash-language-server start` |
+| Nix | `statix check .`, `deadnix --fail .` | `nixd` |
+
+Pyright provides Python type checking (`pyright`) and type-aware editor
+features; Ruff provides lint diagnostics and fixes. Configure your editor
+to launch these servers from the development shell.
+
+The root `pyproject.toml` configures Ruff lint rules and Pyright's basic type
+checking, and enables OMP's default Python server detection. Launch OMP from
+the direnv-enabled environment or with `devenv shell -- omp`; servers start
+lazily when Python, shell, or Nix code intelligence is requested.
+
+Existing repository-scoped shell and Nix checks remain available through
+`nix run .#shellcheckRepo` and `nix run .#nixlintRepo`.
+
 ## Repository-local codebase memory
 
 `codebase-memory-mcp` is provided by this repository's unstable `devenv`

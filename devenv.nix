@@ -9,11 +9,15 @@ in
     with pkgs;
     [
       python3
+      ruff
+      pyright
       nixpkgs-fmt
       statix
       deadnix
+      nixd
       markdownlint-cli
       shellcheck
+      bash-language-server
       codebase-memory-mcp
     ]
     ++ lib.optional (flakeLinterPkg != null) flakeLinterPkg
