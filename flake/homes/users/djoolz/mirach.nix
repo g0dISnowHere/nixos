@@ -1,9 +1,10 @@
-{ ... }:
+{ pkgs, ... }:
 {
   imports = [
+    ../../profiles/base.nix
+    ./personal.nix
     ../../../../modules/home/packages/fonts-and-docs.nix
-    ../../../../modules/home/packages/desktop-apps.nix
-    ../../../../modules/home/packages/maker-tools.nix
+    ../../../../modules/home/packages/server-tools.nix
     ../../../../modules/home/services/keyring-backup.nix
   ];
 

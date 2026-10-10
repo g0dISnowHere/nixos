@@ -6,7 +6,6 @@
     ../../../modules/nixos/system/home-manager.nix
     ../../../modules/nixos/system/ai-tools.nix
     ../../../modules/nixos/system/developer-tools.nix
-    ../../../modules/nixos/system/gui-developer-tools.nix
     ../../../modules/nixos/services/ssh-server.nix
     ../../../modules/nixos/services/tailscale-base.nix
     ../../../modules/nixos/services/tailscale-ssh.nix
@@ -14,6 +13,8 @@
     ../../../modules/nixos/services/tailscale-subnet-router.nix
     ../../../modules/nixos/services/flatpak.nix
     ../../../modules/nixos/desktop/gnome.nix
+    ../../../modules/nixos/desktop/gnome-local-admin.nix
+    ../../../modules/nixos/users/djoolz/printer-secrets.nix
     ../../../modules/nixos/services/monitoring-baseline.nix
     ../../../modules/nixos/services/monitoring-alloy.nix
     ../../../modules/nixos/virtualisation/docker.nix
@@ -50,6 +51,8 @@
     imports = [ ../../../flake/homes/users/djoolz/karaka.nix ];
     home.stateVersion = "24.05";
   };
+
+  services.flatpak.packages = lib.mkForce [];
 
   programs.appimage = {
     enable = true;

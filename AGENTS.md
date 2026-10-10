@@ -37,6 +37,10 @@
 - Keep `mkNixosSystem` and similar helpers as orchestration layers. Do not turn them into opaque policy hubs that hide where behavior comes from.
 
 ## Build, Test, and Development Commands
+- **Run only one Nix operation at a time.** Never overlap evaluation, flake
+  checks, builds, rebuilds, or deployments, including background jobs and
+  subagents. Wait for the current operation to terminate before starting
+  another. Concurrent Nix operations have crashed this server.
 - `sh setup.sh` configures git hooks and verifies the local Nix environment after cloning.
 - `git config core.hooksPath .githooks` enables the repository pre-commit hooks manually.
 - `devenv shell` enters the dev shell with formatting and linting tools.

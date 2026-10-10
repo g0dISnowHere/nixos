@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   hostname,
   ...
@@ -18,7 +19,6 @@
     ../../../modules/nixos/system/home-manager.nix
     ../../../modules/nixos/system/ai-tools.nix
     ../../../modules/nixos/system/developer-tools.nix
-    ../../../modules/nixos/system/gui-developer-tools.nix
     ../../../modules/nixos/services/zigbee2mqtt.nix
     # ../../../modules/nixos/services/audio.nix
     ../../../modules/nixos/services/firewall.nix # Firewall with port rules
@@ -40,9 +40,8 @@
     ./tailscale-subnet-router.nix
     ../../../modules/nixos/virtualisation/docker.nix
     ../../../modules/nixos/desktop/gnome.nix
-    ../../../modules/nixos/flatpak/browsers.nix
-    ../../../modules/nixos/flatpak/development.nix
-    ../../../modules/nixos/flatpak/productivity.nix
+    ../../../modules/nixos/desktop/gnome-local-admin.nix
+    ../../../modules/nixos/users/djoolz/printer-secrets.nix
   ];
 
   networking.hostName = hostname;
@@ -76,13 +75,12 @@
   ];
 
   home-manager.users.djoolz = {
-    imports = [
-      ../../../flake/homes/users/djoolz/base.nix
-      ../../../flake/homes/users/djoolz/gui-apps.nix
-    ];
+    imports = [ ../../../flake/homes/users/djoolz/mirach.nix ];
     # Do not change casually. See docs/architecture/state-version-reasons.md.
     home.stateVersion = "25.11";
   };
+
+  services.flatpak.packages = lib.mkForce [];
 
   programs.appimage = {
     enable = true;

@@ -1,7 +1,9 @@
 {
+  config,
   hostname,
   inputs,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -24,11 +26,62 @@
 
   networking.hostName = hostname;
 
+  # Leave room for Tailscale encapsulation; the Windows WSL link uses MTU 1500.
+  networking.interfaces.eth0.mtu = 1500;
+
+  # WSL creates eth0 before NixOS starts; its MTU is not reapplied by the .link rule.
+  systemd.services.wsl-eth0-mtu = {
+    description = "Apply the WSL underlay MTU before Tailscale starts";
+    wantedBy = [ "multi-user.target" ];
+    requires = [ "sys-subsystem-net-devices-eth0.device" ];
+    after = [ "sys-subsystem-net-devices-eth0.device" ];
+    before = [
+      "network-pre.target"
+      "tailscaled.service"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.iproute2}/bin/ip link set dev eth0 mtu ${toString config.networking.interfaces.eth0.mtu}";
+    };
+  };
+
+  # WSL can restore eth0's MTU to 1280 after resume. Reassert 1500 on only
+  # MTU-change notifications; this never takes the interface down.
+  systemd.services.alhena-eth0-mtu = {
+    description = "Restore Alhena WSL ethernet MTU after host reset";
+    wantedBy = [ "multi-user.target" ];
+    path = [
+      pkgs.coreutils
+      pkgs.iproute2
+    ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = "1s";
+    };
+    script = ''
+      ip monitor link dev eth0 | while IFS= read -r _; do
+        mtu="$(cat /sys/class/net/eth0/mtu)"
+        if [ "$mtu" != 1500 ]; then
+          ip link set dev eth0 mtu 1500
+        fi
+      done
+      echo "eth0 link monitor stopped" >&2
+      exit 1
+    '';
+  };
+
   wsl = {
     enable = true;
     defaultUser = "djoolz";
     startMenuLaunchers = true;
   };
+
+  # WSL exposes audit kernel support, but auditd cannot register its daemon PID.
+  security.audit.enable = lib.mkForce false;
+  security.auditd.enable = lib.mkForce false;
+  services.journald.audit = lib.mkForce false;
 
   # Hardware configuration for NVIDIA GPU support in containers
   hardware.nvidia-container-toolkit = {
