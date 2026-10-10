@@ -58,6 +58,18 @@ eval.
 Flatpak infra and Flatpak app sets stay separate. Host can enable Flatpak
 without inheriting personal desktop bundle. Headless hosts should not get
 Flatpaks through unrelated server behavior.
+Mirach and Karaka retain GNOME for local administration but omit consumer GNOME
+apps, GNOME Software, the GUI IDE bundle, and all Flatpak application packages.
+The `gnome-local-admin.nix` capability keeps core administration tools while
+excluding browser, media, communications, scanning, and other non-admin apps.
+Mirach uses `flake/homes/users/djoolz/mirach.nix`, which retains its original
+CLI packages (`esptool`, `libnotify`, `parted`, `syncthing`, and
+`wl-clipboard`) and replaces GUI `wireshark` with CLI-only `wireshark-cli`,
+retaining `tshark` and `dumpcap`, alongside fonts and keyring backup. Karaka
+retains its existing base user profile and Syncthing CLI. Both keep
+`developer-tools.nix`. Workstation profiles and their GUI application bundles
+remain unchanged.
+
 
 ## Home Manager Boundary
 
