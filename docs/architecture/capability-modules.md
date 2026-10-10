@@ -25,6 +25,8 @@ Examples:
   kernel audit configuration, `auditd`, and journald's audit subscription.
   Ordinary journald logging and monitoring remain enabled; they do not replace
   security audit events.
+  Windows executable interop reuses WSL's existing binfmt handler; NixOS does
+  not register another handler in WSL's protected registry.
 
 ## Module Boundaries
 

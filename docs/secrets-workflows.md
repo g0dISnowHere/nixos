@@ -192,6 +192,7 @@ Workflow useful now. Coherent v1 still needs:
 2. richer `doctor --fix` guidance for create, rotate, retire, and
    partial-verification states
 3. end-to-end live testing of the mutation flows on real machines
+4. optional generation of long random server secrets during `scripts/secrets create`, so operators do not manually generate or copy bootstrap secrets
 
 Current baseline already good enough here:
 

@@ -6,7 +6,8 @@ _: {
     docker-desktop.enable = true;
     interop = {
       includePath = true;
-      register = true;
+      # WSL owns the protected binfmt registry; reuse its Windows handler.
+      register = false;
     };
     ssh-agent.enable = true;
     startMenuLaunchers = true;
