@@ -12,10 +12,18 @@ policy.
 Examples:
 
 - `centauri` imports base system behavior, laptop power management, GNOME,
-  Tailscale client behavior, and rootless Docker. It also imports a credentialed
-  Pangolin Newt connector using a SOPS-managed environment file. Its service
-  starts after network-online; SOPS installs secrets through its activation
-  lifecycle, and a changed Newt template restarts the service.
+  Tailscale client behavior, the interactive Pangolin CLI user client, and a
+  credentialed Pangolin Newt connector. The CLI uses the reusable Home Manager
+  client capability at `modules/home/programs/pangolin-client.nix`; it sets
+  `up.prefer_local_routes` to true while preserving mutable CLI preferences and
+  login state. Import this capability only into profiles that use Pangolin as a
+  client, including headless profiles when enabled; a Newt connector alone is
+  not a Pangolin CLI client. This favors local routes when a local network and
+  a Pangolin remote route overlap; on Centauri's Wi-Fi, local traffic such as
+  DNS to `192.168.3.1` stays local rather than being sent through the remote
+  route. A separate Newt service uses this host's SOPS-managed environment
+  file. It starts after network-online; SOPS installs secrets through its
+  activation lifecycle, and a changed Newt template restarts the service.
 - `mirach` imports base system behavior, SSH server behavior, Tailscale router
   behavior, GNOME for local management, rootful Docker, and its own
   credentialed Pangolin Newt connector using a host-specific SOPS-managed file.
@@ -24,7 +32,15 @@ Examples:
   specifics. Remote administration is intended to use Tailscale SSH rather
   than a public OpenSSH listener.
 - `alhena` imports base system behavior, WSL platform behavior, SSH server
-  behavior, Tailscale client behavior, and Docker.
+  behavior, Tailscale client behavior, Docker, and a credentialed Pangolin
+  Newt connector using a host-specific SOPS-managed environment file. The
+  connector module is imported unconditionally but declares its secret and
+  service only when `secrets/services/pangolin-newt/alhena.yaml` exists; the
+  connector therefore remains disabled until its encrypted secret is
+  provisioned. The endpoint is not verified by nonsecret repository
+  configuration and must be confirmed before secret provisioning; the endpoint
+  and Newt credentials belong in that encrypted environment value, not in Nix
+  configuration.
   Its WSL environment cannot register the audit daemon PID, so the host disables
   kernel audit configuration, `auditd`, and journald's audit subscription.
   Ordinary journald logging and monitoring remain enabled; they do not replace

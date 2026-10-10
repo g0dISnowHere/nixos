@@ -5,7 +5,7 @@
   ...
 }:
 let
-  secretFile = ../../../secrets/services/pangolin/newt/centauri.yaml;
+  secretFile = ../../../secrets/services/pangolin-newt/centauri.yaml;
   hasSecret = builtins.pathExists secretFile;
 in
 lib.mkIf hasSecret {

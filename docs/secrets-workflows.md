@@ -67,6 +67,67 @@ scripts/secrets create --scope services.fleet-test --name example.env
 
 Preferred path for new managed secrets. Keeps file placement aligned with
 policy ownership.
+For a host-specific Pangolin Newt connector, use the existing
+`services.pangolin-newt` scope, which includes Alhena, Centauri, and Mirach.
+Create an encrypted service secret with:
+
+```bash
+scripts/secrets create --scope services.pangolin-newt --name alhena.yaml --template yaml
+```
+
+Set the `env` field to a YAML block scalar because each connector consumes it
+as a systemd `EnvironmentFile`:
+
+```yaml
+env: |
+  PANGOLIN_ENDPOINT=https://<host>[:port]
+  NEWT_ID=<id>
+  NEWT_SECRET=<secret>
+```
+
+Use only a Pangolin endpoint confirmed for this connector; the repository does
+not verify Alhena's endpoint. Replace every placeholder with the actual value
+in the secure editor opened by the script. Do not commit plaintext or
+placeholder credentials. The script writes the SOPS-encrypted result at
+`secrets/services/pangolin-newt/alhena.yaml`. Centauri and Mirach use
+`secrets/services/pangolin-newt/{centauri,mirach}.yaml`; each host's NixOS
+module consumes only its own file. The connector declaration is gated on that
+file existing.
+
+After the encrypted secret is in place, deploy the target NixOS configuration
+to activate its connector.
+
+### Encrypted Sources And Runtime Consumers
+
+The table distinguishes host access to an encrypted source from the service or
+module that consumes it. Every listed host has the shared `users/djoolz`
+password and chezmoi secrets. The `fleet-test/sops-test.yaml` source is only an
+access-validation fixture, not runtime service configuration; Karaka is
+intentionally excluded from that scope.
+
+| Host | Encrypted sources authorized for the host | Runtime consumer |
+| --- | --- | --- |
+| Albaldah | `users/djoolz/{password,chezmoi}.yaml`; `services/{crowdsec/console-enrollment-token.yaml,crowdsec/cti-api-key.yaml,litellm/secret.yaml,monitoring/alertmanager-smtp-password.yaml,monitoring/grafana-admin-password.yaml,pangolin/config.yaml,pangolin/site-albaldah.yaml,traefik/cloudflare-dns-token.yaml,traefik/crowdsec-lapi-key.yaml}`; `services/fleet-test/sops-test.yaml` (fixture) | Shared password and chezmoi system modules; CrowdSec module; Docker Compose secrets for LiteLLM, monitoring, Traefik, the Pangolin server config, and the Albaldah Pangolin site client. Fleet-test is validation-only. |
+| Alhena | `users/djoolz/{password,chezmoi}.yaml`; `services/pangolin-newt/alhena.yaml`; `services/fleet-test/sops-test.yaml` (fixture) | Shared password and chezmoi system modules; host-specific Pangolin Newt `EnvironmentFile`. Fleet-test is validation-only. |
+| Centauri | `users/djoolz/{password,chezmoi}.yaml`; `users/djoolz/{orca-machine-presets,prusa-machine-presets}.yaml`; `services/pangolin-newt/centauri.yaml`; `services/fleet-test/sops-test.yaml` (fixture) | Shared password and chezmoi system modules; printer preset secrets; host-specific Pangolin Newt `EnvironmentFile`. Fleet-test is validation-only. |
+| Karaka | `users/djoolz/{password,chezmoi}.yaml`; `users/djoolz/{orca-machine-presets,prusa-machine-presets}.yaml`; `machines/karaka/pangolin-newt.yaml` | Shared password and chezmoi system modules; printer preset secrets; host-specific Pangolin Newt `EnvironmentFile`. No fleet-test access. |
+| Mirach | `users/djoolz/{password,chezmoi}.yaml`; `users/djoolz/{orca-machine-presets,prusa-machine-presets}.yaml`; `services/pangolin-newt/mirach.yaml`; `services/fleet-test/sops-test.yaml` (fixture) | Shared password and chezmoi system modules; printer preset secrets; host-specific Pangolin Newt `EnvironmentFile`. Fleet-test is validation-only. |
+
+The fleet-test policy also includes Albaldah, Alhena, Centauri, and Mirach.
+Printer preset files are only consumed on Centauri, Mirach, and Karaka even
+though they are files in the shared user scope.
+Pangolin Newt connector credentials (`NEWT_ID`/`NEWT_SECRET`) are distinct
+from the Albaldah Pangolin site client's `SITE_ID`/`SITE_SECRET`; keep these
+identities in their host-appropriate service sources.
+
+`services.pangolin` is limited to Albaldah's server/site-client inputs;
+`services.pangolin-newt` covers the Alhena, Centauri, and Mirach connectors.
+Karaka's connector remains in its host-only `machines/karaka` scope.
+For Albaldah, `services/pangolin/config.yaml` is the complete Pangolin server
+configuration mounted read-only at `/app/config/config.yml`; its NixOS secret
+declaration consumes the whole YAML document, not a single field.
+`services/pangolin/site-albaldah.yaml` has a top-level `env` block scalar with
+`SITE_ID` and `SITE_SECRET`, rendered as the site client's `EnvironmentFile`.
 
 ### Add A Host
 

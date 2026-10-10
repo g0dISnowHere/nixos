@@ -421,8 +421,5 @@ These files matter right now:
 - [scripts/ssh-pubkey-to-age.sh](../scripts/ssh-pubkey-to-age.sh)
 - [modules/nixos/system/secrets.nix](../modules/nixos/system/secrets.nix)
 
-Before broader use, you still need to:
-
-- add real named service scopes under `secrets/services/`
-- create additional encrypted files under `secrets/`
-- wire each real secret into the owning module
+For the current per-host encrypted-source access and runtime-consumer inventory,
+see [Encrypted Sources And Runtime Consumers](../docs/secrets-workflows.md#encrypted-sources-and-runtime-consumers).

@@ -51,6 +51,19 @@
           "mirach"
         ];
       };
+      litellm = {
+        hosts = [ "albaldah" ];
+      };
+      pangolin = {
+        hosts = [ "albaldah" ];
+      };
+      pangolin-newt = {
+        hosts = [
+          "alhena"
+          "centauri"
+          "mirach"
+        ];
+      };
       nextcloud-aio = {
         hosts = [ "albaldah" ];
       };

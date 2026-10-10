@@ -83,3 +83,32 @@ does not affect the CPU passthrough warning.
 Operational notes and documented-only mitigation/test options live in:
 
 - `docs/findings/2026-05-21-mirach-enp0s25-hang-diagnostics.md`
+
+## Pangolin Exit-Node Connector
+
+Mirach's existing Pangolin Newt connector uses the SOPS-managed credentials in
+`nixos/machines/mirach/pangolin-newt.nix`; keep that site identity and service
+configuration unchanged. The connector uses `pkgs.fosrl-newt`, matching the
+shared Newt CLI package, so its version follows the repository's nixpkgs input
+updates rather than a host-specific source pin.
+
+To apply the connector update from this NixOS checkout:
+
+```bash
+sudo nixos-rebuild switch --flake .#mirach
+```
+
+After the service is online, configure the exit node in the Pangolin dashboard:
+
+1. Open **Resources** and create a **Private Resource**.
+2. Set its mode to **Exit Node**. Select Mirach's existing Newt site,
+   `unequaled-long-nosed-snake`, and grant the existing **Member** role access.
+3. Do not set a destination: an exit-node resource routes the IPv4 default
+   route (`0.0.0.0/0`). Pangolin exit nodes currently route IPv4 only; IPv6
+   traffic is not carried through this exit node.
+
+Pangolin's [exit-node guide](https://docs.pangolin.net/manage/resources/private/exit-node)
+documents private-resource setup and IPv4-only routing. No client has been
+selected to use this exit node as part of this change. Runtime verification on
+Mirach remains outstanding: SSH authentication was refused, so the connector
+was not deployed or checked live.

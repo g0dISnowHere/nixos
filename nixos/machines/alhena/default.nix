@@ -22,6 +22,7 @@
     ../../../modules/nixos/services/tailscale-base.nix
     ../../../modules/nixos/services/tailscale-ssh.nix
     ../../../modules/nixos/virtualisation/docker.nix
+    ./pangolin-newt.nix
   ];
 
   networking.hostName = hostname;

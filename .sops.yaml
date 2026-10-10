@@ -39,6 +39,14 @@ creation_rules:
           - *centauri
           - *mirach
 
+  - path_regex: ^secrets/services/litellm/.*\.(yaml|yml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *djoolz_1
+          - *djoolz_2
+          - *albaldah
+
   - path_regex: ^secrets/services/monitoring/.*\.(yaml|yml|json|env|ini)$
     key_groups:
       - age:
@@ -54,6 +62,24 @@ creation_rules:
           - *djoolz_1
           - *djoolz_2
           - *albaldah
+
+  - path_regex: ^secrets/services/pangolin/.*\.(yaml|yml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *djoolz_1
+          - *djoolz_2
+          - *albaldah
+
+  - path_regex: ^secrets/services/pangolin-newt/.*\.(yaml|yml|json|env|ini)$
+    key_groups:
+      - age:
+          - *djoolz
+          - *djoolz_1
+          - *djoolz_2
+          - *alhena
+          - *centauri
+          - *mirach
 
   - path_regex: ^secrets/services/traefik/.*\.(yaml|yml|json|env|ini)$
     key_groups:
