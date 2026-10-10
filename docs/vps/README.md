@@ -39,3 +39,4 @@ findings. Files here describe VPS as work area, not only one host definition.
 - [../reference/crowdsec-commands.md](../reference/crowdsec-commands.md)
 - [secret-rotation-checklist-2026-03-28.md](secret-rotation-checklist-2026-03-28.md)
 - [strato-vps/README.md](strato-vps/README.md)
+- [../reference/strato-vnc.md](../reference/strato-vnc.md)

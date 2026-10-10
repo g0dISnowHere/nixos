@@ -14,3 +14,4 @@ Current entries:
 - `flake-linter.md`
 - `fast-development.md`
 - `log-search.md`
+- `strato-vnc.md`
