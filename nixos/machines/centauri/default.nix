@@ -33,6 +33,7 @@
     ../../../modules/nixos/services/mosh.nix
     ../../../modules/nixos/services/tailscale-base.nix
     ../../../modules/nixos/services/tailscale-ssh.nix
+    ../../../modules/nixos/services/tailscale-alhena-pmtu.nix
     ../../../modules/nixos/system/albaldah-builder.nix
     ../../../modules/nixos/services/avahi-discovery.nix
     ../../../modules/nixos/virtualisation/docker.nix
