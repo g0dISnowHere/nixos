@@ -28,6 +28,17 @@ Examples:
   Windows executable interop reuses WSL's existing binfmt handler; NixOS does
   not register another handler in WSL's protected registry.
 
+Centauri and Albaldah also import
+`modules/nixos/services/tailscale-alhena-pmtu.nix`. It listens for IPv4 route
+updates and reapplies a locked 1216-byte MTU only to Alhena's table-52 route,
+while leaving `tailscale0` at 1280 for IPv6. Alhena's machine configuration
+keeps the boot-time `eth0` MTU at 1500 and monitors link changes to restore it
+after WSL resets the virtual NIC.
+
+These are source-level lifecycle handlers, not proof that a machine has
+activated them. They take effect only after the matching NixOS generation is
+activated; the currently active host generation may still lack them.
+
 ## Module Boundaries
 
 - `modules/nixos/system/`: platform and baseline system behavior like
@@ -71,7 +82,6 @@ retaining `tshark` and `dumpcap`, alongside fonts and keyring backup. Karaka
 retains its existing base user profile and Syncthing CLI. Both keep
 `developer-tools.nix`. Workstation profiles and their GUI application bundles
 remain unchanged.
-
 
 ## Home Manager Boundary
 

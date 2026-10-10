@@ -46,6 +46,32 @@
     };
   };
 
+  # WSL can restore eth0's MTU to 1280 after resume. Reassert 1500 on only
+  # MTU-change notifications; this never takes the interface down.
+  systemd.services.alhena-eth0-mtu = {
+    description = "Restore Alhena WSL ethernet MTU after host reset";
+    wantedBy = [ "multi-user.target" ];
+    path = [
+      pkgs.coreutils
+      pkgs.iproute2
+    ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = "1s";
+    };
+    script = ''
+      ip monitor link dev eth0 | while IFS= read -r _; do
+        mtu="$(cat /sys/class/net/eth0/mtu)"
+        if [ "$mtu" != 1500 ]; then
+          ip link set dev eth0 mtu 1500
+        fi
+      done
+      echo "eth0 link monitor stopped" >&2
+      exit 1
+    '';
+  };
+
   wsl = {
     enable = true;
     defaultUser = "djoolz";

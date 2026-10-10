@@ -19,6 +19,7 @@
     ../../../modules/nixos/services/crowdsec.nix
     ../../../modules/nixos/services/tailscale-base.nix
     ../../../modules/nixos/services/tailscale-ssh.nix
+    ../../../modules/nixos/services/tailscale-alhena-pmtu.nix
     ../../../modules/nixos/services/tailscale-exit-node.nix
     ../../../modules/nixos/services/tailscale-subnet-router.nix
     ../../../modules/nixos/virtualisation/docker.nix
