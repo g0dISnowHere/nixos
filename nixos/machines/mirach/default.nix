@@ -42,6 +42,7 @@
     ../../../modules/nixos/desktop/gnome.nix
     ../../../modules/nixos/desktop/gnome-local-admin.nix
     ../../../modules/nixos/users/djoolz/printer-secrets.nix
+    ./pangolin-newt.nix
   ];
 
   networking.hostName = hostname;

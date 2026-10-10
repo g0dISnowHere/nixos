@@ -12,9 +12,13 @@ policy.
 Examples:
 
 - `centauri` imports base system behavior, laptop power management, GNOME,
-  Tailscale client behavior, and rootless Docker.
+  Tailscale client behavior, and rootless Docker. It also imports a credentialed
+  Pangolin Newt connector using a SOPS-managed environment file. Its service
+  starts after network-online; SOPS installs secrets through its activation
+  lifecycle, and a changed Newt template restarts the service.
 - `mirach` imports base system behavior, SSH server behavior, Tailscale router
-  behavior, GNOME for local management, and rootful Docker.
+  behavior, GNOME for local management, rootful Docker, and its own
+  credentialed Pangolin Newt connector using a host-specific SOPS-managed file.
 - `albaldah` imports base system behavior, VS Code remote-session support,
   CrowdSec, Tailscale router behavior, rootful Docker, and VPS disk/network
   specifics. Remote administration is intended to use Tailscale SSH rather

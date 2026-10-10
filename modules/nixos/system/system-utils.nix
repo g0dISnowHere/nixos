@@ -12,6 +12,7 @@
     ldns
     aria2
     socat
+    fosrl-newt
     clinfo
     elfinfo
     nmap

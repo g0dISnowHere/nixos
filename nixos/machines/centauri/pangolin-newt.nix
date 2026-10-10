@@ -21,16 +21,13 @@ lib.mkIf hasSecret {
     path = "/run/secrets/pangolin/newt.env";
     owner = "root";
     content = config.sops.placeholder."pangolin-newt-env";
+    restartUnits = [ "pangolin-newt.service" ];
   };
 
   systemd.services.pangolin-newt = {
     description = "Pangolin Newt connector";
     wants = [ "network-online.target" ];
-    requires = [ "sops-install-secrets.service" ];
-    after = [
-      "network-online.target"
-      "sops-install-secrets.service"
-    ];
+    after = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       EnvironmentFile = "/run/secrets/pangolin/newt.env";

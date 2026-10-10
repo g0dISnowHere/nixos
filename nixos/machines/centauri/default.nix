@@ -45,6 +45,7 @@
     ../../../modules/nixos/flatpak/media.nix
     ../../../modules/nixos/flatpak/messaging.nix
     ../../../modules/nixos/flatpak/productivity.nix
+    ./pangolin-newt.nix
   ];
 
   # Bootloader.
